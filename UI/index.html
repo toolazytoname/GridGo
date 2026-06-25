@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Focal — OKR 人生规划</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:oklch(99% 0.002 240);--surface:oklch(100% 0 0);--fg:oklch(18% 0.012 250);--muted:oklch(54% 0.012 250);--border:oklch(92% 0.005 250);--accent:oklch(58% 0.18 255);--font:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif}
+    html{height:100%}
+    body{font-family:var(--font);background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;-webkit-font-smoothing:antialiased}
+    .logo{font-size:32px;font-weight:700;letter-spacing:-.04em;margin-bottom:8px}
+    .logo span{color:var(--accent)}
+    .tagline{font-size:16px;color:var(--muted);margin-bottom:48px;text-align:center}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;width:100%;max-width:800px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;text-decoration:none;color:var(--fg);transition:all .2s;display:flex;flex-direction:column;gap:8px}
+    .card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.06)}
+    .card-icon{font-size:32px;margin-bottom:4px}
+    .card-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+    .card-desc{font-size:12px;color:var(--muted);line-height:1.5}
+    .card-badge{display:inline-flex;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:600;background:oklch(94% 0.008 255);color:var(--accent);margin-top:4px;width:fit-content}
+    .card-badge.android{background:oklch(94% 0.008 145);color:var(--success)}
+    .card-badge.web{background:oklch(94% 0.008 45);color:oklch(60% 0.16 45)}
+    .card-badge.widget{background:oklch(94% 0.008 240);color:var(--muted)}
+    .footer{font-size:11px;color:var(--muted);margin-top:48px}
+    .footer a{color:var(--muted);text-decoration:none}
+    .footer a:hover{color:var(--fg)}
+  </style>
+</head>
+<body>
+  <div class="logo">Focal<span>.</span></div>
+  <p class="tagline">OKR 目标管理 · 艾森豪威尔矩阵 · 甘特图 · 日历</p>
+
+  <div class="grid">
+    <a href="landing.html" class="card">
+      <div class="card-icon">🌐</div>
+      <div class="card-title">营销落地页</div>
+      <div class="card-desc">产品介绍、功能亮点、平台支持、品牌形象</div>
+      <span class="card-badge">Web</span>
+    </a>
+    <a href="app.html" class="card">
+      <div class="card-icon">📊</div>
+      <div class="card-title">主应用 — 响应式</div>
+      <div class="card-desc">四象限矩阵 · OKR 列表 · 甘特图 · 日历 · 成就中心</div>
+      <span class="card-badge">Responsive Web</span>
+    </a>
+    <a href="mobile-ios.html" class="card">
+      <div class="card-icon">📱</div>
+      <div class="card-title">iOS 原生应用</div>
+      <div class="card-desc">iPhone 15 Pro 框架 · 四象限 · 列表 · 日历 · 成就</div>
+      <span class="card-badge android">iOS</span>
+    </a>
+    <a href="mobile-android.html" class="card">
+      <div class="card-icon">🤖</div>
+      <div class="card-title">Android 原生应用</div>
+      <div class="card-desc">Pixel 8 Pro 框架 · 四象限 · 列表 · 日历 · 成就</div>
+      <span class="card-badge android">Android</span>
+    </a>
+    <a href="widgets.html" class="card">
+      <div class="card-icon">🧩</div>
+      <div class="card-title">OS 组件</div>
+      <div class="card-desc">iOS WidgetKit (Small/Medium/Large) · Android Glance · Live Activity</div>
+      <span class="card-badge widget">Widgets</span>
+    </a>
+  </div>
+
+  <div class="footer">
+    Focal — 用目标驱动每一天 &nbsp;·&nbsp; <a href="app.html">打开应用</a>
+  </div>
+</body>
+</html>
