@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "mobile-ios.html",
+  "entry": "mobile-ios.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-06-24T12:52:02.872Z",
+  "updatedAt": "2026-06-24T12:52:02.872Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

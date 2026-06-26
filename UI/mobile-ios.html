@@ -1,95 +1,142 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Focal iOS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>格行 GridGo · iOS</title>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:oklch(99% 0.002 240);--surface:oklch(100% 0 0);--fg:oklch(18% 0.012 250);--muted:oklch(54% 0.012 250);--border:oklch(92% 0.005 250);--accent:oklch(58% 0.18 255);--success:oklch(70% 0.16 145);--warning:oklch(70% 0.16 45);--font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif}
-    html,body{font-family:var(--font);background:#000;height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg:oklch(99% 0.002 240);--surface:oklch(100% 0 0);--surface-warm:oklch(98% 0.003 240);
+      --fg:oklch(18% 0.012 250);--fg-2:oklch(28% 0.012 250);--muted:oklch(54% 0.012 250);--meta:oklch(72% 0.008 250);
+      --border:oklch(92% 0.005 250);--border-soft:oklch(95% 0.004 250);
+      --accent:oklch(58% 0.18 255);--accent-hover:oklch(52% 0.19 255);--accent-active:oklch(46% 0.20 255);
+      --success:oklch(70% 0.16 145);--warning:oklch(70% 0.16 45);--danger:oklch(65% 0.20 25);
+      --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',system-ui,sans-serif;
+      --font-body:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',system-ui,sans-serif;
+      --font-mono:'SF Mono',ui-monospace,'JetBrains Mono',Menlo,monospace;
+      --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+      --ease-ios:cubic-bezier(0.32,0.72,0,1);
+    }
+    html,body{font-family:var(--font-body);background:#000;height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
     .phone-wrap{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
     .device{position:relative;width:390px;height:844px;border-radius:56px;padding:12px;background:linear-gradient(160deg,#2a2a2c,#1a1a1c,#0e0e10);isolation:isolate;box-shadow:0 28px 60px -12px rgba(0,0,0,.45)}
     .island{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:124px;height:36px;background:#000;border-radius:999px;z-index:5}
     .screen{position:relative;width:100%;height:100%;background:#fafaf7;border-radius:44px;overflow:hidden;display:flex;flex-direction:column}
-    .statusbar{flex:0 0 47px;padding:18px 26px 0;display:flex;align-items:flex-start;justify-content:space-between;font-size:15px;font-weight:600;color:#1a1916}
+    /* ── Status Bar (iOS 17) ── */
+    .statusbar{flex:0 0 47px;padding:18px 26px 0;display:flex;align-items:flex-start;justify-content:space-between;font-size:15px;font-weight:600;color:#1a1916;pointer-events:none}
     .statusbar .right{display:inline-flex;align-items:center;gap:6px}
     .statusbar svg{width:17px;height:11px;fill:currentColor}
-    .app-body{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
-    .app-topbar{display:flex;align-items:center;padding:12px 20px;gap:10px;background:#fafaf7;border-bottom:1px solid var(--border)}
-    .app-logo{font-size:18px;font-weight:700;letter-spacing:-.03em}
-    .app-logo span{color:var(--accent)}
+    /* ── App Body ── */
+    .app-body{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
+    .app-topbar{display:flex;align-items:center;padding:10px 20px 8px;gap:10px;background:#fafaf7}
+    .app-logo-img{height:24px;width:24px;display:block}
     .okr-chip{flex:1;display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--border);font-size:12px;font-weight:500;cursor:pointer}
     .okr-chip svg{width:12px;height:12px;color:var(--muted)}
-    .view-body{flex:1;overflow-y:auto;padding:16px}
-    /* Matrix */
+    .topbar-btn{width:30px;height:30px;border-radius:8px;background:transparent;border:none;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+    .topbar-btn svg{width:16px;height:16px}
+    .topbar-btn:active{background:oklch(94% 0.005 240)}
+    .view-body{flex:1;overflow-y:auto;padding:0 0 100px}
+    /* ── Sub-tabs (二级 Tab) ── */
+    .m-subtabs{display:flex;gap:0;padding:0 16px;background:rgba(250,250,247,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:5}
+    .m-subtabs::-webkit-scrollbar{display:none}
+    .m-subtab{padding:9px 12px;font-size:12px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .15s}
+    .m-subtab.active{color:var(--fg);border-bottom-color:var(--accent);font-weight:600}
+    .m-subview{display:none;padding:14px 16px 20px;animation:subIn 240ms var(--ease-ios) both}
+    .m-subview.active{display:block}
+    @keyframes subIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    /* ── Matrix ── */
     .eq2grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .eq2{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;min-height:130px;display:flex;flex-direction:column}
+    .eq2{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;min-height:130px;display:flex;flex-direction:column;overflow:hidden}
     .eq2.q1{border-top:2px solid var(--accent)}.eq2.q2{border-top:2px solid var(--success)}.eq2.q3{border-top:2px solid var(--warning)}.eq2.q4{border-top:2px solid var(--muted)}
     .eq2h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
     .eq2l{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
     .eq2c{font-size:9px;font-weight:600;color:var(--muted);background:var(--bg);padding:1px 5px;border-radius:999px}
     .eq2t{display:flex;flex-direction:column;gap:4px;flex:1;overflow:hidden}
-    .eq2item{display:flex;align-items:flex-start;gap:6px;padding:6px 8px;border-radius:7px;background:var(--bg);cursor:pointer}
-    .eq2ck{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;cursor:pointer;display:grid;place-items:center;transition:all .12s}
+    .eq2item{display:flex;align-items:flex-start;gap:6px;padding:6px 8px;border-radius:7px;background:var(--bg);cursor:pointer;transition:background-color .15s}
+    .eq2item:active{background:oklch(94% 0.005 240)}
+    .eq2ck{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;cursor:pointer;display:grid;place-items:center;transition:all .15s var(--ease-spring)}
+    .eq2ck:active{transform:scale(.85)}
     .eq2ck.done{background:var(--success);border-color:var(--success)}
     .eq2ck.done::after{content:'';width:5px;height:5px;background:#fff;border-radius:50%}
     .eq2item-title{font-size:11px;font-weight:500;color:var(--fg);line-height:1.35}
     .eq2item-title.done{text-decoration:line-through;color:var(--muted)}
     .eq2tag{font-size:9px;font-weight:600;color:var(--accent);background:oklch(94% 0.008 255);padding:1px 5px;border-radius:3px;margin-top:2px;display:inline-block}
-    /* List */
+    /* ── List (树状) ── */
     .okr-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+    .okr-card .row-body{flex-direction:column;align-items:stretch;gap:0}
     .okr-h{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
     .okr-exp{width:18px;height:18px;display:grid;place-items:center;color:var(--muted);transition:transform .2s;flex-shrink:0}
     .okr-exp.open{transform:rotate(90deg)}
     .okr-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-    .okr-n{font-size:13px;font-weight:600;color:var(--fg);flex:1}
+    .okr-n{font-size:13px;font-weight:600;color:var(--fg);flex:1;line-height:1.3}
     .okr-pbar{flex:0 0 60px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
     .okr-pfill{height:100%;border-radius:2px;background:var(--accent);transition:width .3s}
-    .okr-pl{font-size:10px;font-weight:600;color:var(--muted)}
-    .kr-body{display:none;padding:0 14px 12px 46px}
+    .okr-pl{font-size:10px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+    .kr-body{display:none;padding:0 14px 10px 38px;border-left:1.5px solid var(--border);margin-left:18px}
     .kr-body.open{display:block}
-    .kr-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+    .kr-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer}
     .kr-row:last-child{border-bottom:none}
-    .kr-ck{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;cursor:pointer;display:grid;place-items:center}
+    .kr-ck{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;cursor:pointer;display:grid;place-items:center;transition:all .15s var(--ease-spring)}
+    .kr-ck:active{transform:scale(.85)}
     .kr-ck.done{background:var(--success);border-color:var(--success)}
     .kr-ck.done::after{content:'';width:6px;height:6px;background:#fff;border-radius:50%}
-    .kr-tx{font-size:12px;color:var(--fg);flex:1}
+    .kr-tx{font-size:12px;color:var(--fg);flex:1;line-height:1.4}
     .kr-tx.done{text-decoration:line-through;color:var(--muted)}
     .kr-tag{font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px}
     .kr-tag.q1{background:oklch(94% 0.008 255);color:var(--accent)}
     .kr-tag.q2{background:oklch(94% 0.008 145);color:var(--success)}
-    /* Calendar */
+    .kr-tag.q3{background:oklch(94% 0.008 45);color:var(--warning)}
+    /* ── iOS Swipe Action (iOS 13+) ── */
+    .swipe-row{position:relative;overflow:hidden}
+    .swipe-row .row-body{background:var(--surface);transition:transform .25s var(--ease-ios);position:relative;z-index:2;display:flex;align-items:flex-start;gap:6px;width:100%}
+    .swipe-row.swiped .row-body{transform:translateX(-80px)}
+    .swipe-actions{position:absolute;top:0;right:0;bottom:0;width:80px;display:none}
+    .swipe-row.swiped .swipe-actions{display:flex}
+    .swipe-act{flex:1;background:var(--danger);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:600;cursor:pointer;border:none}
+    /* ── Calendar ── */
     .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .cal-head h2{font-size:15px;font-weight:700;letter-spacing:-.02em}
+    .cal-head h2{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:-.02em}
     .cal-nav{display:flex;gap:6px}
-    .cal-nbtn{width:28px;height:28px;border-radius:8px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+    .cal-nbtn{width:28px;height:28px;border-radius:8px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;color:var(--muted);transition:all .12s}
+    .cal-nbtn:active{background:oklch(94% 0.005 240)}
     .cal-nbtn svg{width:12px;height:12px}
     .cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
     .cal-dow{font-size:9px;font-weight:700;color:var(--muted);text-align:center;letter-spacing:.05em;padding:2px 0}
-    .cal-d{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 2px;cursor:pointer;min-height:42px}
-    .cal-d:hover{background:var(--bg)}
+    .cal-d{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 2px;cursor:pointer;min-height:42px;transition:background-color .12s}
+    .cal-d:active{background:oklch(94% 0.005 240)}
     .cal-d.oth{opacity:.3}
+    .cal-d.today{background:oklch(94% 0.008 255)}
     .cal-d.today .cal-dn{background:var(--accent);color:#fff}
     .cal-dn{font-size:10px;font-weight:600;color:var(--fg);width:22px;height:22px;display:grid;place-items:center;border-radius:50%}
     .cal-dts{display:flex;gap:1px;margin-top:2px}
     .cal-dt{width:4px;height:4px;border-radius:50%}
     .cal-dt.a{background:var(--accent)}.cal-dt.b{background:var(--success)}.cal-dt.c{background:var(--warning)}
-    .cal-evts{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:12px}
-    .cal-evts h3{font-size:11px;font-weight:700;color:var(--fg);margin-bottom:8px}
-    .cal-evt{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
-    .cal-evt:last-child{border-bottom:none}
-    .cal-ev-t{font-size:10px;font-weight:700;color:var(--muted);min-width:36px;font-variant-numeric:tabular-nums}
-    .cal-ev-n{font-size:11px;color:var(--fg)}
-    .cal-ev-o{font-size:9px;color:var(--accent);margin-top:1px}
-    /* Gantt */
-    .gantt-hd{font-size:14px;font-weight:700;letter-spacing:-.02em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+    /* ── Achievements ── */
+    .ach-hero{background:linear-gradient(135deg,oklch(58% 0.18 255),oklch(48% 0.20 270));border-radius:18px;padding:18px 16px 16px;text-align:center;margin-bottom:12px;color:#fff;position:relative;overflow:hidden}
+    .ach-hero::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%}
+    .ach-hero::before{content:'';position:absolute;bottom:-40px;left:20px;width:80px;height:80px;background:rgba(255,255,255,.05);border-radius:50%}
+    .ach-n{font-family:var(--font-display);font-size:48px;font-weight:700;letter-spacing:-.04em;line-height:1;position:relative;z-index:1}
+    .ach-l{font-size:11px;opacity:.85;margin-top:8px;position:relative;z-index:1;letter-spacing:.02em}
+    .ach-sub{font-size:11px;opacity:.7;margin-top:6px;position:relative;z-index:1}
+    .ach-streak{display:flex;gap:3px;justify-content:center;margin-top:12px;position:relative;z-index:1;flex-wrap:wrap}
+    .ach-dot{width:18px;height:18px;border-radius:4px}
+    .ach-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+    .ach-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+    .ach-stat-n{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums}
+    .ach-stat-l{font-size:9px;color:var(--muted);margin-top:3px}
+    .ach-okrs{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .ach-okr-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)}
+    .ach-okr-row:last-child{border-bottom:none}
+    .ach-dot-sm{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .ach-okr-n{flex:1;font-size:12px;font-weight:500}
+    .ach-okr-pct{font-size:12px;font-weight:700;color:var(--success);font-variant-numeric:tabular-nums}
+    /* ── Gantt ── */
+    .gantt-hd{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:-.02em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
     .gantt-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
     .gantt-okr-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
     .gantt-okr-name{font-size:13px;font-weight:600;color:var(--fg)}
-    .gantt-okr-meta{font-size:10px;color:var(--muted)}
+    .gantt-okr-meta{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
     .gantt-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:10px}
     .gantt-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:8px;font-weight:700;color:#fff}
     .gantt-subs{display:flex;flex-direction:column;gap:6px}
@@ -97,56 +144,239 @@
     .gantt-sub-n{font-size:10px;color:var(--muted);width:64px;flex-shrink:0}
     .gantt-sub-t{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
     .gantt-sub-f{height:100%;border-radius:3px;opacity:.65}
-    /* Achievements */
-    .ach-hero{background:linear-gradient(135deg,#5856D6,#AF52DE);border-radius:16px;padding:22px 16px;text-align:center;margin-bottom:12px;color:#fff}
-    .ach-n{font-size:44px;font-weight:700;letter-spacing:-.04em;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display'}
-    .ach-l{font-size:12px;opacity:.85;margin-top:2px}
-    .ach-sub{font-size:11px;opacity:.6;margin-top:8px}
-    .ach-streak{display:flex;gap:3px;justify-content:center;margin-top:10px}
-    .ach-dot{width:18px;height:18px;border-radius:4px}
-    .ach-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
-    .ach-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
-    .ach-stat-n{font-size:20px;font-weight:700;color:var(--fg)}
-    .ach-stat-l{font-size:9px;color:var(--muted);margin-top:2px}
-    .ach-okrs{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-    .ach-okr-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)}
-    .ach-okr-row:last-child{border-bottom:none}
-    .ach-dot-sm{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .ach-okr-n{flex:1;font-size:12px;font-weight:500}
-    .ach-okr-pct{font-size:12px;font-weight:700;color:var(--success)}
-    /* Sub-tabs (二级Tab) */
-    .m-subtabs{display:flex;gap:0;padding:0 14px;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
-    .m-subtabs::-webkit-scrollbar{display:none}
-    .m-subtab{padding:9px 12px;font-size:12px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s}
-    .m-subtab.active{color:var(--fg);border-bottom-color:var(--accent);font-weight:600}
-    .m-subview{display:none;padding:14px}
-    .m-subview.active{display:block}
-    /* Bottom nav */
-    .ios-tabbar{flex:0 0 60px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;padding:6px 0;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
-    .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px;cursor:pointer}
-    .tab-item svg{width:22px;height:22px;color:var(--muted)}
-    .tab-item.active svg{color:var(--accent)}
-    .tab-item span{font-size:9px;font-weight:500;color:var(--muted)}
-    .tab-item.active span{color:var(--accent)}
-    /* FAB */
-    .fab{position:absolute;bottom:72px;right:20px;width:50px;height:50px;border-radius:25px;background:var(--accent);color:#fff;display:grid;place-items:center;box-shadow:0 4px 16px rgba(88,144,255,.35);cursor:pointer;transition:transform .15s;z-index:10}
-    .fab:hover{transform:scale(1.06)}
-    .fab svg{width:22px;height:22px}
-    /* Modal */
-    .modal-o{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;place-items:center;z-index:300;backdrop-filter:blur(4px)}
-    .modal-o.open{display:grid}
-    .modal{background:var(--surface);border-radius:16px;padding:24px;width:min(360px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.15)}
-    .modal h3{font-size:16px;font-weight:700;letter-spacing:-.02em;margin-bottom:14px}
-    .fg{margin-bottom:12px}
-    .fl{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:.04em}
-    .fi{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);color:var(--fg);background:var(--bg);outline:none}
-    .fi:focus{border-color:var(--accent)}
-    .fs{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);color:var(--fg);background:var(--bg);cursor:pointer}
-    .ma{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-    .bc{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer}
-    .bc:hover{color:var(--fg)}
-    .bl{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;background:var(--accent);color:#fff;border:none;cursor:pointer}
-    @media(max-width:430px){.phone-wrap{padding:0}.device{width:100%;height:100vh;border-radius:0;padding:0;box-shadow:none}.screen{border-radius:0}.island{display:none}.statusbar{padding:12px 20px 0}}
+    /* ── Bottom Tab Bar (iOS HIG) ── */
+    .ios-tabbar{flex:0 0 60px;background:rgba(250,250,247,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding:6px 0;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
+    .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px;cursor:pointer;color:var(--muted);transition:color .12s}
+    .tab-item svg{width:24px;height:24px}
+    .tab-item.active{color:var(--accent)}
+    .tab-item span{font-size:10px;font-weight:500}
+    .tab-item.active span{font-weight:600}
+    /* ── iOS FAB (Compact Material-ish for iOS) ── */
+    .fab{position:absolute;bottom:78px;right:20px;width:54px;height:54px;border-radius:27px;background:var(--accent);color:#fff;display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.08);cursor:pointer;z-index:10;transition:transform .15s var(--ease-spring)}
+    .fab:active{transform:scale(.92)}
+    .fab svg{width:24px;height:24px}
+    /* ── Topbar 头像/登录按钮 ── */
+    .topbar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,oklch(58% 0.18 255),oklch(48% 0.20 270));color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;border:none;cursor:pointer;flex-shrink:0;transition:transform .15s var(--ease-spring);letter-spacing:-.02em}
+    .topbar-avatar:active{transform:scale(.9)}
+    .topbar-avatar.loggedout{background:var(--surface);border:1px solid var(--border);color:var(--accent);font-weight:600}
+
+    /* ── iOS Sheet (Bottom Sheet) ── */
+    .sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:none;z-index:200;align-items:flex-end;backdrop-filter:blur(2px)}
+    .sheet-overlay.open{display:flex;animation:overlayIn .2s var(--ease-ios)}
+    @keyframes overlayIn{from{opacity:0}to{opacity:1}}
+    .sheet{background:var(--surface);border-radius:14px 14px 0 0;width:100%;padding:8px 16px 32px;animation:sheetUp .35s var(--ease-ios);max-height:80%;overflow-y:auto}
+    @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .sheet-grabber{width:36px;height:5px;background:var(--border);border-radius:3px;margin:8px auto 14px}
+    .sheet h3{font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:-.02em;margin-bottom:12px}
+    .sheet .form-field{margin-bottom:10px}
+    .sheet .form-field label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+    .sheet .form-field input,.sheet .form-field select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--font-body);color:var(--fg);background:var(--bg);outline:none}
+    .sheet .form-field input:focus,.sheet .form-field select:focus{border-color:var(--accent)}
+    .sheet-actions{display:flex;gap:8px;margin-top:14px}
+    .sheet-btn{flex:1;padding:11px;border-radius:10px;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:var(--font-body)}
+    .sheet-btn.primary{background:var(--accent);color:#fff}
+    .sheet-btn.primary:active{background:var(--accent-active)}
+    .sheet-btn.cancel{background:oklch(96% 0.005 240);color:var(--fg)}
+    /* ── iOS Context Menu (Long Press) ── */
+    .context-overlay{position:absolute;inset:0;background:rgba(0,0,0,.25);display:none;z-index:250;place-items:flex-end;justify-content:center;padding:0 8px 30px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+    .context-overlay.open{display:flex;animation:overlayIn .15s var(--ease-ios)}
+    .context-menu{background:rgba(255,255,255,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px;width:100%;max-width:300px;padding:6px;box-shadow:0 8px 30px rgba(0,0,0,.18);animation:menuIn .25s var(--ease-spring)}
+    @keyframes menuIn{from{opacity:0;transform:scale(.92) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .context-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--fg);transition:background-color .1s}
+    .context-item:active{background:oklch(94% 0.005 240)}
+    .context-item svg{width:18px;height:18px;color:var(--muted);flex-shrink:0}
+    .context-item.danger{color:var(--danger)}
+    .context-divider{height:1px;background:var(--border);margin:4px 8px}
+    /* ── iOS Pull to Refresh indicator ── */
+    .ptr-indicator{height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:height .2s var(--ease-ios);color:var(--muted)}
+    .ptr-indicator.pulling{height:48px}
+    .ptr-indicator svg{width:18px;height:18px;animation:ptrSpin 1s linear infinite}
+    @keyframes ptrSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+    /* ── iOS Login Sheet ── */
+    .auth-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:none;z-index:260;align-items:flex-end;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+    .auth-overlay.open{display:flex;animation:overlayIn .2s var(--ease-ios)}
+    .auth-sheet{background:var(--surface);border-radius:18px 18px 0 0;width:100%;padding:8px 22px calc(20px + env(safe-area-inset-bottom,0px));animation:sheetUp .35s var(--ease-ios);max-height:88%;overflow-y:auto}
+    .auth-logo{height:42px;width:42px;margin:6px auto 10px;display:block}
+    .auth-tagline{font-size:12px;color:var(--muted);text-align:center;margin-bottom:18px;line-height:1.5}
+    .auth-tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:18px}
+    .auth-tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:600;color:var(--muted);border-radius:7px;cursor:pointer;transition:all .15s}
+    .auth-tab.active{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+    .auth-field{margin-bottom:12px}
+    .auth-field label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+    .auth-field input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px;font-family:var(--font-body);color:var(--fg);background:var(--bg);outline:none;transition:border-color .15s}
+    .auth-field input:focus{border-color:var(--accent)}
+    .auth-view{display:none}
+    .auth-view.active{display:block}
+    .auth-submit{width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:600;background:var(--accent);color:#fff;border:none;cursor:pointer;margin-top:6px;transition:opacity .15s;font-family:var(--font-body)}
+    .auth-submit:active{opacity:.85}
+    .auth-divider{font-size:11px;color:var(--muted);text-align:center;margin:18px 0 10px;position:relative}
+    .auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;width:calc(50% - 24px);height:1px;background:var(--border)}
+    .auth-divider::before{left:0}
+    .auth-divider::after{right:0}
+    .auth-socials{display:flex;gap:10px;justify-content:center}
+    .auth-social{width:44px;height:44px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;transition:all .15s}
+    .auth-social:active{transform:scale(.92);background:var(--surface)}
+    .auth-social svg{width:20px;height:20px}
+    .auth-actions{display:flex;gap:8px;margin-top:14px}
+    .auth-actions .sheet-btn{cancel}
+
+    /* ── iOS Task Detail Sheet (large, 80vh) ── */
+    .task-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:none;z-index:260;align-items:flex-end;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+    .task-overlay.open{display:flex;animation:overlayIn .2s var(--ease-ios)}
+    .task-sheet{background:var(--surface);border-radius:18px 18px 0 0;width:100%;max-height:88%;display:flex;flex-direction:column;animation:sheetUp .35s var(--ease-ios);overflow:hidden}
+    .task-head{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 18px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .task-head-left{display:flex;align-items:center;gap:8px}
+    .task-pill{font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.04em}
+    .task-pill.q1{background:oklch(94% 0.008 255);color:var(--accent)}
+    .task-pill.q2{background:oklch(94% 0.008 145);color:var(--success)}
+    .task-pill.q3{background:oklch(94% 0.008 45);color:var(--warning)}
+    .task-pill.q4{background:var(--bg);color:var(--muted)}
+    .task-status{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px}
+    .task-status .dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+    .task-status.done .dot{background:var(--success)}
+    .task-close{width:26px;height:26px;border-radius:7px;border:none;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center}
+    .task-close:active{background:oklch(94% 0.005 240);color:var(--fg)}
+    .task-close svg{width:14px;height:14px}
+    .task-grabber{width:36px;height:5px;background:var(--border);border-radius:3px;margin:8px auto -2px}
+    .task-body{flex:1;overflow-y:auto;padding:14px 18px}
+    .task-title{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--fg);line-height:1.3;margin-bottom:12px}
+    .task-title.done{text-decoration:line-through;color:var(--muted)}
+    .task-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-bottom:14px}
+    .task-meta-row{display:flex;flex-direction:column;gap:2px}
+    .task-meta-label{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+    .task-meta-val{font-size:12px;color:var(--fg);font-weight:500;display:flex;align-items:center;gap:4px}
+    .task-meta-val .okr-dot{width:14px;height:14px;font-size:8px}
+    .task-desc{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--fg);line-height:1.55;margin-bottom:12px}
+    .task-children{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+    .task-children-head{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+    .task-children-count{background:var(--surface);padding:1px 7px;border-radius:999px;font-weight:600;font-size:9px}
+    .task-sub{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+    .task-sub:last-child{border-bottom:none}
+    .task-sub-check{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;cursor:pointer;display:grid;place-items:center}
+    .task-sub-check.done{background:var(--success);border-color:var(--success)}
+    .task-sub-check.done::after{content:'';width:5px;height:5px;background:#fff;border-radius:50%}
+    .task-sub-text{font-size:11px;color:var(--fg);flex:1}
+    .task-sub-text.done{text-decoration:line-through;color:var(--muted)}
+    .task-sub-meta{font-size:9px;color:var(--muted)}
+    .task-comments{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+    .task-comments-head{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+    .task-comment{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+    .task-comment:last-child{border-bottom:none}
+    .task-comment-av{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:9px;font-weight:700;flex-shrink:0}
+    .task-comment-body{flex:1;min-width:0}
+    .task-comment-meta{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:var(--muted);margin-bottom:2px}
+    .task-comment-name{font-weight:600;color:var(--fg);font-size:10px}
+    .task-comment-text{font-size:11px;color:var(--fg);line-height:1.45}
+    .task-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 18px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);gap:8px;background:var(--surface);flex-shrink:0}
+    .task-foot-left,.task-foot-right{display:flex;gap:6px}
+    .task-btn{padding:8px 12px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--muted);transition:all .12s}
+    .task-btn:active{transform:scale(.96)}
+    .task-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .task-btn.danger{color:var(--danger)}
+
+    /* ── iOS OKR Manager Sheet ── */
+    .okr-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:none;z-index:260;align-items:flex-end;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+    .okr-overlay.open{display:flex;animation:overlayIn .2s var(--ease-ios)}
+    .okr-sheet{background:var(--surface);border-radius:18px 18px 0 0;width:100%;max-height:88%;display:flex;flex-direction:column;animation:sheetUp .35s var(--ease-ios);overflow:hidden}
+    .okr-list{flex:1;overflow-y:auto;padding:12px 18px 18px}
+    .okr-list-row{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+    .okr-list-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .okr-list-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .okr-list-name{flex:1;font-size:13px;font-weight:600;color:var(--fg);line-height:1.35}
+    .okr-act-btn{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:grid;place-items:center;color:var(--muted);transition:all .12s;flex-shrink:0}
+    .okr-act-btn:active{transform:scale(.92)}
+    .okr-act-btn.danger:active{color:var(--danger);border-color:var(--danger)}
+    .okr-act-btn svg{width:11px;height:11px}
+    .okr-progress-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .okr-progress-bar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+    .okr-progress-fill{height:100%;border-radius:2px;background:var(--accent)}
+    .okr-progress-label{font-size:10px;font-weight:600;color:var(--muted);min-width:28px;text-align:right;font-variant-numeric:tabular-nums}
+    .okr-kr-list{margin-top:6px;padding-left:12px;border-left:2px solid var(--border)}
+    .okr-kr-row{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11px;color:var(--fg)}
+    .okr-kr-row .kr-check{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;cursor:pointer;display:grid;place-items:center}
+    .okr-kr-row .kr-check.done{background:var(--success);border-color:var(--success)}
+    .okr-kr-row .kr-check.done::after{content:'';width:4px;height:4px;background:#fff;border-radius:50%}
+    .okr-kr-row .kr-name{flex:1;line-height:1.4}
+    .okr-kr-row .kr-name.done{text-decoration:line-through;color:var(--muted)}
+    .okr-kr-row .kr-pct{font-size:9px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+    .okr-kr-add{display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)}
+    .okr-kr-input{flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg);color:var(--fg);outline:none;font-family:var(--font-body)}
+    .okr-kr-input:focus{border-color:var(--accent)}
+    .okr-add-form{background:var(--bg);border:1px dashed var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+    .okr-add-color-pick{display:flex;gap:6px;margin-bottom:8px}
+    .okr-color-dot{width:16px;height:16px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .12s}
+    .okr-color-dot:active{transform:scale(.9)}
+    .okr-color-dot.sel{border-color:var(--fg)}
+    .okr-add-name{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--surface);color:var(--fg);outline:none;font-family:var(--font-body);margin-bottom:8px}
+    .okr-add-name:focus{border-color:var(--accent)}
+
+    /* ── 「我的」 个人中心 ── */
+    .me-card{display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,oklch(58% 0.18 255),oklch(48% 0.20 270));border-radius:16px;margin-bottom:12px;position:relative;overflow:hidden;color:#fff}
+    .me-card::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%;pointer-events:none}
+    .me-card::before{content:'';position:absolute;bottom:-40px;left:-20px;width:90px;height:90px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none}
+    .me-av-lg{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;font-family:var(--font-display);font-size:20px;font-weight:700;border:2px solid rgba(255,255,255,.4);flex-shrink:0;position:relative;z-index:1;letter-spacing:-.02em}
+    .me-info{flex:1;min-width:0;position:relative;z-index:1}
+    .me-name{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+    .me-sub{font-size:11px;opacity:.85;margin-top:3px;letter-spacing:.01em}
+    .me-edit-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);display:grid;place-items:center;cursor:pointer;color:#fff;flex-shrink:0;position:relative;z-index:1;transition:transform .12s var(--ease-spring)}
+    .me-edit-btn:active{transform:scale(.9);background:rgba(255,255,255,.28)}
+    .me-edit-btn svg{width:15px;height:15px}
+    /* 概览行 */
+    .me-quick{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 6px;margin-bottom:14px}
+    .me-quick-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+    .me-quick-n{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+    .me-quick-l{font-size:9px;color:var(--muted);font-weight:500}
+    .me-quick-sep{width:1px;height:20px;background:var(--border)}
+    /* section title */
+    .me-section-title{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:14px 4px 8px}
+    /* OKR 卡片 */
+    .me-okr-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+    .me-okr-row{display:flex;align-items:center;gap:8px}
+    .me-okr-name{flex:1;font-size:12px;font-weight:500;color:var(--fg);line-height:1.35}
+    .me-okr-pct{font-size:11px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+    /* 操作列表 */
+    .me-actions{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .me-act{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background-color .12s}
+    .me-act:last-child{border-bottom:none}
+    .me-act:active{background:oklch(96% 0.005 240)}
+    .me-act-ic{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex-shrink:0}
+    .me-act-ic svg{width:17px;height:17px}
+    .me-act-tx{flex:1;min-width:0}
+    .me-act-title{font-size:13px;font-weight:600;color:var(--fg);line-height:1.3}
+    .me-act-desc{font-size:10px;color:var(--muted);margin-top:1px}
+    .me-act-arrow{width:14px;height:14px;color:var(--muted);flex-shrink:0}
+    /* 偏好列表 (iOS Settings 风格) */
+    .me-list{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .me-li{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background-color .12s}
+    .me-li:last-child{border-bottom:none}
+    .me-li:active{background:oklch(96% 0.005 240)}
+    .me-li-ic{width:28px;height:28px;border-radius:7px;background:var(--bg);display:grid;place-items:center;color:var(--muted);flex-shrink:0}
+    .me-li-ic svg{width:16px;height:16px}
+    .me-li-name{flex:1;font-size:13px;font-weight:500;color:var(--fg)}
+    .me-li-meta{font-size:11px;color:var(--muted);text-align:right}
+    /* 退出按钮 + footer */
+    .me-logout{width:100%;padding:13px;border-radius:11px;font-size:13px;font-weight:600;color:var(--danger);background:var(--surface);border:1px solid var(--border);cursor:pointer;margin-top:18px;font-family:var(--font-body);transition:all .12s}
+    .me-logout:active{background:oklch(96% 0.008 30);border-color:var(--danger)}
+    .me-footer{text-align:center;font-size:10px;color:var(--meta);margin:14px 0 6px;letter-spacing:.04em}
+    .ios-toast{position:absolute;top:60px;left:16px;right:16px;background:rgba(28,28,30,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:#fff;padding:12px 14px;border-radius:14px;display:none;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:toastIn .3s var(--ease-spring)}
+    .ios-toast.show{display:flex;align-items:center;gap:10px}
+    @keyframes toastIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+    .ios-toast-icon{width:32px;height:32px;border-radius:8px;background:var(--accent);display:grid;place-items:center;flex-shrink:0}
+    .ios-toast-icon svg{width:18px;height:18px;color:#fff}
+    .ios-toast-body{flex:1;min-width:0}
+    .ios-toast-title{font-size:13px;font-weight:600}
+    .ios-toast-msg{font-size:11px;opacity:.7;margin-top:1px}
+    /* ── Haptic Tap pseudo (visual only) ── */
+    .haptic-target{transition:transform .12s var(--ease-spring)}
+    .haptic-target:active{transform:scale(.96)}
+    /* ── Responsive: full-screen on real iPhone ── */
+    @media(max-width:430px){
+      .phone-wrap{padding:0}
+      .device{width:100%;height:100vh;border-radius:0;padding:0;box-shadow:none}
+      .screen{border-radius:0}
+      .island{display:none}
+      .statusbar{padding:14px 22px 0}
+    }
   </style>
 </head>
 <body>
@@ -162,13 +392,20 @@
         <svg width="25" height="11" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".45"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4" fill="currentColor" fill-opacity=".45"/><rect x="2" y="2" width="18" height="7" rx="1.4" fill="currentColor"/></svg>
       </span>
     </div>
-    <div class="app-body">
+    <div class="app-body" id="appBody">
+      <!-- Pull to refresh indicator -->
+      <div class="ptr-indicator" id="ptrIndicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3.5-7.1M21 4v5h-5"/></svg></div>
+
       <div class="app-topbar">
-        <div class="app-logo">Focal<span>.</span></div>
-        <button class="okr-chip"><span>Q3 OKR</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></button>
+        <img class="app-logo-img" src="logo-mark.svg" alt="格行 GridGo" />
+        <button class="okr-chip" onclick="openOkrSwitcher()"><span>Q3 OKR</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></button>
+        <button class="topbar-btn" onclick="openShareSheet()" title="分享" aria-label="分享"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2v12M7 7l5-5 5 5M5 14h14v6H5z"/></svg></button>
+        <button class="topbar-avatar" id="topbarAvatar" onclick="openAuth()" title="登录 / 我的" aria-label="登录 / 我的">
+          <span id="avatarInitial">林</span>
+        </button>
       </div>
 
-      <!-- Matrix -->
+      <!-- ── Matrix ── -->
       <div class="view-body" id="vb-matrix">
         <div class="m-subtabs">
           <div class="m-subtab active" onclick="switchMSub('matrix','all',this)">全部</div>
@@ -176,41 +413,93 @@
           <div class="m-subtab" onclick="switchMSub('matrix','week',this)">本周</div>
         </div>
         <div class="m-subview active" data-msubview="matrix-all">
-        <div class="eq2grid">
-          <div class="eq2 q1"><div class="eq2h"><span class="eq2l">紧急重要</span><span class="eq2c">3</span></div><div class="eq2t">
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck"></div><div><div class="eq2item-title">Q3 OKR 评审材料</div><span class="eq2tag">产品增长</span></div></div>
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck"></div><div class="eq2item-title">客户紧急修复</div></div>
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck done"></div><div class="eq2item-title done">准备产品演示</div></div>
-          </div></div>
-          <div class="eq2 q2"><div class="eq2h"><span class="eq2l">重要</span><span class="eq2c">4</span></div><div class="eq2t">
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck"></div><div><div class="eq2item-title">每周跑步 3 次</div><span class="eq2tag" style="color:var(--success);background:oklch(94% 0.008 145)">健康管理</span></div></div>
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck"></div><div class="eq2item-title">学习 TypeScript</div></div>
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck"></div><div class="eq2item-title">月度财务复盘</div></div>
-          </div></div>
-          <div class="eq2 q3"><div class="eq2h"><span class="eq2l">紧急</span><span class="eq2c">2</span></div><div class="eq2t">
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck"></div><div class="eq2item-title">处理积压邮件</div></div>
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck"></div><div class="eq2item-title">会议记录同步</div></div>
-          </div></div>
-          <div class="eq2 q4"><div class="eq2h"><span class="eq2l">其他</span><span class="eq2c">2</span></div><div class="eq2t">
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck"></div><div class="eq2item-title">整理收藏夹</div></div>
-              <div class="eq2item" onclick="iosCheck(this)"><div class="eq2ck"></div><div class="eq2item-title">刷社交媒体</div></div>
-          </div></div>
+          <div class="eq2grid">
+            <div class="eq2 q1">
+              <div class="eq2h"><span class="eq2l">紧急 × 重要</span><span class="eq2c">3</span></div>
+              <div class="eq2t">
+                <div class="eq2item swipe-row" data-task-id="t1" onclick="openTaskDetail(this)">
+                  <div class="row-body">
+                    <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                    <div style="flex:1;min-width:0"><div class="eq2item-title">Q3 OKR 评审材料</div><span class="eq2tag">产品增长</span></div>
+                  </div>
+                  <div class="swipe-actions"><button class="swipe-act" onclick="event.stopPropagation();markDone(this)">完成</button></div>
+                </div>
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div><div class="eq2item-title">客户需求紧急修复</div><div style="font-size:9px;color:var(--muted);margin-top:2px">今天截止 · 2h</div></div>
+                </div>
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck done" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div><div class="eq2item-title done">准备周一产品演示</div><span class="eq2tag">产品增长</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="eq2 q2">
+              <div class="eq2h"><span class="eq2l">不紧急 × 重要</span><span class="eq2c">4</span></div>
+              <div class="eq2t">
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div><div class="eq2item-title">每周跑步 3 次</div><span class="eq2tag" style="color:var(--success);background:oklch(94% 0.008 145)">健康管理</span></div>
+                </div>
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div><div class="eq2item-title">学习 TypeScript 进阶</div><span class="eq2tag" style="color:var(--warning);background:oklch(94% 0.008 45)">技能提升</span></div>
+                </div>
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div class="eq2item-title">月度财务复盘</div>
+                </div>
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div><div class="eq2item-title">建立应急基金</div><span class="eq2tag" style="color:var(--danger);background:oklch(94% 0.008 30)">财务健康</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="eq2 q3">
+              <div class="eq2h"><span class="eq2l">紧急 × 不重要</span><span class="eq2c">2</span></div>
+              <div class="eq2t">
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div class="eq2item-title">处理积压邮件</div>
+                </div>
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div class="eq2item-title">部分会议记录同步</div>
+                </div>
+              </div>
+            </div>
+            <div class="eq2 q4">
+              <div class="eq2h"><span class="eq2l">不紧急 × 不重要</span><span class="eq2c">2</span></div>
+              <div class="eq2t">
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div class="eq2item-title">整理浏览器收藏夹</div>
+                </div>
+                <div class="eq2item" onclick="openTaskDetail(this)">
+                  <div class="eq2ck" onclick="event.stopPropagation();iosCheck(this)"></div>
+                  <div class="eq2item-title">刷社交媒体</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        </div>
-        <div class="m-subview" data-msubview="matrix-today" style="padding:14px">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;margin-bottom:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">今日任务</div><div style="font-size:24px;font-weight:700;color:var(--fg)">6 项</div></div>
+        <div class="m-subview" data-msubview="matrix-today">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;margin-bottom:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">今日任务</div><div style="font-size:24px;font-weight:700;color:var(--fg);font-family:var(--font-display)">6 项</div></div>
           <div class="eq2 q1" style="margin-bottom:8px"><div class="eq2h"><span class="eq2l">紧急重要</span><span class="eq2c">2</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">Q3 OKR 评审材料</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">客户紧急修复</div></div></div></div>
           <div class="eq2 q2" style="margin-bottom:8px"><div class="eq2h"><span class="eq2l">重要</span><span class="eq2c">3</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck done"></div><div class="eq2item-title done">深度工作 4h</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">每周跑步</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">阅读《原子习惯》</div></div></div></div>
           <div class="eq2 q3"><div class="eq2h"><span class="eq2l">紧急</span><span class="eq2c">1</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">处理积压邮件</div></div></div></div>
         </div>
-        <div class="m-subview" data-msubview="matrix-week" style="padding:14px">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--fg);margin-bottom:6px">📌 本周重点</div><div style="font-size:11px;color:var(--muted);line-height:1.6">聚焦 <b style="color:var(--fg)">产品增长 OKR</b> 核心功能重构与 A/B 测试上线。每日 14:00-18:00 深度工作块。</div></div>
-          <div class="eq2 q1" style="margin-bottom:8px"><div class="eq2h"><span class="eq2l">紧急重要</span><span class="eq2c">3</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">Q3 OKR 评审会议 周五</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">核心功能联调</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">客户紧急修复</div></div></div></div>
+        <div class="m-subview" data-msubview="matrix-week">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px">
+            <div style="font-size:12px;font-weight:600;color:var(--fg);margin-bottom:8px">本周重点</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.7">聚焦 <b style="color:var(--fg)">产品增长 OKR</b> 核心功能重构与 A/B 测试上线。每日 14:00-18:00 深度工作块。</div>
+          </div>
+          <div class="eq2 q1" style="margin-bottom:8px"><div class="eq2h"><span class="eq2l">紧急重要</span><span class="eq2c">3</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">Q3 OKR 评审会议 周五</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">核心功能联调</div></div></div></div>
           <div class="eq2 q2"><div class="eq2h"><span class="eq2l">重要</span><span class="eq2c">6</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">每周跑步 3 次</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">TS 进阶阅读</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">用户访谈 3 位</div></div></div></div>
         </div>
       </div>
 
-      <!-- List -->
+      <!-- ── List ── -->
       <div class="view-body" id="vb-list" style="display:none">
         <div class="m-subtabs">
           <div class="m-subtab active" onclick="switchMSub('list','all',this)">全部</div>
@@ -218,65 +507,75 @@
           <div class="m-subtab" onclick="switchMSub('list','done',this)">已完成</div>
         </div>
         <div class="m-subview active" data-msubview="list-all">
-        <div class="okr-card">
-          <div class="okr-h" onclick="iosOkr(this)"><div class="okr-exp open"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2l4 3-4 3"/></svg></div><div class="okr-dot" style="background:var(--accent)"></div><span class="okr-n">产品增长 — Q3 月活+30%</span><div class="okr-pbar"><div class="okr-pfill" style="width:67%"></div></div><span class="okr-pl">67%</span></div>
-          <div class="kr-body open">
-            <div class="kr-row"><div class="kr-ck done" onclick="iosKr(event,this)"></div><span class="kr-tx done">完成核心功能重构</span><span class="kr-tag q1">紧急</span></div>
-            <div class="kr-row"><div class="kr-ck" onclick="iosKr(event,this)"></div><span class="kr-tx">上线 A/B 测试</span><span class="kr-tag q2">重要</span></div>
-            <div class="kr-row"><div class="kr-ck" onclick="iosKr(event,this)"></div><span class="kr-tx">用户访谈 10 位</span><span class="kr-tag q2">重要</span></div>
+          <div class="okr-card swipe-row" data-task-id="okr1">
+            <div class="row-body">
+              <div class="okr-h" onclick="iosOkr(this)">
+                <div class="okr-exp open"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2l4 3-4 3"/></svg></div>
+                <div class="okr-dot" style="background:var(--accent)"></div>
+                <span class="okr-n">产品增长 — Q3 月活+30%</span>
+                <div class="okr-pbar"><div class="okr-pfill" style="width:67%"></div></div>
+                <span class="okr-pl">67%</span>
+              </div>
+              <div class="kr-body open">
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx done">完成核心功能重构</span><span class="kr-tag q1">紧急</span></div>
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx">上线 A/B 测试</span><span class="kr-tag q2">重要</span></div>
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx">用户访谈 10 位</span><span class="kr-tag q2">重要</span></div>
+              </div>
+            </div>
+            <div class="swipe-actions"><button class="swipe-act" onclick="event.stopPropagation();markDone(this)">完成</button></div>
+          </div>
+          <div class="okr-card">
+            <div class="okr-h" onclick="iosOkr(this)">
+              <div class="okr-exp"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2l4 3-4 3"/></svg></div>
+              <div class="okr-dot" style="background:var(--success)"></div>
+              <span class="okr-n">健康管理</span>
+              <div class="okr-pbar"><div class="okr-pfill" style="width:45%;background:var(--success)"></div></div>
+              <span class="okr-pl">45%</span>
+            </div>
+            <div class="kr-body">
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx done">每周跑步 3 次</span></div>
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx">每天 8 杯水</span></div>
+            </div>
+          </div>
+          <div class="okr-card">
+            <div class="okr-h" onclick="iosOkr(this)">
+              <div class="okr-exp"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2l4 3-4 3"/></svg></div>
+              <div class="okr-dot" style="background:var(--warning)"></div>
+              <span class="okr-n">技能提升</span>
+              <div class="okr-pbar"><div class="okr-pfill" style="width:30%;background:var(--warning)"></div></div>
+              <span class="okr-pl">30%</span>
+            </div>
+            <div class="kr-body">
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx">学习 TypeScript</span></div>
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx">阅读《深度工作》</span></div>
+            </div>
           </div>
         </div>
-        <div class="okr-card">
-          <div class="okr-h" onclick="iosOkr(this)"><div class="okr-exp"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2l4 3-4 3"/></svg></div><div class="okr-dot" style="background:var(--success)"></div><span class="okr-n">健康管理</span><div class="okr-pbar"><div class="okr-pfill" style="width:45%;background:var(--success)"></div></div><span class="okr-pl">45%</span></div>
-          <div class="kr-body">
-            <div class="kr-row"><div class="kr-ck done" onclick="iosKr(event,this)"></div><span class="kr-tx done">每周跑步 3 次</span></div>
-            <div class="kr-row"><div class="kr-ck" onclick="iosKr(event,this)"></div><span class="kr-tx">每天 8 杯水</span></div>
-          </div>
-        </div>
-        <div class="okr-card">
-          <div class="okr-h" onclick="iosOkr(this)"><div class="okr-exp"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2l4 3-4 3"/></svg></div><div class="okr-dot" style="background:var(--warning)"></div><span class="okr-n">技能提升</span><div class="okr-pbar"><div class="okr-pfill" style="width:30%;background:var(--warning)"></div></div><span class="okr-pl">30%</span></div>
-          <div class="kr-body">
-            <div class="kr-row"><div class="kr-ck" onclick="iosKr(event,this)"></div><span class="kr-tx">学习 TypeScript</span></div>
-            <div class="kr-row"><div class="kr-ck" onclick="iosKr(event,this)"></div><span class="kr-tx">阅读《深度工作》</span></div>
-          </div>
-        </div>
-        </div>
-        <div class="m-subview" data-msubview="list-progress" style="padding:14px">
+        <div class="m-subview" data-msubview="list-progress">
           <div style="font-size:11px;color:var(--muted);margin-bottom:10px">12 项进行中</div>
           <div class="okr-card">
             <div class="okr-h"><div class="okr-dot" style="background:var(--accent)"></div><span class="okr-n">产品增长</span><span class="okr-pl">4 / 6</span></div>
             <div class="kr-body open" style="padding-left:14px">
-              <div class="kr-row"><div class="kr-ck"></div><span class="kr-tx">完成核心功能重构</span></div>
-              <div class="kr-row"><div class="kr-ck"></div><span class="kr-tx">A/B 测试上线</span></div>
-              <div class="kr-row"><div class="kr-ck"></div><span class="kr-tx">用户访谈 10 位</span></div>
-            </div>
-          </div>
-          <div class="okr-card">
-            <div class="okr-h"><div class="okr-dot" style="background:var(--success)"></div><span class="okr-n">健康管理</span><span class="okr-pl">2 / 3</span></div>
-            <div class="kr-body open" style="padding-left:14px">
-              <div class="kr-row"><div class="kr-ck"></div><span class="kr-tx">周六跑步 5km</span></div>
-              <div class="kr-row"><div class="kr-ck"></div><span class="kr-tx">每天 8 杯水</span></div>
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck"></div><span class="kr-tx">完成核心功能重构</span></div>
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck"></div><span class="kr-tx">A/B 测试上线</span></div>
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck"></div><span class="kr-tx">用户访谈 10 位</span></div>
             </div>
           </div>
         </div>
-        <div class="m-subview" data-msubview="list-done" style="padding:14px">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:10px">🎉 已完成 24 项 · 满满成就感</div>
+        <div class="m-subview" data-msubview="list-done">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px">已完成 24 项 · 满满成就感</div>
           <div class="okr-card">
             <div class="okr-h"><div class="okr-dot" style="background:var(--muted)"></div><span class="okr-n">本周 · 8 项</span></div>
             <div class="kr-body open" style="padding-left:14px">
-              <div class="kr-row"><div class="kr-ck done"></div><span class="kr-tx done">准备产品演示</span></div>
-              <div class="kr-row"><div class="kr-ck done"></div><span class="kr-tx done">深度工作 4h</span></div>
-              <div class="kr-row"><div class="kr-ck done"></div><span class="kr-tx done">周一跑步 5km</span></div>
-              <div class="kr-row"><div class="kr-ck done"></div><span class="kr-tx done">周三跑步 5km</span></div>
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">准备产品演示</span></div>
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">深度工作 4h</span></div>
+              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">周一跑步 5km</span></div>
             </div>
-          </div>
-          <div class="okr-card">
-            <div class="okr-h"><div class="okr-dot" style="background:var(--muted)"></div><span class="okr-n">上周 · 10 项</span></div>
           </div>
         </div>
       </div>
 
-      <!-- Calendar -->
+      <!-- ── Calendar ── -->
       <div class="view-body" id="vb-calendar" style="display:none">
         <div class="m-subtabs">
           <div class="m-subtab active" onclick="switchMSub('calendar','month',this)">月</div>
@@ -284,71 +583,67 @@
           <div class="m-subtab" onclick="switchMSub('calendar','day',this)">日</div>
         </div>
         <div class="m-subview active" data-msubview="calendar-month">
-        <div class="cal-head"><h2>七月 2025</h2><div class="cal-nav"><button class="cal-nbtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2L3 6l4 4"/></svg></button><button class="cal-nbtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2l4 4-4 4"/></svg></button></div></div>
-        <div class="cal-g">
-          <div class="cal-dow">一</div><div class="cal-dow">二</div><div class="cal-dow">三</div><div class="cal-dow">四</div><div class="cal-dow">五</div><div class="cal-dow">六</div><div class="cal-dow">日</div>
-          <div class="cal-d oth"><div class="cal-dn">30</div></div>
-          <div class="cal-d"><div class="cal-dn">1</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
-          <div class="cal-d"><div class="cal-dn">2</div></div>
-          <div class="cal-d"><div class="cal-dn">3</div></div>
-          <div class="cal-d"><div class="cal-dn">4</div><div class="cal-dts"><span class="cal-dt b"></span></div></div>
-          <div class="cal-d"><div class="cal-dn">5</div></div>
-          <div class="cal-d"><div class="cal-dn">6</div></div>
-          <div class="cal-d"><div class="cal-dn">7</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
-          <div class="cal-d"><div class="cal-dn">8</div></div>
-          <div class="cal-d"><div class="cal-dn">9</div><div class="cal-dts"><span class="cal-dt a"></span><span class="cal-dt c"></span></div></div>
-          <div class="cal-d"><div class="cal-dn">10</div></div>
-          <div class="cal-d"><div class="cal-dn">11</div><div class="cal-dts"><span class="cal-dt b"></span></div></div>
-          <div class="cal-d"><div class="cal-dn">12</div></div>
-          <div class="cal-d"><div class="cal-dn">13</div></div>
-          <div class="cal-d"><div class="cal-dn">14</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
-          <div class="cal-d"><div class="cal-dn">15</div></div>
-          <div class="cal-d"><div class="cal-dn">16</div></div>
-          <div class="cal-d"><div class="cal-dn">17</div></div>
-          <div class="cal-d today"><div class="cal-dn">18</div><div class="cal-dts"><span class="cal-dt b"></span><span class="cal-dt c"></span></div></div>
-          <div class="cal-d"><div class="cal-dn">19</div></div>
-          <div class="cal-d"><div class="cal-dn">20</div></div>
-          <div class="cal-d"><div class="cal-dn">21</div></div>
-          <div class="cal-d"><div class="cal-dn">22</div></div>
-          <div class="cal-d"><div class="cal-dn">23</div></div>
-          <div class="cal-d"><div class="cal-dn">24</div></div>
-          <div class="cal-d"><div class="cal-dn">25</div><div class="cal-dts"><span class="cal-dt b"></span><span class="cal-dt a"></span></div></div>
-          <div class="cal-d"><div class="cal-dn">26</div></div>
-          <div class="cal-d"><div class="cal-dn">27</div></div>
-          <div class="cal-d"><div class="cal-dn">28</div></div>
-          <div class="cal-d"><div class="cal-dn">29</div></div>
-          <div class="cal-d"><div class="cal-dn">30</div></div>
-          <div class="cal-d"><div class="cal-dn">31</div></div>
-          <div class="cal-d oth"><div class="cal-dn">1</div></div>
-          <div class="cal-d oth"><div class="cal-dn">2</div></div>
-        </div>
-        <div class="cal-evts"><h3>即将到来</h3>
-          <div class="cal-evt"><div class="cal-ev-t">今天</div><div><div class="cal-ev-n">Q3 OKR 评审</div><div class="cal-ev-o">产品增长</div></div></div>
-          <div class="cal-evt"><div class="cal-ev-t">明天</div><div><div class="cal-ev-n">每周跑步</div><div class="cal-ev-o">健康管理</div></div></div>
-        </div>
-        </div>
-        <div class="m-subview" data-msubview="calendar-week" style="padding:14px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:10px">本周 7/14 – 7/20</div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周一 7/14</div><div style="font-size:11px">深度工作 4h · 每周跑步</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周二 7/15</div><div style="font-size:11px">处理积压邮件 · 会议记录同步 · 用户访谈</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周三 7/16</div><div style="font-size:11px">核心功能重构联调 · 每周跑步</div></div>
-            <div style="background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周五 7/18 今天</div><div style="font-size:11px">Q3 OKR 评审会议 · 每周跑步 · 周报撰写</div></div>
+          <div class="cal-head"><h2>2025 年 7 月</h2><div class="cal-nav"><button class="cal-nbtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2L3 6l4 4"/></svg></button><button class="cal-nbtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2l4 4-4 4"/></svg></button></div></div>
+          <div class="cal-g">
+            <div class="cal-dow">一</div><div class="cal-dow">二</div><div class="cal-dow">三</div><div class="cal-dow">四</div><div class="cal-dow">五</div><div class="cal-dow">六</div><div class="cal-dow">日</div>
+            <div class="cal-d oth"><div class="cal-dn">30</div></div>
+            <div class="cal-d"><div class="cal-dn">1</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
+            <div class="cal-d"><div class="cal-dn">2</div></div>
+            <div class="cal-d"><div class="cal-dn">3</div></div>
+            <div class="cal-d"><div class="cal-dn">4</div><div class="cal-dts"><span class="cal-dt b"></span></div></div>
+            <div class="cal-d"><div class="cal-dn">5</div></div>
+            <div class="cal-d"><div class="cal-dn">6</div></div>
+            <div class="cal-d"><div class="cal-dn">7</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
+            <div class="cal-d"><div class="cal-dn">8</div></div>
+            <div class="cal-d"><div class="cal-dn">9</div><div class="cal-dts"><span class="cal-dt a"></span><span class="cal-dt c"></span></div></div>
+            <div class="cal-d"><div class="cal-dn">10</div></div>
+            <div class="cal-d"><div class="cal-dn">11</div><div class="cal-dts"><span class="cal-dt b"></span></div></div>
+            <div class="cal-d"><div class="cal-dn">12</div></div>
+            <div class="cal-d"><div class="cal-dn">13</div></div>
+            <div class="cal-d"><div class="cal-dn">14</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
+            <div class="cal-d"><div class="cal-dn">15</div></div>
+            <div class="cal-d"><div class="cal-dn">16</div></div>
+            <div class="cal-d"><div class="cal-dn">17</div></div>
+            <div class="cal-d today"><div class="cal-dn">18</div><div class="cal-dts"><span class="cal-dt b"></span><span class="cal-dt c"></span></div></div>
+            <div class="cal-d"><div class="cal-dn">19</div></div>
+            <div class="cal-d"><div class="cal-dn">20</div></div>
+            <div class="cal-d"><div class="cal-dn">21</div></div>
+            <div class="cal-d"><div class="cal-dn">22</div></div>
+            <div class="cal-d"><div class="cal-dn">23</div></div>
+            <div class="cal-d"><div class="cal-dn">24</div></div>
+            <div class="cal-d"><div class="cal-dn">25</div><div class="cal-dts"><span class="cal-dt b"></span><span class="cal-dt a"></span></div></div>
+            <div class="cal-d"><div class="cal-dn">26</div></div>
+            <div class="cal-d"><div class="cal-dn">27</div></div>
+            <div class="cal-d"><div class="cal-dn">28</div></div>
+            <div class="cal-d"><div class="cal-dn">29</div></div>
+            <div class="cal-d"><div class="cal-dn">30</div></div>
+            <div class="cal-d"><div class="cal-dn">31</div></div>
+            <div class="cal-d oth"><div class="cal-dn">1</div></div>
+            <div class="cal-d oth"><div class="cal-dn">2</div></div>
+            <div class="cal-d oth"><div class="cal-dn">3</div></div>
           </div>
         </div>
-        <div class="m-subview" data-msubview="calendar-day" style="padding:14px">
+        <div class="m-subview" data-msubview="calendar-week">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px">本周 7/14 – 7/20</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div class="haptic-target" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周一 7/14</div><div style="font-size:11px">深度工作 4h · 每周跑步</div></div>
+            <div class="haptic-target" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周二 7/15</div><div style="font-size:11px">处理积压邮件 · 会议记录同步 · 用户访谈</div></div>
+            <div class="haptic-target" style="background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周五 7/18 今天</div><div style="font-size:11px">Q3 OKR 评审会议 · 每周跑步 · 周报撰写</div></div>
+          </div>
+        </div>
+        <div class="m-subview" data-msubview="calendar-day">
           <div style="font-size:13px;font-weight:600;margin-bottom:10px">今日 · 7/18 周五</div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
-            <div style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">09:00</div><div style="font-size:11px"><b>晨会</b><br><span style="color:var(--muted);font-size:10px">产品组站会 30min</span></div></div>
-            <div style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">10:00</div><div style="font-size:11px"><b>深度工作</b><br><span style="color:var(--muted);font-size:10px">Q3 OKR 评审材料 2h</span></div></div>
-            <div style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">13:00</div><div style="font-size:11px"><b>客户需求修复</b><br><span style="color:var(--muted);font-size:10px">紧急修复上线 2h</span></div></div>
-            <div style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">14:00</div><div style="font-size:11px"><b>Q3 OKR 评审会议</b><br><span style="color:var(--muted);font-size:10px">全员参与 90min</span></div></div>
-            <div style="display:flex;gap:10px;padding:10px 12px"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">17:00</div><div style="font-size:11px"><b>周报撰写</b><br><span style="color:var(--muted);font-size:10px">本周总结 45min</span></div></div>
+            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">09:00</div><div style="font-size:11px"><b>晨会</b><br><span style="color:var(--muted);font-size:10px">产品组站会 30min</span></div></div>
+            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">10:00</div><div style="font-size:11px"><b>深度工作</b><br><span style="color:var(--muted);font-size:10px">Q3 OKR 评审材料 2h</span></div></div>
+            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">13:00</div><div style="font-size:11px"><b>客户需求修复</b><br><span style="color:var(--muted);font-size:10px">紧急修复上线 2h</span></div></div>
+            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">14:00</div><div style="font-size:11px"><b>Q3 OKR 评审会议</b><br><span style="color:var(--muted);font-size:10px">全员参与 90min</span></div></div>
+            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">17:00</div><div style="font-size:11px"><b>周报撰写</b><br><span style="color:var(--muted);font-size:10px">本周总结 45min</span></div></div>
           </div>
         </div>
       </div>
 
-      <!-- Gantt -->
+      <!-- ── Gantt ── -->
       <div class="view-body" id="vb-gantt" style="display:none">
         <div class="m-subtabs">
           <div class="m-subtab active" onclick="switchMSub('gantt','month',this)">本月</div>
@@ -356,171 +651,596 @@
           <div class="m-subtab" onclick="switchMSub('gantt','year',this)">全年</div>
         </div>
         <div class="m-subview active" data-msubview="gantt-month">
-        <div class="gantt-hd">本月 · 7 月</div>
-        <div class="gantt-card">
-          <div class="gantt-okr-row"><div class="gantt-okr-name">🏆 产品增长</div><div class="gantt-okr-meta">Q3 · 67%</div></div>
-          <div class="gantt-track"><div class="gantt-fill" style="width:67%;background:linear-gradient(90deg,var(--accent),#5856D6)">67%</div></div>
-          <div class="gantt-subs">
-            <div class="gantt-sub"><div class="gantt-sub-n">核心重构</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:100%;background:var(--accent)"></div></div></div>
-            <div class="gantt-sub"><div class="gantt-sub-n">A/B 测试</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:60%;background:var(--accent)"></div></div></div>
-            <div class="gantt-sub"><div class="gantt-sub-n">用户访谈</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:40%;background:var(--accent)"></div></div></div>
+          <div class="gantt-hd">本月 · 7 月</div>
+          <div class="gantt-card">
+            <div class="gantt-okr-row"><div class="gantt-okr-name">产品增长</div><div class="gantt-okr-meta">Q3 · 67%</div></div>
+            <div class="gantt-track"><div class="gantt-fill" style="width:67%;background:linear-gradient(90deg,var(--accent),oklch(48% 0.20 270))">67%</div></div>
+            <div class="gantt-subs">
+              <div class="gantt-sub"><div class="gantt-sub-n">核心重构</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:100%;background:var(--accent)"></div></div></div>
+              <div class="gantt-sub"><div class="gantt-sub-n">A/B 测试</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:60%;background:var(--accent)"></div></div></div>
+              <div class="gantt-sub"><div class="gantt-sub-n">用户访谈</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:40%;background:var(--accent)"></div></div></div>
+            </div>
+          </div>
+          <div class="gantt-card">
+            <div class="gantt-okr-row"><div class="gantt-okr-name">健康管理</div><div class="gantt-okr-meta">持续 · 45%</div></div>
+            <div class="gantt-track"><div class="gantt-fill" style="width:45%;background:linear-gradient(90deg,var(--success),oklch(70% 0.16 145))">45%</div></div>
+            <div class="gantt-subs">
+              <div class="gantt-sub"><div class="gantt-sub-n">每周跑步</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:66%;background:var(--success)"></div></div></div>
+              <div class="gantt-sub"><div class="gantt-sub-n">每天喝水</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:30%;background:var(--success)"></div></div></div>
+            </div>
+          </div>
+          <div class="gantt-card">
+            <div class="gantt-okr-row"><div class="gantt-okr-name">技能提升</div><div class="gantt-okr-meta">Q3 · 30%</div></div>
+            <div class="gantt-track"><div class="gantt-fill" style="width:30%;background:linear-gradient(90deg,var(--warning),oklch(70% 0.16 45))">30%</div></div>
+            <div class="gantt-subs">
+              <div class="gantt-sub"><div class="gantt-sub-n">TypeScript</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:40%;background:var(--warning)"></div></div></div>
+              <div class="gantt-sub"><div class="gantt-sub-n">深度工作</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:20%;background:var(--warning)"></div></div></div>
+            </div>
           </div>
         </div>
-        <div class="gantt-card">
-          <div class="gantt-okr-row"><div class="gantt-okr-name">💪 健康管理</div><div class="gantt-okr-meta">持续 · 45%</div></div>
-          <div class="gantt-track"><div class="gantt-fill" style="width:45%;background:linear-gradient(90deg,var(--success),#30D158)">45%</div></div>
-          <div class="gantt-subs">
-            <div class="gantt-sub"><div class="gantt-sub-n">每周跑步</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:66%;background:var(--success)"></div></div></div>
-            <div class="gantt-sub"><div class="gantt-sub-n">每天喝水</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:30%;background:var(--success)"></div></div></div>
-          </div>
-        </div>
-        <div class="gantt-card">
-          <div class="gantt-okr-row"><div class="gantt-okr-name">📚 技能提升</div><div class="gantt-okr-meta">Q3 · 30%</div></div>
-          <div class="gantt-track"><div class="gantt-fill" style="width:30%;background:linear-gradient(90deg,var(--warning),#FFD60A)">30%</div></div>
-          <div class="gantt-subs">
-            <div class="gantt-sub"><div class="gantt-sub-n">TypeScript</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:40%;background:var(--warning)"></div></div></div>
-            <div class="gantt-sub"><div class="gantt-sub-n">深度工作</div><div class="gantt-sub-t"><div class="gantt-sub-f" style="width:20%;background:var(--warning)"></div></div></div>
-          </div>
-        </div>
-        </div>
-        <div class="m-subview" data-msubview="gantt-quarter" style="padding:14px">
+        <div class="m-subview" data-msubview="gantt-quarter">
           <div style="font-size:13px;font-weight:600;margin-bottom:10px">本季度 · Q3 (7-9 月)</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--success)">12</div><div style="font-size:9px;color:var(--muted)">进行中</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--warning)">4</div><div style="font-size:9px;color:var(--muted)">即将截止</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700">3</div><div style="font-size:9px;color:var(--muted)">OKR</div></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--success);font-family:var(--font-display)">12</div><div style="font-size:9px;color:var(--muted)">进行中</div></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--warning);font-family:var(--font-display)">4</div><div style="font-size:9px;color:var(--muted)">即将截止</div></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;font-family:var(--font-display)">3</div><div style="font-size:9px;color:var(--muted)">OKR</div></div>
           </div>
           <div class="gantt-card">
-            <div class="gantt-okr-row"><div class="gantt-okr-name">🎯 季度路线</div><div class="gantt-okr-meta">Q3</div></div>
-            <div class="gantt-track"><div class="gantt-fill" style="width:55%;background:linear-gradient(90deg,var(--accent),#5856D6)">55%</div></div>
+            <div class="gantt-okr-row"><div class="gantt-okr-name">季度路线</div><div class="gantt-okr-meta">Q3</div></div>
+            <div class="gantt-track"><div class="gantt-fill" style="width:55%;background:linear-gradient(90deg,var(--accent),oklch(48% 0.20 270))">55%</div></div>
           </div>
         </div>
-        <div class="m-subview" data-msubview="gantt-year" style="padding:14px">
+        <div class="m-subview" data-msubview="gantt-year">
           <div style="font-size:13px;font-weight:600;margin-bottom:10px">2025 全年路线图</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--success)">1</div><div style="font-size:9px;color:var(--muted)">完成季度</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700">1</div><div style="font-size:9px;color:var(--muted)">进行中</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700">2</div><div style="font-size:9px;color:var(--muted)">未来</div></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--success);font-family:var(--font-display)">1</div><div style="font-size:9px;color:var(--muted)">完成季度</div></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;font-family:var(--font-display)">1</div><div style="font-size:9px;color:var(--muted)">进行中</div></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;font-family:var(--font-display)">2</div><div style="font-size:9px;color:var(--muted)">未来</div></div>
           </div>
           <div class="gantt-card">
-            <div class="gantt-okr-row"><div class="gantt-okr-name">🎯 产品增长</div><div class="gantt-okr-meta">全年</div></div>
-            <div class="gantt-track"><div class="gantt-fill" style="width:100%;background:linear-gradient(90deg,var(--accent),#5856D6)">全年</div></div>
+            <div class="gantt-okr-row"><div class="gantt-okr-name">产品增长</div><div class="gantt-okr-meta">全年</div></div>
+            <div class="gantt-track"><div class="gantt-fill" style="width:100%;background:linear-gradient(90deg,var(--accent),oklch(48% 0.20 270))">全年</div></div>
           </div>
           <div class="gantt-card">
-            <div class="gantt-okr-row"><div class="gantt-okr-name">🏃 健康管理</div><div class="gantt-okr-meta">全年</div></div>
-            <div class="gantt-track"><div class="gantt-fill" style="width:100%;background:linear-gradient(90deg,var(--success),#30D158)">全年</div></div>
+            <div class="gantt-okr-row"><div class="gantt-okr-name">健康管理</div><div class="gantt-okr-meta">全年</div></div>
+            <div class="gantt-track"><div class="gantt-fill" style="width:100%;background:linear-gradient(90deg,var(--success),oklch(70% 0.16 145))">全年</div></div>
           </div>
         </div>
       </div>
 
-      <!-- Achievements -->
+      <!-- ── 我的 ── -->
       <div class="view-body" id="vb-ach" style="display:none">
-        <div class="m-subtabs">
-          <div class="m-subtab active" onclick="switchMSub('ach','data',this)">数据</div>
-          <div class="m-subtab" onclick="switchMSub('ach','badges',this)">勋章</div>
-          <div class="m-subtab" onclick="switchMSub('ach','retro',this)">复盘</div>
-          <div class="m-subtab" onclick="switchMSub('ach','share',this)">分享</div>
+        <!-- 个人卡片 -->
+        <div class="me-card" id="meCard">
+          <div class="me-av-lg" id="meAvLg">林</div>
+          <div class="me-info">
+            <div class="me-name" id="meName">林小白</div>
+            <div class="me-sub" id="meSub">已登录 · 7/18 加入 · Q3 进行中</div>
+          </div>
+          <button class="me-edit-btn haptic-target" onclick="openAuth()" aria-label="切换账号">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+          </button>
         </div>
-        <div class="m-subview active" data-msubview="ach-data">
-        <div class="ach-hero">
-          <div class="ach-n">24</div>
-          <div class="ach-l">已完成任务</div>
-          <div class="ach-sub">超过 92% 的用户 · 连续 12 天</div>
-          <div class="ach-streak">
-            <div class="ach-dot" style="background:rgba(255,255,255,.3)"></div>
-            <div class="ach-dot" style="background:rgba(255,255,255,.3)"></div>
-            <div class="ach-dot" style="background:rgba(255,255,255,.3)"></div>
-            <div class="ach-dot" style="background:rgba(255,255,255,.3)"></div>
-            <div class="ach-dot" style="background:rgba(255,255,255,.3)"></div>
-            <div class="ach-dot" style="background:rgba(255,255,255,.3)"></div>
-            <div class="ach-dot" style="background:white"></div>
+
+        <!-- 概览行（紧凑 1 行） -->
+        <div class="me-quick">
+          <div class="me-quick-item"><div class="me-quick-n">24</div><div class="me-quick-l">已完成</div></div>
+          <div class="me-quick-sep"></div>
+          <div class="me-quick-item"><div class="me-quick-n">3</div><div class="me-quick-l">OKR</div></div>
+          <div class="me-quick-sep"></div>
+          <div class="me-quick-item"><div class="me-quick-n">86h</div><div class="me-quick-l">专注</div></div>
+          <div class="me-quick-sep"></div>
+          <div class="me-quick-item"><div class="me-quick-n">12<span style="font-size:11px;color:var(--muted);font-weight:500">天</span></div><div class="me-quick-l">连续</div></div>
+        </div>
+
+        <!-- 当前 OKR 进度条 -->
+        <div class="me-section-title">我的 OKR</div>
+        <div class="me-okr-card">
+          <div class="me-okr-row"><div class="ach-dot-sm" style="background:var(--accent)"></div><span class="me-okr-name">产品增长 · Q3 月活提升 30%</span><span class="me-okr-pct">67%</span></div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px"><div style="height:100%;width:67%;background:var(--accent);border-radius:2px"></div></div>
+          <div class="me-okr-row" style="margin-top:10px"><div class="ach-dot-sm" style="background:#8B5CF6"></div><span class="me-okr-name">健康管理 · 养成运动习惯</span><span class="me-okr-pct">45%</span></div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px"><div style="height:100%;width:45%;background:#8B5CF6;border-radius:2px"></div></div>
+          <div class="me-okr-row" style="margin-top:10px"><div class="ach-dot-sm" style="background:var(--warning)"></div><span class="me-okr-name">技能提升 · 掌握 TypeScript</span><span class="me-okr-pct">30%</span></div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px"><div style="height:100%;width:30%;background:var(--warning);border-radius:2px"></div></div>
+        </div>
+
+        <!-- 我的操作 -->
+        <div class="me-section-title">我的操作</div>
+        <div class="me-actions">
+          <div class="me-act haptic-target" onclick="openOkrMgr()">
+            <div class="me-act-ic" style="background:oklch(94% 0.008 255);color:var(--accent)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></div>
+            <div class="me-act-tx"><div class="me-act-title">目标管理</div><div class="me-act-desc">编辑 OKR / KR</div></div>
+            <svg class="me-act-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+          <div class="me-act haptic-target" onclick="tabBar(document.querySelector('.tab-item:nth-child(2)'),'list')">
+            <div class="me-act-ic" style="background:oklch(94% 0.008 145);color:var(--success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
+            <div class="me-act-tx"><div class="me-act-title">我的任务</div><div class="me-act-desc">进行中 12 · 已完成 24</div></div>
+            <svg class="me-act-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+          <div class="me-act haptic-target" onclick="openShareSheet()">
+            <div class="me-act-ic" style="background:oklch(94% 0.008 45);color:var(--warning)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></div>
+            <div class="me-act-tx"><div class="me-act-title">分享进度</div><div class="me-act-desc">生成季度成长卡片</div></div>
+            <svg class="me-act-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 6l6 6-6 6"/></svg>
           </div>
         </div>
-        <div class="ach-stats">
-          <div class="ach-stat"><div class="ach-stat-n">🎯</div><div class="ach-stat-l">已完成</div></div>
-          <div class="ach-stat"><div class="ach-stat-n">3</div><div class="ach-stat-l">OKR</div></div>
-          <div class="ach-stat"><div class="ach-stat-n">86h</div><div class="ach-stat-l">专注</div></div>
-        </div>
-        <div class="ach-okrs">
-          <div class="ach-okr-row"><div class="ach-dot-sm" style="background:var(--accent)"></div><span class="ach-okr-n">产品增长</span><span class="ach-okr-pct">67%</span></div>
-          <div class="ach-okr-row"><div class="ach-dot-sm" style="background:var(--success)"></div><span class="ach-okr-n">健康管理</span><span class="ach-okr-pct">45%</span></div>
-          <div class="ach-okr-row"><div class="ach-dot-sm" style="background:var(--warning)"></div><span class="ach-okr-n">技能提升</span><span class="ach-okr-pct">30%</span></div>
-        </div>
-        </div>
-        <div class="m-subview" data-msubview="ach-badges" style="padding:14px">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:10px">已解锁 6 / 12</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#FFD86F,#FF9F1C);color:#fff;display:grid;place-items:center;margin:0 auto 6px;font-size:18px">🏆</div><div style="font-size:11px;font-weight:600">初次达成</div><div style="font-size:9px;color:var(--muted);margin-top:2px">完成第一个OKR</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#FFD86F,#FF9F1C);color:#fff;display:grid;place-items:center;margin:0 auto 6px;font-size:18px">🔥</div><div style="font-size:11px;font-weight:600">连续 7 天</div><div style="font-size:9px;color:var(--muted);margin-top:2px">一周不间断</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7EE8B5,#16A34A);color:#fff;display:grid;place-items:center;margin:0 auto 6px;font-size:18px">🌱</div><div style="font-size:11px;font-weight:600">运动健将</div><div style="font-size:9px;color:var(--muted);margin-top:2px">跑步 30 天</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;opacity:.4;filter:grayscale(80%)"><div style="width:36px;height:36px;border-radius:50%;background:var(--muted);color:#fff;display:grid;place-items:center;margin:0 auto 6px;font-size:18px">🌟</div><div style="font-size:11px;font-weight:600">季度冠军</div><div style="font-size:9px;color:var(--muted);margin-top:2px">完成季度</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;opacity:.4;filter:grayscale(80%)"><div style="width:36px;height:36px;border-radius:50%;background:var(--muted);color:#fff;display:grid;place-items:center;margin:0 auto 6px;font-size:18px">💎</div><div style="font-size:11px;font-weight:600">年度之星</div><div style="font-size:9px;color:var(--muted);margin-top:2px">完成全年</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;opacity:.4;filter:grayscale(80%)"><div style="width:36px;height:36px;border-radius:50%;background:var(--muted);color:#fff;display:grid;place-items:center;margin:0 auto 6px;font-size:18px">🚀</div><div style="font-size:11px;font-weight:600">速度之神</div><div style="font-size:9px;color:var(--muted);margin-top:2px">24h 紧急</div></div>
+
+        <!-- 偏好与账户 -->
+        <div class="me-section-title">偏好与账户</div>
+        <div class="me-list">
+          <div class="me-li haptic-target" onclick="showToast('通知设置','即将开放')">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21a2 2 0 0 0 4 0"/></svg></div>
+            <span class="me-li-name">通知设置</span>
+            <span class="me-li-meta">已开启 3 项</span>
+          </div>
+          <div class="me-li haptic-target" onclick="showToast('主题外观','即将开放')">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
+            <span class="me-li-name">主题外观</span>
+            <span class="me-li-meta">跟随系统</span>
+          </div>
+          <div class="me-li haptic-target" onclick="showToast('数据同步','iCloud 已同步 · 刚刚')">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 12a9 9 0 1 1-3.5-7.1M21 4v5h-5"/></svg></div>
+            <span class="me-li-name">数据同步</span>
+            <span class="me-li-meta">刚刚</span>
+          </div>
+          <div class="me-li haptic-target" onclick="showToast('隐私设置','即将开放')">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+            <span class="me-li-name">隐私</span>
+            <span class="me-li-meta">仅自己可见</span>
+          </div>
+          <div class="me-li haptic-target" onclick="showToast('帮助与反馈','感谢使用 GridGo')">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-1 1-2 1.5-2 3M12 17h.01"/></svg></div>
+            <span class="me-li-name">帮助与反馈</span>
+            <span class="me-li-meta"></span>
+          </div>
+          <div class="me-li haptic-target" onclick="showToast('关于','格行 GridGo · v0.1.0')">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg></div>
+            <span class="me-li-name">关于</span>
+            <span class="me-li-meta">v0.1.0</span>
           </div>
         </div>
-        <div class="m-subview" data-msubview="ach-retro" style="padding:14px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:10px">时间都去哪儿了</div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px">
-            <div style="font-size:11px;font-weight:600;margin-bottom:8px">本周时间分配</div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:10px;font-weight:500;min-width:60px">🎯 产品</div><div style="flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:62%;background:var(--accent);border-radius:3px"></div></div><div style="font-size:10px;color:var(--muted);min-width:34px;text-align:right">12.4h</div></div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:10px;font-weight:500;min-width:60px">📚 学习</div><div style="flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:18%;background:var(--success);border-radius:3px"></div></div><div style="font-size:10px;color:var(--muted);min-width:34px;text-align:right">3.6h</div></div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:10px;font-weight:500;min-width:60px">🏃 健康</div><div style="flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:10%;background:var(--warning);border-radius:3px"></div></div><div style="font-size:10px;color:var(--muted);min-width:34px;text-align:right">2.0h</div></div>
-            <div style="display:flex;align-items:center;gap:8px"><div style="font-size:10px;font-weight:500;min-width:60px">📧 沟通</div><div style="flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:7%;background:var(--muted);border-radius:3px"></div></div><div style="font-size:10px;color:var(--muted);min-width:34px;text-align:right">1.4h</div></div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px"><div style="font-size:11px;font-weight:600;margin-bottom:8px">💡 洞察</div><div style="font-size:11px;color:var(--muted);line-height:1.6;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:6px">本周 <b style="color:var(--fg)">深度工作 12.4h</b>，是本季度最高。</div><div style="font-size:11px;color:var(--muted);line-height:1.6">已连续 <b style="color:var(--fg)">12 天</b> 完成每日任务。</div></div>
+
+        <button class="me-logout haptic-target" onclick="logout()">退出登录</button>
+        <div class="me-footer">格行 GridGo · 让 OKR 真正被看见</div>
+      </div>
+    </div>
+
+    <!-- iOS FAB: 移出 .app-body 避免跟随滚动 (触觉感更强) -->
+    <div class="fab haptic-target" onclick="openAddSheet()" title="添加任务" aria-label="添加任务">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </div>
+
+    <!-- ── iOS 5-Tab Bottom Bar (HIG) ── -->
+    <div class="ios-tabbar">
+      <div class="tab-item active" onclick="tabBar(this,'matrix')" aria-label="四象限"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg><span>四象限</span></div>
+      <div class="tab-item" onclick="tabBar(this,'list')" aria-label="列表"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>列表</span></div>
+      <div class="tab-item" onclick="tabBar(this,'calendar')" aria-label="日历"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>日历</span></div>
+      <div class="tab-item" onclick="tabBar(this,'gantt')" aria-label="甘特图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="18" y2="6"/><line x1="3" y1="12" x2="14" y2="12"/><line x1="3" y1="18" x2="10" y2="18"/></svg><span>甘特图</span></div>
+      <div class="tab-item" onclick="tabBar(this,'ach')" aria-label="成就"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><span>成就</span></div>
+    </div>
+
+    <!-- iOS Sheet (添加任务) -->
+    <div class="sheet-overlay" id="addSheet" onclick="if(event.target===this)closeAddSheet()">
+      <div class="sheet">
+        <div class="sheet-grabber"></div>
+        <h3>添加新任务</h3>
+        <div class="form-field"><label>任务名称</label><input type="text" placeholder="例如：完成产品需求文档" /></div>
+        <div class="form-field"><label>所属 OKR</label><select><option>产品增长  ·  Q3 月活提升 30%</option><option>健康管理  ·  养成运动习惯</option><option>技能提升  ·  掌握 TypeScript</option></select></div>
+        <div class="form-field"><label>象限</label><select><option>紧急 × 重要</option><option>不紧急 × 重要</option><option>紧急 × 不重要</option><option>不紧急 × 不重要</option></select></div>
+        <div class="form-field"><label>截止日期</label><input type="date" /></div>
+        <div class="sheet-actions">
+          <button class="sheet-btn cancel" onclick="closeAddSheet()">取消</button>
+          <button class="sheet-btn primary" onclick="closeAddSheet();showToast('任务已添加')">添加任务</button>
         </div>
-        <div class="m-subview" data-msubview="ach-share" style="padding:14px">
-          <div style="background:linear-gradient(135deg,#5856D6,#AF52DE);border-radius:14px;padding:18px;color:#fff;margin-bottom:12px">
-            <div style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;opacity:.85;margin-bottom:4px">2025 Q3 · OKR 进度</div>
-            <div style="font-size:15px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px">林小白 的季度成长</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><div style="font-size:18px;font-weight:700">67%</div><div style="font-size:9px;opacity:.85">产品</div></div><div><div style="font-size:18px;font-weight:700">45%</div><div style="font-size:9px;opacity:.85">健康</div></div><div><div style="font-size:18px;font-weight:700">30%</div><div style="font-size:9px;opacity:.85">技能</div></div></div>
+      </div>
+    </div>
+
+    <!-- iOS Context Menu (长按唤出) -->
+    <div class="context-overlay" id="contextMenu" onclick="if(event.target===this)closeContext()">
+      <div class="context-menu">
+        <div class="context-item" onclick="closeContext();showToast('已标记完成')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12l5 5L20 7"/></svg>标记完成</div>
+        <div class="context-item" onclick="closeContext();showToast('已设置提醒')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>添加提醒</div>
+        <div class="context-item" onclick="closeContext()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4v16h16v-7M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>编辑任务</div>
+        <div class="context-item" onclick="closeContext()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12h6M12 9v6"/></svg>移到其他象限</div>
+        <div class="context-divider"></div>
+        <div class="context-item danger" onclick="closeContext();showToast('已删除')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>删除任务</div>
+      </div>
+    </div>
+
+    <!-- iOS 登录 / 注册 Sheet -->
+    <div class="auth-overlay" id="authSheet" onclick="if(event.target===this)closeAuth()">
+      <div class="auth-sheet">
+        <div class="sheet-grabber"></div>
+        <img class="auth-logo" src="logo-mark.svg" alt="格行 GridGo" />
+        <div class="auth-tagline">登录后同步你的 OKR 到所有设备，与关心你的人分享进度。</div>
+
+        <div class="auth-tabs">
+          <div class="auth-tab active" data-mode="login" onclick="switchAuthTab('login',this)">登录</div>
+          <div class="auth-tab" data-mode="register" onclick="switchAuthTab('register',this)">注册</div>
+        </div>
+
+        <div class="auth-view active" data-authview="login">
+          <div class="auth-field"><label>邮箱</label><input type="email" placeholder="you@example.com" /></div>
+          <div class="auth-field"><label>密码</label><input type="password" placeholder="••••••••" /></div>
+          <button type="button" class="auth-submit" onclick="doLogin()">登录</button>
+        </div>
+
+        <div class="auth-view" data-authview="register">
+          <div class="auth-field"><label>昵称</label><input type="text" placeholder="例如：林小白" /></div>
+          <div class="auth-field"><label>邮箱</label><input type="email" placeholder="you@example.com" /></div>
+          <div class="auth-field"><label>密码</label><input type="password" placeholder="至少 8 位" /></div>
+          <button type="button" class="auth-submit" onclick="doRegister()">创建账号</button>
+        </div>
+
+        <div class="auth-divider">或使用</div>
+        <div class="auth-socials">
+          <div class="auth-social" title="Google" onclick="showToast('Google 登录','即将开放')"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></div>
+          <div class="auth-social" title="Apple" onclick="showToast('Apple 登录','即将开放')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.04c-.03-2.75 2.25-4.07 2.35-4.13-1.28-1.87-3.27-2.13-3.98-2.16-1.69-.17-3.31 1-4.17 1-.87 0-2.19-.98-3.6-.95-1.85.03-3.55 1.07-4.5 2.73-1.92 3.33-.49 8.27 1.38 10.97.91 1.33 2 2.81 3.42 2.76 1.37-.06 1.89-.89 3.55-.89 1.65 0 2.13.89 3.59.86 1.48-.03 2.42-1.34 3.32-2.68 1.05-1.54 1.48-3.03 1.5-3.11-.03-.01-2.88-1.1-2.91-4.4zM14.45 4.1c.76-.92 1.27-2.2 1.13-3.47-1.09.04-2.42.73-3.21 1.64-.7.81-1.32 2.12-1.16 3.36 1.22.09 2.46-.62 3.24-1.53z"/></svg></div>
+          <div class="auth-social" title="微信" onclick="showToast('微信登录','即将开放')"><svg viewBox="0 0 24 24" fill="#07C160"><path d="M8.69 4C4.99 4 2 6.5 2 9.6c0 1.71.91 3.24 2.36 4.27-.07.27-.49 1.81-.56 2.06-.09.32.12.32.25.23.1-.07 1.54-1.05 2.17-1.48.79.21 1.62.34 2.5.34.23 0 .46-.01.69-.03-.15-.5-.23-1.02-.23-1.56 0-2.96 2.86-5.36 6.39-5.36.18 0 .36.01.53.02C15.21 5.57 12.18 4 8.69 4zm-2.86 3.04c.5 0 .9.4.9.9s-.4.9-.9.9-.9-.4-.9-.9.4-.9.9-.9zm5.32 0c.5 0 .9.4.9.9s-.4.9-.9.9-.9-.4-.9-.9.4-.9.9-.9zm3.62 1.93c-3.21 0-5.82 2.05-5.82 4.58s2.61 4.58 5.82 4.58c.69 0 1.34-.1 1.95-.27.49.33 1.62 1.06 1.7 1.11.1.07.26.07.19-.21-.05-.2-.38-1.36-.43-1.57 1.16-.82 1.9-2.04 1.9-3.44 0-2.53-2.61-4.58-5.31-4.58zm-2.13 1.7c.4 0 .72.32.72.72s-.32.72-.72.72-.72-.32-.72-.72.32-.72.72-.72zm4.21 0c.4 0 .72.32.72.72s-.32.72-.72.72-.72-.32-.72-.72.32-.72.72-.72z"/></svg></div>
+          <div class="auth-social" title="GitHub" onclick="showToast('GitHub 登录','即将开放')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-1.92c-3.2.69-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39s1.97.13 2.89.39c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.41-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.55C20.21 21.38 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+<!-- iOS Notification Toast -->
+    <div class="ios-toast" id="iosToast">
+      <div class="ios-toast-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg></div>
+      <div class="ios-toast-body"><div class="ios-toast-title" id="toastTitle">操作完成</div><div class="ios-toast-msg" id="toastMsg">已成功保存到你的 OKR</div></div>
+    </div>
+
+    <!-- iOS Task Detail Sheet (大sheet, 含标签/状态/元信息/描述/子任务/评论) -->
+    <div class="task-overlay" id="taskSheet" onclick="if(event.target===this)closeTask()">
+      <div class="task-sheet">
+        <div class="task-grabber"></div>
+        <div class="task-head">
+          <div class="task-head-left">
+            <span class="task-pill q1" id="task-pill">紧急重要</span>
+            <div class="task-status" id="task-status"><span class="dot"></span><span id="task-status-text">进行中</span></div>
           </div>
-          <div style="display:flex;gap:6px;margin-bottom:12px"><input value="https://focal.app/share/x8f2k9" readonly style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:10px;font-family:monospace;background:var(--bg);color:var(--fg)" /><button style="padding:8px 12px;border-radius:8px;background:var(--accent);color:#fff;border:none;font-size:11px;font-weight:600">复制</button></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 4px;text-align:center"><div style="font-size:18px;margin-bottom:4px">💬</div><div style="font-size:10px;color:var(--fg)">微信</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 4px;text-align:center"><div style="font-size:18px;margin-bottom:4px">🐦</div><div style="font-size:10px;color:var(--fg)">Twitter</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 4px;text-align:center"><div style="font-size:18px;margin-bottom:4px">📧</div><div style="font-size:10px;color:var(--fg)">邮件</div></div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 4px;text-align:center"><div style="font-size:18px;margin-bottom:4px">📱</div><div style="font-size:10px;color:var(--fg)">朋友圈</div></div>
+          <button type="button" class="task-close" onclick="closeTask()" aria-label="关闭">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+          </button>
+        </div>
+
+        <div class="task-body">
+          <div class="task-title" id="task-title">Q3 OKR 评审材料</div>
+
+          <div class="task-meta">
+            <div class="task-meta-row">
+              <div class="task-meta-label">所属 OKR</div>
+              <div class="task-meta-val" id="task-okr"><span class="okr-dot" style="background:var(--accent);color:#fff;width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700">P</span> 产品增长</div>
+            </div>
+            <div class="task-meta-row">
+              <div class="task-meta-label">截止日期</div>
+              <div class="task-meta-val" id="task-due">今天 · 7/18 18:00</div>
+            </div>
+            <div class="task-meta-row">
+              <div class="task-meta-label">预计耗时</div>
+              <div class="task-meta-val" id="task-estimate">2 小时</div>
+            </div>
+            <div class="task-meta-row">
+              <div class="task-meta-label">创建于</div>
+              <div class="task-meta-val" id="task-created">7/14 · 林小白</div>
+            </div>
+          </div>
+
+          <div class="task-desc" id="task-desc">撰写 Q3 OKR 评审会议的材料,包含进度回顾、下季度规划、风险与依赖项。需要同步给所有相关人。</div>
+
+          <div class="task-children">
+            <div class="task-children-head">子任务 <span class="task-children-count" id="task-children-count">3 项</span></div>
+            <div class="task-sub"><div class="task-sub-check done"></div><span class="task-sub-text done">汇总 OKR 数据</span><span class="task-sub-meta">已完成 · 7/15</span></div>
+            <div class="task-sub"><div class="task-sub-check"></div><span class="task-sub-text">起草评审文档大纲</span><span class="task-sub-meta">1h</span></div>
+            <div class="task-sub"><div class="task-sub-check"></div><span class="task-sub-text">邀请评审参与者</span><span class="task-sub-meta">30min</span></div>
+          </div>
+
+          <div class="task-comments">
+            <div class="task-comments-head">评论 3 条</div>
+            <div class="task-comment">
+              <div class="task-comment-av" style="background:var(--accent)">林</div>
+              <div class="task-comment-body">
+                <div class="task-comment-meta"><span class="task-comment-name">林小白</span><span>2 小时前</span></div>
+                <div class="task-comment-text">材料大纲已写好，放在共享文档里，大家可以补充各自负责的部分。</div>
+              </div>
+            </div>
+            <div class="task-comment">
+              <div class="task-comment-av" style="background:#22D3EE">陈</div>
+              <div class="task-comment-body">
+                <div class="task-comment-meta"><span class="task-comment-name">陈晓</span><span>昨天</span></div>
+                <div class="task-comment-text">需要我同步数据吗？我这边有最新的用户增长数据。</div>
+              </div>
+            </div>
+            <div class="task-comment">
+              <div class="task-comment-av" style="background:#8B5CF6">王</div>
+              <div class="task-comment-body">
+                <div class="task-comment-meta"><span class="task-comment-name">王明</span><span>3 天前</span></div>
+                <div class="task-comment-text">评审时间确认下：周五下午五点带大家过一遍 OKR？</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-foot">
+          <div class="task-foot-left">
+            <button type="button" class="task-btn danger" onclick="closeTask();showToast('已删除','任务已从 OKR 中移除')">删除</button>
+          </div>
+          <div class="task-foot-right">
+            <button type="button" class="task-btn" onclick="toggleTaskDone()">标记完成</button>
+            <button type="button" class="task-btn primary" onclick="closeTask();showToast('已编辑','任务信息已保存')">编辑</button>
           </div>
         </div>
       </div>
-
-      <div class="fab" onclick="openM()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
     </div>
 
-    <!-- 5-Tab Bottom Bar -->
-    <div class="ios-tabbar">
-      <div class="tab-item active" onclick="tabBar(this,'matrix')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg><span>四象限</span></div>
-      <div class="tab-item" onclick="tabBar(this,'list')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>列表</span></div>
-      <div class="tab-item" onclick="tabBar(this,'calendar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>日历</span></div>
-      <div class="tab-item" onclick="tabBar(this,'gantt')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="18" y2="6"/><line x1="3" y1="12" x2="14" y2="12"/><line x1="3" y1="18" x2="10" y2="18"/></svg><span>甘特图</span></div>
-      <div class="tab-item" onclick="tabBar(this,'ach')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg><span>成就</span></div>
+    <!-- iOS OKR Manager Sheet (目标管理: 进度/KR/新建) -->
+    <div class="okr-overlay" id="okrSheet" onclick="if(event.target===this)closeOkrMgr()">
+      <div class="okr-sheet">
+        <div class="task-grabber"></div>
+        <div class="task-head">
+          <div class="task-head-left">
+            <span class="task-pill q1" style="background:oklch(94% 0.008 255);color:var(--accent)">OKR</span>
+            <div class="task-status"><span class="dot"></span><span>目标管理</span></div>
+          </div>
+          <button type="button" class="task-close" onclick="closeOkrMgr()" aria-label="关闭">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+          </button>
+        </div>
+
+        <div class="okr-list">
+          <!-- OKR 1 -->
+          <div class="okr-list-row">
+            <div class="okr-list-head">
+              <div class="okr-list-dot" style="background:var(--accent)"></div>
+              <span class="okr-list-name">产品增长 · Q3 月活提升 30%</span>
+              <button type="button" class="okr-act-btn danger" title="删除" onclick="this.closest('.okr-list-row').style.display='none';showToast('已删除','OKR 已移除')">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h8M5 4V2h4v2M4 4l1 8h4l1-8"/></svg>
+              </button>
+            </div>
+            <div class="okr-progress-row">
+              <div class="okr-progress-bar"><div class="okr-progress-fill" style="width:67%"></div></div>
+              <span class="okr-progress-label">67%</span>
+            </div>
+            <div class="okr-kr-list">
+              <div class="okr-kr-row"><div class="kr-check done" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name done">完成核心功能重构</span><span class="kr-pct">100%</span></div>
+              <div class="okr-kr-row"><div class="kr-check" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name">上线 A/B 测试框架</span><span class="kr-pct">60%</span></div>
+              <div class="okr-kr-row"><div class="kr-check" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name">用户访谈 10 位</span><span class="kr-pct">40%</span></div>
+              <div class="okr-kr-add">
+                <input class="okr-kr-input" placeholder="+ 添加关键结果…" />
+              </div>
+            </div>
+          </div>
+
+          <!-- OKR 2 -->
+          <div class="okr-list-row">
+            <div class="okr-list-head">
+              <div class="okr-list-dot" style="background:#8B5CF6"></div>
+              <span class="okr-list-name">健康管理 · 养成运动习惯</span>
+              <button type="button" class="okr-act-btn danger" title="删除" onclick="this.closest('.okr-list-row').style.display='none';showToast('已删除','OKR 已移除')">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h8M5 4V2h4v2M4 4l1 8h4l1-8"/></svg>
+              </button>
+            </div>
+            <div class="okr-progress-row">
+              <div class="okr-progress-bar"><div class="okr-progress-fill" style="width:45%;background:#8B5CF6"></div></div>
+              <span class="okr-progress-label">45%</span>
+            </div>
+            <div class="okr-kr-list">
+              <div class="okr-kr-row"><div class="kr-check done" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name done">每周跑步 3 次</span><span class="kr-pct">66%</span></div>
+              <div class="okr-kr-row"><div class="kr-check" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name">每天 8 杯水</span><span class="kr-pct">30%</span></div>
+              <div class="okr-kr-add">
+                <input class="okr-kr-input" placeholder="+ 添加关键结果…" />
+              </div>
+            </div>
+          </div>
+
+          <!-- 新建 OKR -->
+          <div class="okr-add-form">
+            <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase">+ 新建 OKR</div>
+            <div class="okr-add-color-pick">
+              <div class="okr-color-dot sel" style="background:var(--accent)"></div>
+              <div class="okr-color-dot" style="background:#8B5CF6"></div>
+              <div class="okr-color-dot" style="background:var(--warning)"></div>
+              <div class="okr-color-dot" style="background:var(--danger)"></div>
+              <div class="okr-color-dot" style="background:var(--muted)"></div>
+            </div>
+            <input class="okr-add-name" placeholder="例如：技能提升 · 掌握 TypeScript" />
+            <button type="button" class="task-btn primary" style="width:100%" onclick="closeOkrMgr();showToast('OKR 已创建','新建的目标已添加到列表')">创建 OKR</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 </div>
 
-<div class="modal-o" id="modal-o" onclick="if(event.target===this)closeM()">
-  <div class="modal">
-    <h3>添加任务</h3>
-    <div class="fg"><label class="fl">任务名称</label><input class="fi" type="text" placeholder="输入任务…" /></div>
-    <div class="fg"><label class="fl">所属 OKR</label><select class="fs"><option>产品增长 — Q3 月活+30%</option><option>健康管理</option><option>技能提升</option></select></div>
-    <div class="fg"><label class="fl">象限</label><select class="fs"><option>紧急 × 重要</option><option>不紧急 × 重要</option><option>紧急 × 不重要</option><option>不紧急 × 不重要</option></select></div>
-    <div class="ma"><button class="bc" onclick="closeM()">取消</button><button class="bl" onclick="closeM()">添加</button></div>
-  </div>
-</div>
 <script>
 function tabBar(el,name){
   document.querySelectorAll('.tab-item').forEach(function(t){t.classList.remove('active')});
   el.classList.add('active');
   document.querySelectorAll('.view-body').forEach(function(v){v.style.display='none'});
   document.getElementById('vb-'+name).style.display='block';
+  document.getElementById('appBody').scrollTop = 0;
 }
-function iosCheck(el){var ck=el.querySelector('.eq2ck');if(!ck.classList.contains('done')){ck.classList.add('done');el.querySelector('.eq2item-title').classList.add('done')}else{ck.classList.remove('done');el.querySelector('.eq2item-title').classList.remove('done')}}
-function iosKr(e,el){e.stopPropagation();if(!el.classList.contains('done')){el.classList.add('done');el.nextElementSibling.classList.add('done')}else{el.classList.remove('done');el.nextElementSibling.classList.remove('done')}}
-function iosOkr(h){var b=h.nextElementSibling;var e=h.querySelector('.okr-exp');b.classList.toggle('open');e.classList.toggle('open')}
-function openM(){document.getElementById('modal-o').classList.add('open')}
-function closeM(){document.getElementById('modal-o').classList.remove('open')}
+
+function iosCheck(el){
+  var ck=el;
+  // 兼容两种结构：传入的可能是 eq2ck 或包含它的 row
+  if(!ck.classList.contains('eq2ck')) ck = el.querySelector('.eq2ck');
+  if(!ck) return;
+  if(!ck.classList.contains('done')){
+    ck.classList.add('done');
+    var title=ck.parentElement && ck.parentElement.querySelector('.eq2item-title');
+    if(title) title.classList.add('done');
+    triggerHaptic();
+    showToast('任务已完成','+ 4h 专注时间');
+  } else {
+    ck.classList.remove('done');
+    var title2=ck.parentElement && ck.parentElement.querySelector('.eq2item-title');
+    if(title2) title2.classList.remove('done');
+  }
+}
+
+function iosKr(e,el){
+  e.stopPropagation();
+  if(!el.classList.contains('done')){
+    el.classList.add('done');
+    var label=el.parentElement.querySelector('.kr-tx');
+    if(label) label.classList.add('done');
+    triggerHaptic();
+  } else {
+    el.classList.remove('done');
+    var label2=el.parentElement.querySelector('.kr-tx');
+    if(label2) label2.classList.remove('done');
+  }
+}
+
+function iosOkr(h){
+  var card = h.closest('.okr-card');
+  var b = card.querySelector('.kr-body');
+  var e = h.querySelector('.okr-exp');
+  if(b) b.classList.toggle('open');
+  if(e) e.classList.toggle('open');
+  triggerHaptic();
+}
+
+// iOS Swipe action (左滑显示「完成」)
+document.querySelectorAll('.swipe-row').forEach(function(row){
+  var startX=0, currentX=0, swiped=false;
+  row.addEventListener('touchstart', function(e){
+    startX = e.touches[0].clientX;
+    swiped = false;
+  }, {passive:true});
+  row.addEventListener('touchmove', function(e){
+    currentX = e.touches[0].clientX - startX;
+    if(currentX < -10){
+      row.classList.add('swiped');
+      swiped = true;
+    } else if(currentX > 10){
+      row.classList.remove('swiped');
+    }
+  }, {passive:true});
+  row.addEventListener('touchend', function(){
+    // 没滑够 -10px 时自动收起
+    if(!swiped) row.classList.remove('swiped');
+  });
+});
+
+// iOS Sheet (添加任务)
+function openAddSheet(){
+  var sheet = document.getElementById('addSheet');
+  // 重置回「添加任务」模式（防止被分享 sheet 改过）
+  sheet.querySelector('h3').textContent = '添加新任务';
+  sheet.querySelectorAll('.form-field').forEach(function(f){ f.style.display=''; });
+  var oldExtra = sheet.querySelector('.share-extra');
+  if(oldExtra) oldExtra.remove();
+  var cancel = sheet.querySelector('.sheet-btn.cancel');
+  var primary = sheet.querySelector('.sheet-btn.primary');
+  cancel.textContent = '取消';
+  primary.textContent = '添加任务';
+  sheet.classList.add('open');
+  triggerHaptic();
+}
+function closeAddSheet(){ document.getElementById('addSheet').classList.remove('open'); }
+
+// 顶栏 OKR 周期切换 → 打开目标管理 Sheet
+function openOkrSwitcher(){
+  triggerHaptic();
+  openOkrMgr();
+}
+
+// OKR 颜色选择器交互
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.okr-color-dot').forEach(function(dot){
+    dot.addEventListener('click', function(){
+      this.parentElement.querySelectorAll('.okr-color-dot').forEach(function(d){d.classList.remove('sel')});
+      this.classList.add('sel');
+      triggerHaptic();
+    });
+  });
+});
+// 兼容无 DOMContentLoaded 事件的情况
+window.addEventListener('load', function(){
+  document.querySelectorAll('.okr-color-dot').forEach(function(dot){
+    dot.onclick = function(){
+      this.parentElement.querySelectorAll('.okr-color-dot').forEach(function(d){d.classList.remove('sel')});
+      this.classList.add('sel');
+      triggerHaptic();
+    };
+  });
+});
+
+// 顶栏分享：复用 Add Sheet 改成分享卡
+function openShareSheet(){
+  triggerHaptic();
+  var sheet = document.getElementById('addSheet');
+  sheet.querySelector('h3').textContent = '分享季度成长';
+  sheet.querySelectorAll('.form-field').forEach(function(f){ f.style.display='none'; });
+  var linkHtml = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;margin:6px 0 4px"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">2025 Q3 · 季度成长卡片</div><div style="font-size:13px;font-weight:600;color:var(--fg);margin-bottom:8px">林小白</div><div style="display:flex;gap:10px;justify-content:center"><div><div style="font-size:18px;font-weight:700;color:var(--accent)">67%</div><div style="font-size:9px;color:var(--muted)">产品</div></div><div><div style="font-size:18px;font-weight:700;color:var(--success)">45%</div><div style="font-size:9px;color:var(--muted)">健康</div></div><div><div style="font-size:18px;font-weight:700;color:var(--warning)">30%</div><div style="font-size:9px;color:var(--muted)">技能</div></div></div></div>';
+  var oldExtra = sheet.querySelector('.share-extra');
+  if(oldExtra) oldExtra.remove();
+  var wrap = document.createElement('div'); wrap.className='share-extra'; wrap.innerHTML = linkHtml;
+  sheet.querySelector('.sheet').insertBefore(wrap, sheet.querySelector('.sheet-actions'));
+  var cancel = sheet.querySelector('.sheet-btn.cancel');
+  var primary = sheet.querySelector('.sheet-btn.primary');
+  cancel.textContent = '关闭';
+  primary.textContent = '复制链接';
+  sheet.classList.add('open');
+}
+
+// iOS Context Menu (长按任务)
+var contextTimer = null;
+document.querySelectorAll('.eq2item, .kr-row').forEach(function(el){
+  el.addEventListener('touchstart', function(e){
+    contextTimer = setTimeout(function(){
+      openContext();
+    }, 500);
+  }, {passive:true});
+  el.addEventListener('touchend', function(){ clearTimeout(contextTimer); });
+  el.addEventListener('touchmove', function(){ clearTimeout(contextTimer); });
+  // 也支持桌面端 contextmenu
+  el.addEventListener('contextmenu', function(e){ e.preventDefault(); openContext(); });
+});
+function openContext(){ document.getElementById('contextMenu').classList.add('open'); triggerHaptic(); }
+function closeContext(){ document.getElementById('contextMenu').classList.remove('open'); }
+
+// iOS Toast (顶部通知条)
+var toastTimer = null;
+function showToast(title, msg){
+  var t = document.getElementById('iosToast');
+  if(title) document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg || '已成功保存到你的 OKR';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+// Haptic feedback simulation (视觉回弹)
+function triggerHaptic(){
+  if(navigator.vibrate) navigator.vibrate(8);
+}
+
+// Pull to refresh
+(function(){
+  var body = document.getElementById('appBody');
+  var ptr = document.getElementById('ptrIndicator');
+  var startY=0, pulling=false;
+  body.addEventListener('touchstart', function(e){
+    if(body.scrollTop === 0){ startY = e.touches[0].clientY; pulling=true; }
+  }, {passive:true});
+  body.addEventListener('touchmove', function(e){
+    if(!pulling) return;
+    var dy = e.touches[0].clientY - startY;
+    if(dy > 50 && dy < 150) ptr.classList.add('pulling');
+  }, {passive:true});
+  body.addEventListener('touchend', function(){
+    if(ptr.classList.contains('pulling')){
+      setTimeout(function(){
+        ptr.classList.remove('pulling');
+        showToast('已同步','最新数据已更新');
+        triggerHaptic();
+      }, 600);
+    }
+    pulling = false;
+  });
+})();
+
 // Mobile secondary tab switcher
 function switchMSub(panel, view, el){
   var vb = document.getElementById('vb-' + panel);
@@ -530,6 +1250,162 @@ function switchMSub(panel, view, el){
   vb.querySelectorAll(':scope > .m-subview').forEach(function(v){
     v.classList.toggle('active', v.getAttribute('data-msubview') === panel + '-' + view);
   });
+  triggerHaptic();
+}
+
+// Task detail (placeholder - 真实 iOS 用 navigation push)
+function openTaskDetail(el){
+  triggerHaptic();
+  // 演示: 弹 task detail sheet
+  document.getElementById('taskSheet').classList.add('open');
+}
+function closeTask(){
+  document.getElementById('taskSheet').classList.remove('open');
+}
+function toggleTaskDone(){
+  var t = document.getElementById('task-title');
+  var pill = document.getElementById('task-pill');
+  var status = document.getElementById('task-status');
+  if(t.classList.contains('done')){
+    t.classList.remove('done');
+    pill.textContent = '紧急重要'; pill.className = 'task-pill q1';
+    status.classList.remove('done');
+    document.getElementById('task-status-text').textContent = '进行中';
+    showToast('已恢复为进行中','任务回到你的 OKR');
+  } else {
+    t.classList.add('done');
+    pill.textContent = '已完成'; pill.className = 'task-pill q2';
+    status.classList.add('done');
+    document.getElementById('task-status-text').textContent = '已完成';
+    showToast('任务已完成','+ 4h 专注时间');
+  }
+}
+
+// OKR Manager (顶栏切换 OKR 周期时弹出)
+function openOkrMgr(){
+  triggerHaptic();
+  document.getElementById('okrSheet').classList.add('open');
+}
+function closeOkrMgr(){
+  document.getElementById('okrSheet').classList.remove('open');
+}
+
+// ─── 登录 / 我的账号 ───
+var currentUser = null; // {name: '林小白', initial: '林', sub: '已登录 · 7/18 加入 · Q3 进行中'}
+
+function openAuth(){
+  triggerHaptic();
+  var sheet = document.getElementById('authSheet');
+  if(!sheet) return;
+  // 切换回登录 tab
+  switchAuthTab('login', sheet.querySelector('.auth-tab'));
+  sheet.classList.add('open');
+}
+function closeAuth(){
+  var sheet = document.getElementById('authSheet');
+  if(sheet) sheet.classList.remove('open');
+}
+function switchAuthTab(mode, el){
+  var sheet = document.getElementById('authSheet');
+  if(!sheet) return;
+  sheet.querySelectorAll('.auth-tab').forEach(function(t){ t.classList.remove('active'); });
+  if(el) el.classList.add('active');
+  sheet.querySelectorAll('.auth-view').forEach(function(v){ v.classList.toggle('active', v.getAttribute('data-authview') === mode); });
+  triggerHaptic();
+}
+function doLogin(){
+  var sheet = document.getElementById('authSheet');
+  var email = sheet.querySelector('[data-authview="login"] input[type=email]').value.trim();
+  if(!email){
+    showToast('请输入邮箱','登录需要先填写邮箱地址');
+    return;
+  }
+  // 演示：从邮箱前缀推断昵称
+  var localPart = email.split('@')[0] || '我';
+  currentUser = {
+    name: localPart.length > 10 ? localPart.slice(0,10) : localPart,
+    initial: localPart.charAt(0).toUpperCase(),
+    sub: '已登录 · ' + email
+  };
+  persistUser();
+  closeAuth();
+  showToast('登录成功','欢迎回来, ' + currentUser.name);
+}
+function doRegister(){
+  var sheet = document.getElementById('authSheet');
+  var nameInput = sheet.querySelector('[data-authview="register"] input[type=text]');
+  var emailInput = sheet.querySelector('[data-authview="register"] input[type=email]');
+  var name = (nameInput && nameInput.value.trim()) || '我';
+  currentUser = {
+    name: name,
+    initial: name.charAt(0).toUpperCase(),
+    sub: '已注册 · ' + ((emailInput && emailInput.value.trim()) || '欢迎使用 GridGo')
+  };
+  persistUser();
+  closeAuth();
+  showToast('账号已创建','欢迎加入 GridGo, ' + currentUser.name);
+}
+function logout(){
+  triggerHaptic();
+  currentUser = null;
+  try{ localStorage.removeItem('gridgo-user'); }catch(e){}
+  updateProfileUI();
+  showToast('已退出登录','期待你的回归');
+}
+function persistUser(){
+  try{
+    if(currentUser) localStorage.setItem('gridgo-user', JSON.stringify(currentUser));
+  }catch(e){}
+}
+function loadUser(){
+  try{
+    var raw = localStorage.getItem('gridgo-user');
+    if(raw) currentUser = JSON.parse(raw);
+  }catch(e){}
+}
+function updateProfileUI(){
+  var av = document.getElementById('avatarInitial');
+  var hero = document.getElementById('heroAvatar');
+  var heroName = document.getElementById('heroName');
+  var meAv = document.getElementById('meAvLg');
+  var meName = document.getElementById('meName');
+  var meSub = document.getElementById('meSub');
+  var topbarAv = document.getElementById('topbarAvatar');
+  if(currentUser){
+    if(av) av.textContent = currentUser.initial;
+    if(hero) hero.textContent = currentUser.initial;
+    if(heroName) heroName.textContent = currentUser.name;
+    if(meAv) meAv.textContent = currentUser.initial;
+    if(meName) meName.textContent = currentUser.name;
+    if(meSub) meSub.textContent = currentUser.sub;
+    if(topbarAv) topbarAv.classList.remove('loggedout');
+  } else {
+    var guestInitial = '我';
+    if(av) av.textContent = guestInitial;
+    if(hero) hero.textContent = guestInitial;
+    if(heroName) heroName.textContent = '未登录';
+    if(meAv) meAv.textContent = guestInitial;
+    if(meName) meName.textContent = '未登录';
+    if(meSub) meSub.textContent = '登录后同步 OKR · 跨设备';
+    if(topbarAv) topbarAv.classList.add('loggedout');
+  }
+}
+
+// 启动时恢复登录态
+loadUser();
+if(!currentUser){
+  currentUser = {name:'林小白', initial:'林', sub:'已登录 · 7/18 加入 · Q3 进行中'};
+  // 不持久化（演示默认状态）
+}
+updateProfileUI();
+
+function markDone(btn){
+  var row = btn.closest('.swipe-row');
+  if(row){
+    row.classList.remove('swiped');
+    showToast('任务已完成','+ 4h 专注时间');
+    triggerHaptic();
+  }
 }
 </script>
 </body>

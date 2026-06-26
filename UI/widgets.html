@@ -1,119 +1,159 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Focal — OS Widgets</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>格行 GridGo · OS Widgets</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;510;590;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;510;590;600;700&display=swap" rel="stylesheet" />
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:oklch(99% 0.002 240);--surface:oklch(100% 0 0);--fg:oklch(18% 0.012 250);--muted:oklch(54% 0.012 250);--border:oklch(92% 0.005 250);--accent:oklch(58% 0.18 255);--success:oklch(70% 0.16 145);--warning:oklch(70% 0.16 45);--font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif}
-    body{font-family:var(--font);background:var(--bg);min-height:100vh;padding:40px 24px;-webkit-font-smoothing:antialiased}
-    h1{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;font-size:28px;font-weight:700;letter-spacing:-.03em;color:var(--fg);margin-bottom:6px}
+    :root{
+      --bg:oklch(99% 0.002 240);--surface:oklch(100% 0 0);--surface-warm:oklch(98% 0.003 240);
+      --fg:oklch(18% 0.012 250);--fg-2:oklch(28% 0.012 250);--muted:oklch(54% 0.012 250);--meta:oklch(72% 0.008 250);
+      --border:oklch(92% 0.005 250);--border-soft:oklch(95% 0.004 250);
+      --accent:oklch(58% 0.18 255);--accent-hover:oklch(52% 0.19 255);--accent-active:oklch(46% 0.20 255);
+      --success:oklch(70% 0.16 145);--warning:oklch(70% 0.16 45);--danger:oklch(65% 0.20 25);
+      --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',system-ui,sans-serif;
+      --font-body:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',system-ui,sans-serif;
+      --font-mono:'SF Mono',ui-monospace,'JetBrains Mono',Menlo,monospace;
+    }
+    body{font-family:var(--font-body);background:var(--bg);min-height:100vh;padding:40px 24px;-webkit-font-smoothing:antialiased}
+    h1{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.03em;color:var(--fg);margin-bottom:6px}
     .subtitle{font-size:14px;color:var(--muted);margin-bottom:40px}
     .section{margin-bottom:48px}
-    .section-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
-    .row{display:flex;gap:20px;flex-wrap:wrap}
-    /* iOS widget card */
+    .section-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+    .section-title::before{content:'';width:3px;height:11px;background:var(--accent);border-radius:2px}
+    .row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end}
+    /* ── Widget 通用卡片 ── */
     .ios-wg-card{background:var(--surface);border-radius:20px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);border:1px solid var(--border)}
-    .ios-wg-inner{padding:14px}
-    .ios-wg-small .ios-wg-inner{padding:10px}
+    .ios-wg-inner{padding:14px;height:100%;display:flex;flex-direction:column}
     .ios-wg-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-    .ios-wg-logo{font-size:11px;font-weight:700;letter-spacing:-.01em}
+    .ios-wg-logo{font-family:var(--font-display);font-size:12px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:5px}
+    .ios-wg-logo-img{height:18px;width:18px;display:block}
     .ios-wg-logo span{color:var(--accent)}
+    .ios-wg-logo .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
     .ios-wg-time{font-size:10px;font-weight:500;color:var(--muted)}
-    .ios-wg-body{}
+    .ios-wg-body{flex:1;display:flex;flex-direction:column}
     /* iOS small widget - single OKR */
-    .wg-sm-okr{display:flex;align-items:center;gap:8px;padding:6px 0}
+    .wg-sm-okr{display:flex;align-items:center;gap:8px;padding:4px 0}
     .wg-sm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .wg-sm-name{font-size:12px;font-weight:500;color:var(--fg);flex:1}
-    .wg-sm-pct{font-size:11px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-    .wg-sm-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+    .wg-sm-name{font-size:12px;font-weight:500;color:var(--fg);flex:1;line-height:1.3}
+    .wg-sm-pct{font-size:12px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+    .wg-sm-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px}
     .wg-sm-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
     /* iOS medium widget - matrix peek */
-    .wg-md-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-    .wg-md-cell{background:var(--bg);border-radius:8px;padding:8px;min-height:52px}
+    .wg-md-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1}
+    .wg-md-cell{background:var(--bg);border-radius:8px;padding:8px;display:flex;flex-direction:column;min-height:50px;overflow:hidden}
     .wg-md-cell.q1{border-top:1.5px solid var(--accent)}.wg-md-cell.q2{border-top:1.5px solid var(--success)}.wg-md-cell.q3{border-top:1.5px solid var(--warning)}.wg-md-cell.q4{border-top:1.5px solid var(--muted)}
-    .wg-md-l{font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .wg-md-l{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
     .wg-md-task{font-size:10px;font-weight:500;color:var(--fg);line-height:1.3}
-    .wg-md-more{font-size:9px;color:var(--muted);margin-top:3px}
+    .wg-md-more{font-size:9px;color:var(--muted);margin-top:2px}
     /* iOS large widget - full matrix */
-    .wg-lg-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;height:140px}
-    .wg-lg-cell{background:var(--bg);border-radius:10px;padding:10px}
+    .wg-lg-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;flex:1;height:100%}
+    .wg-lg-cell{background:var(--bg);border-radius:10px;padding:10px;display:flex;flex-direction:column;overflow:hidden}
     .wg-lg-cell.q1{border-top:2px solid var(--accent)}.wg-lg-cell.q2{border-top:2px solid var(--success)}.wg-lg-cell.q3{border-top:2px solid var(--warning)}.wg-lg-cell.q4{border-top:2px solid var(--muted)}
-    .wg-lg-l{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
-    .wg-lg-c{font-size:10px;font-weight:600;color:var(--muted);float:right}
-    .wg-lg-task{font-size:11px;font-weight:500;color:var(--fg);line-height:1.35;margin-bottom:3px}
-    .wg-lg-tag{font-size:9px;font-weight:600;color:var(--accent);background:oklch(94% 0.008 255);padding:1px 5px;border-radius:3px}
-    /* Android widget */
-    .and-wg{background:var(--surface);border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.06)}
-    .and-wg-header{display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);gap:6px}
-    .and-wg-logo{font-size:12px;font-weight:700;letter-spacing:-.01em}
+    .wg-lg-l{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center}
+    .wg-lg-c{font-size:9px;font-weight:600;color:var(--muted)}
+    .wg-lg-task{font-size:11px;font-weight:500;color:var(--fg);line-height:1.35;margin-bottom:2px}
+    .wg-lg-tag{font-size:9px;font-weight:600;color:var(--accent);background:oklch(94% 0.008 255);padding:1px 5px;border-radius:3px;display:inline-block}
+    /* ── Android Widget ── */
+    .and-wg{background:var(--surface);border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.06);height:100%;display:flex;flex-direction:column}
+    .and-wg-header{display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);gap:6px;flex-shrink:0}
+    .and-wg-logo{font-family:'Roboto','Noto Sans SC',sans-serif;font-size:12px;font-weight:500;letter-spacing:-.01em;display:flex;align-items:center;gap:5px}
+    .and-wg-logo-img{height:18px;width:18px;display:block}
     .and-wg-logo span{color:var(--accent)}
+    .and-wg-logo .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
     .and-wg-time{font-size:10px;color:var(--muted);margin-left:auto}
-    .and-wg-body{padding:10px}
-    /* Android 4x2 widget */
-    .wg-and-row{display:flex;align-items:center;gap:8px;padding:5px 0}
+    .and-wg-body{padding:10px;flex:1;display:flex;flex-direction:column}
+    .wg-and-row{display:flex;align-items:center;gap:8px;padding:4px 0}
     .wg-and-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .wg-and-name{font-size:12px;font-weight:500;color:var(--fg);flex:1}
-    .wg-and-pct{font-size:11px;font-weight:700;color:var(--accent)}
-    .wg-and-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px}
+    .wg-and-name{font-size:12px;font-weight:500;color:var(--fg);flex:1;line-height:1.3}
+    .wg-and-pct{font-size:11px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+    .wg-and-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px}
     .wg-and-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
-    /* Android 4x4 widget - calendar */
+    /* Android 4x4 calendar widget */
     .wg-and-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:8px}
-    .wg-and-dow{font-size:8px;font-weight:700;color:var(--muted);text-align:center}
-    .wg-and-day{font-size:9px;color:var(--fg);text-align:center;padding:2px;border-radius:4px}
+    .wg-and-dow{font-size:9px;font-weight:500;color:var(--muted);text-align:center}
+    .wg-and-day{font-size:9px;color:var(--fg);text-align:center;padding:3px 0;border-radius:50%;aspect-ratio:1;display:grid;place-items:center}
     .wg-and-day.oth{opacity:.3}
-    .wg-and-day.today{background:var(--accent);color:#fff;font-weight:700}
-    .wg-and-ev{font-size:10px;color:var(--fg);display:flex;gap:6px;padding:3px 0}
-    .wg-and-ev-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
-    /* Live Activity */
-    .la-row{display:flex;gap:16px;align-items:flex-start}
-    .la-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:14px;width:200px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+    .wg-and-day.today{background:var(--accent);color:#fff;font-weight:600}
+    .wg-and-ev{font-size:10px;color:var(--fg);display:flex;gap:6px;padding:3px 0;align-items:flex-start}
+    .wg-and-ev-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+    /* ── iOS Live Activity (Lock Screen) ── */
+    .la-card{background:rgba(28,28,30,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:18px;padding:14px;width:200px;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.18);position:relative;overflow:hidden}
     .la-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-    .la-title{font-size:12px;font-weight:700}
-    .la-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:var(--accent);color:#fff}
+    .la-title{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
+    .la-title .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+    .la-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--accent);color:#fff;letter-spacing:.02em}
+    .la-badge.success{background:var(--success)}
     .la-progress{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-    .la-pbar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-    .la-pfill{height:100%;background:var(--accent);border-radius:2px}
-    .la-pct{font-size:10px;font-weight:700;color:var(--accent);min-width:28px;text-align:right}
-    .la-task{font-size:10px;color:var(--muted)}
-    .la-divider{width:1px;height:60px;background:var(--border);margin-top:4px}
-    /* size labels */
-    .size-label{font-size:10px;font-weight:600;color:var(--muted);margin-bottom:8px;letter-spacing:.05em}
+    .la-pbar{flex:1;height:4px;background:rgba(255,255,255,.18);border-radius:2px;overflow:hidden}
+    .la-pfill{height:100%;background:#fff;border-radius:2px}
+    .la-pfill.accent{background:var(--accent)}
+    .la-pfill.success{background:var(--success)}
+    .la-pct{font-size:11px;font-weight:700;color:#fff;min-width:32px;text-align:right;font-variant-numeric:tabular-nums}
+    .la-task{font-size:11px;opacity:.85;line-height:1.3}
+    .la-time{margin-top:6px;font-size:10px;opacity:.6;display:flex;align-items:center;gap:4px}
+    .la-time::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--success);box-shadow:0 0 4px var(--success)}
+    /* ── iOS Dynamic Island (Compact + Minimal) ── */
+    .dynamic-island{position:relative;width:380px;background:#000;border-radius:22px;padding:8px 12px;display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-body);overflow:hidden;min-height:38px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+    .di-ic{width:22px;height:22px;border-radius:11px;background:var(--accent);display:grid;place-items:center;flex-shrink:0}
+    .di-ic svg{width:12px;height:12px}
+    .di-content{flex:1;min-width:0}
+    .di-title{font-size:11px;font-weight:600;line-height:1.2}
+    .di-sub{font-size:10px;opacity:.6;line-height:1.2;margin-top:1px}
+    .di-progress{height:3px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;margin-top:4px}
+    .di-progress-fill{height:100%;background:var(--accent);border-radius:2px}
+    .di-right{font-size:10px;font-weight:600;color:var(--accent);flex-shrink:0;font-variant-numeric:tabular-nums}
+    /* ── StandBy mode (iOS 17) ── */
+    .standby-card{background:#000;border-radius:28px;padding:20px;width:280px;color:#fff;font-family:var(--font-display);text-align:center;position:relative;overflow:hidden}
+    .standby-time{font-size:54px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+    .standby-date{font-size:13px;font-weight:500;opacity:.7;margin-top:4px}
+    .standby-divider{height:1px;background:rgba(255,255,255,.1);margin:16px -8px}
+    .standby-task{font-size:14px;font-weight:600;color:#fff}
+    .standby-meta{font-size:11px;opacity:.6;margin-top:2px}
+    .standby-ring{width:120px;height:120px;margin:8px auto 12px;position:relative}
+    .standby-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+    .standby-ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+    /* ── size labels ── */
+    .size-label{font-size:10px;font-weight:600;color:var(--muted);margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase}
+    /* ── Live Activity size note ── */
+    .la-frame{position:relative;width:200px;height:300px;background:linear-gradient(160deg,#1c1c2e,#0a0a14);border-radius:36px;padding:24px 12px;border:1px solid #2a2a3a;display:flex;flex-direction:column;gap:14px}
+    .la-frame-time{text-align:center;color:#fff;font-family:var(--font-display);font-size:14px;font-weight:600;margin-top:auto;font-variant-numeric:tabular-nums;opacity:.85}
+    .la-lock{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.06);display:grid;place-items:center;color:rgba(255,255,255,.3);font-size:9px;font-weight:600;letter-spacing:.05em}
   </style>
 </head>
 <body>
-<h1>OS Widgets</h1>
-<p class="subtitle">Focal — iOS WidgetKit + Android Home Screen Widgets</p>
+<h1>OS Widgets · 格行 GridGo</h1>
+<p class="subtitle">iOS WidgetKit · Dynamic Island · Live Activity · Android Glance · StandBy</p>
 
-<!-- iOS Widgets -->
+<!-- ── iOS Widgets ── -->
 <div class="section">
   <div class="section-title">iOS WidgetKit</div>
   <div class="row">
     <!-- Small -->
     <div>
-      <div class="size-label">Small — 155 × 155</div>
-      <div style="width:155px;height:155px;background:var(--bg);padding:8px">
+      <div class="size-label">Small · 155 × 155</div>
+      <div style="width:155px;height:155px;background:linear-gradient(135deg,oklch(96% 0.005 240),oklch(94% 0.008 255));padding:8px;border-radius:24px">
         <div class="ios-wg-card" style="width:100%;height:100%">
           <div class="ios-wg-inner">
             <div class="ios-wg-header">
-              <span class="ios-wg-logo">Focal<span>.</span></span>
+              <span class="ios-wg-logo"><img class="ios-wg-logo-img" src="logo-mark.svg" alt="格行" /></span>
               <span class="ios-wg-time">今天</span>
             </div>
             <div class="ios-wg-body">
               <div style="font-size:11px;font-weight:700;color:var(--fg);margin-bottom:6px">产品增长</div>
-              <div style="font-size:9px;color:var(--muted);margin-bottom:8px">Q3 月活+30%</div>
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+              <div style="font-size:9px;color:var(--muted);margin-bottom:6px">Q3 月活+30%</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
                 <div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden"><div style="width:67%;height:100%;background:var(--accent);border-radius:2px"></div></div>
-                <span style="font-size:10px;font-weight:700;color:var(--accent)">67%</span>
+                <span style="font-size:10px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums">67%</span>
               </div>
-              <div style="font-size:9px;color:var(--muted);margin-bottom:4px">今日任务</div>
-              <div style="display:flex;align-items:center;gap:5px;padding:3px 0">
+              <div style="font-size:9px;color:var(--muted);margin-bottom:3px">今日任务</div>
+              <div style="display:flex;align-items:center;gap:5px">
                 <div style="width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0"></div>
-                <span style="font-size:10px;color:var(--fg)">Q3 OKR 评审材料</span>
+                <span style="font-size:10px;color:var(--fg);line-height:1.3">Q3 OKR 评审材料</span>
               </div>
             </div>
           </div>
@@ -123,13 +163,13 @@
 
     <!-- Medium -->
     <div>
-      <div class="size-label">Medium — 329 × 155</div>
-      <div style="width:329px;height:155px;background:var(--bg);padding:8px">
+      <div class="size-label">Medium · 329 × 155</div>
+      <div style="width:329px;height:155px;background:linear-gradient(135deg,oklch(96% 0.005 240),oklch(94% 0.008 255));padding:8px;border-radius:24px">
         <div class="ios-wg-card" style="width:100%;height:100%">
           <div class="ios-wg-inner">
             <div class="ios-wg-header">
-              <span class="ios-wg-logo">Focal<span>.</span></span>
-              <span class="ios-wg-time">今天 · 18 日</span>
+              <span class="ios-wg-logo"><img class="ios-wg-logo-img" src="logo-mark.svg" alt="格行" /></span>
+              <span class="ios-wg-time">今天 · 7/18 周五</span>
             </div>
             <div class="wg-md-grid">
               <div class="wg-md-cell q1">
@@ -160,35 +200,31 @@
 
     <!-- Large -->
     <div>
-      <div class="size-label">Large — 329 × 345</div>
-      <div style="width:329px;height:345px;background:var(--bg);padding:8px">
+      <div class="size-label">Large · 329 × 345</div>
+      <div style="width:329px;height:345px;background:linear-gradient(135deg,oklch(96% 0.005 240),oklch(94% 0.008 255));padding:8px;border-radius:24px">
         <div class="ios-wg-card" style="width:100%;height:100%">
           <div class="ios-wg-inner">
             <div class="ios-wg-header">
-              <span class="ios-wg-logo">Focal<span>.</span></span>
-              <span class="ios-wg-time">今天 · 18 日</span>
+              <span class="ios-wg-logo"><img class="ios-wg-logo-img" src="logo-mark.svg" alt="格行" /> · 今日</span>
+              <span class="ios-wg-time">7/18 周五</span>
             </div>
             <div class="wg-lg-grid">
               <div class="wg-lg-cell q1">
-                <span class="wg-lg-c">3</span>
-                <div class="wg-lg-l">紧急重要</div>
+                <div class="wg-lg-l">紧急重要 <span class="wg-lg-c">3</span></div>
                 <div class="wg-lg-task">Q3 OKR 评审材料</div>
-                <div class="wg-lg-tag">产品增长</div>
+                <span class="wg-lg-tag">产品增长</span>
               </div>
               <div class="wg-lg-cell q2">
-                <span class="wg-lg-c">4</span>
-                <div class="wg-lg-l">重要</div>
+                <div class="wg-lg-l">重要 <span class="wg-lg-c">4</span></div>
                 <div class="wg-lg-task">每周跑步 3 次</div>
-                <div class="wg-lg-tag" style="color:var(--success);background:oklch(94% 0.008 145)">健康管理</div>
+                <span class="wg-lg-tag" style="color:var(--success);background:oklch(94% 0.008 145)">健康管理</span>
               </div>
               <div class="wg-lg-cell q3">
-                <span class="wg-lg-c">2</span>
-                <div class="wg-lg-l">紧急</div>
+                <div class="wg-lg-l">紧急 <span class="wg-lg-c">2</span></div>
                 <div class="wg-lg-task">处理积压邮件</div>
               </div>
               <div class="wg-lg-cell q4">
-                <span class="wg-lg-c">2</span>
-                <div class="wg-lg-l">其他</div>
+                <div class="wg-lg-l">其他 <span class="wg-lg-c">2</span></div>
                 <div class="wg-lg-task">整理收藏夹</div>
               </div>
             </div>
@@ -199,30 +235,135 @@
   </div>
 </div>
 
-<!-- Android Widgets -->
+<!-- ── iOS Dynamic Island ── -->
 <div class="section">
-  <div class="section-title">Android Widget (Glance)</div>
+  <div class="section-title">iOS Dynamic Island</div>
+  <div class="row">
+    <div>
+      <div class="size-label">Compact · 计时中</div>
+      <div class="dynamic-island">
+        <div class="di-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <div class="di-content">
+          <div class="di-title">专注中</div>
+          <div class="di-sub">Q3 OKR 评审材料</div>
+          <div class="di-progress"><div class="di-progress-fill" style="width:67%"></div></div>
+        </div>
+        <div class="di-right">25:00</div>
+      </div>
+    </div>
+    <div>
+      <div class="size-label">Compact · 任务完成</div>
+      <div class="dynamic-island">
+        <div class="di-ic" style="background:var(--success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 7"/></svg></div>
+        <div class="di-content">
+          <div class="di-title">已完成 1 项</div>
+          <div class="di-sub">深度工作 4h · +30min 专注</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="size-label">Minimal · 任务到期</div>
+      <div class="dynamic-island" style="width:120px;justify-content:center;padding:8px 16px">
+        <div class="di-ic" style="background:var(--warning)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 8v4l3 2M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"/></svg></div>
+        <div class="di-right" style="margin-left:6px">14:00</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── iOS Live Activity (Lock Screen) ── -->
+<div class="section">
+  <div class="section-title">iOS Live Activity · Lock Screen</div>
+  <div class="row">
+    <div>
+      <div class="size-label">专注中</div>
+      <div class="la-frame">
+        <div class="la-card">
+          <div class="la-card-header">
+            <span class="la-title"><span class="dot"></span>格行 · 专注中</span>
+            <span class="la-badge">25 min</span>
+          </div>
+          <div class="la-progress">
+            <div class="la-pbar"><div class="la-pfill accent" style="width:67%"></div></div>
+            <span class="la-pct">67%</span>
+          </div>
+          <div class="la-task">Q3 OKR 评审材料撰写</div>
+          <div class="la-time">16:42 后完成 · 16:30 结束</div>
+        </div>
+        <div class="la-lock">·</div>
+        <div class="la-frame-time">7:30</div>
+      </div>
+    </div>
+    <div>
+      <div class="size-label">已完成</div>
+      <div class="la-frame">
+        <div class="la-card">
+          <div class="la-card-header">
+            <span class="la-title"><span class="dot" style="background:var(--success)"></span>格行 · 跑步</span>
+            <span class="la-badge success">已达成</span>
+          </div>
+          <div class="la-progress">
+            <div class="la-pbar"><div class="la-pfill success" style="width:66%"></div></div>
+            <span class="la-pct">2/3</span>
+          </div>
+          <div class="la-task">本周跑步 · 5km</div>
+          <div class="la-time">连续 12 天 · 🔥 保持节奏</div>
+        </div>
+        <div class="la-lock">·</div>
+        <div class="la-frame-time">7:30</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── iOS StandBy (iOS 17) ── -->
+<div class="section">
+  <div class="section-title">iOS StandBy Mode</div>
+  <div class="row">
+    <div>
+      <div class="size-label">夜间 StandBy · 任务概览</div>
+      <div class="standby-card">
+        <div class="standby-time">7:30</div>
+        <div class="standby-date">周五 · 7月18日</div>
+        <div class="standby-divider"></div>
+        <div class="standby-ring">
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="8"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="104"/>
+          </svg>
+          <div class="pct">67%</div>
+        </div>
+        <div class="standby-task">产品增长 OKR</div>
+        <div class="standby-meta">Q3 月活提升 30%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Android Widgets ── -->
+<div class="section">
+  <div class="section-title">Android Glance</div>
   <div class="row">
     <!-- 4x2 OKR widget -->
     <div>
-      <div class="size-label">4×2 — OKR 进度</div>
-      <div style="width:220px;height:110px;background:var(--bg);padding:6px">
+      <div class="size-label">4×2 · OKR 进度</div>
+      <div style="width:250px;height:110px;background:linear-gradient(135deg,oklch(96% 0.005 240),oklch(94% 0.008 255));padding:6px;border-radius:20px">
         <div class="and-wg" style="width:100%;height:100%">
           <div class="and-wg-header">
-            <span class="and-wg-logo">Focal<span>.</span></span>
+            <span class="and-wg-logo"><img class="and-wg-logo-img" src="logo-mark.svg" alt="格行" /></span>
             <span class="and-wg-time">今天</span>
           </div>
           <div class="and-wg-body">
             <div class="wg-and-row">
               <div class="wg-and-dot" style="background:var(--accent)"></div>
-              <span class="and-wg-name">产品增长</span>
-              <span class="and-wg-pct">67%</span>
+              <span class="wg-and-name">产品增长</span>
+              <span class="wg-and-pct">67%</span>
             </div>
             <div class="wg-and-bar"><div class="wg-and-bar-fill" style="width:67%"></div></div>
-            <div class="wg-and-row" style="margin-top:6px">
+            <div class="wg-and-row" style="margin-top:4px">
               <div class="wg-and-dot" style="background:var(--success)"></div>
-              <span class="and-wg-name">健康管理</span>
-              <span class="and-wg-pct" style="color:var(--success)">45%</span>
+              <span class="wg-and-name">健康管理</span>
+              <span class="wg-and-pct" style="color:var(--success)">45%</span>
             </div>
             <div class="wg-and-bar"><div class="wg-and-bar-fill" style="width:45%;background:var(--success)"></div></div>
           </div>
@@ -232,12 +373,12 @@
 
     <!-- 4x4 Calendar widget -->
     <div>
-      <div class="size-label">4×4 — 日历概览</div>
-      <div style="width:220px;height:220px;background:var(--bg);padding:6px">
+      <div class="size-label">4×4 · 日历概览</div>
+      <div style="width:250px;height:250px;background:linear-gradient(135deg,oklch(96% 0.005 240),oklch(94% 0.008 255));padding:6px;border-radius:20px">
         <div class="and-wg" style="width:100%;height:100%">
           <div class="and-wg-header">
-            <span class="and-wg-logo">Focal<span>.</span></span>
-            <span class="and-wg-time">7 月</span>
+            <span class="and-wg-logo"><img class="and-wg-logo-img" src="logo-mark.svg" alt="格行" /></span>
+            <span class="and-wg-time">2025 · 7 月</span>
           </div>
           <div class="and-wg-body">
             <div class="wg-and-cal">
@@ -276,8 +417,8 @@
               <div class="wg-and-day">31</div>
               <div class="wg-and-day oth">1</div>
             </div>
-            <div class="wg-and-ev"><div class="wg-and-ev-dot" style="background:var(--accent)"></div><span>Q3 OKR 评审 — 今天 14:00</span></div>
-            <div class="wg-and-ev"><div class="wg-and-ev-dot" style="background:var(--success)"></div><span>每周跑步 — 明天 09:00</span></div>
+            <div class="wg-and-ev"><div class="wg-and-ev-dot" style="background:var(--accent)"></div><span>Q3 OKR 评审 · 今天 14:00</span></div>
+            <div class="wg-and-ev"><div class="wg-and-ev-dot" style="background:var(--success)"></div><span>每周跑步 · 明天 09:00</span></div>
           </div>
         </div>
       </div>
@@ -285,120 +426,21 @@
   </div>
 </div>
 
-<!-- Live Activity -->
+<!-- ── Quick Settings Tile (Android 12+) ── -->
 <div class="section">
-  <div class="section-title">iOS Live Activity / Dynamic Island</div>
-  <div class="la-row">
-    <div class="la-card">
-      <div class="la-card-header">
-        <span class="la-title">Focal</span>
-        <span class="la-badge">专注中</span>
+  <div class="section-title">Android Quick Settings Tile</div>
+  <div class="row">
+    <div>
+      <div class="size-label">下拉通知栏 Tile</div>
+      <div style="display:grid;grid-template-columns:repeat(2,72px);gap:8px;background:rgba(28,28,30,.85);padding:14px;border-radius:18px;width:fit-content">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:10px"><div style="width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.1);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.7"><path d="M5 12.55a11 11 0 0 1 14 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg></div><span>WiFi</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:10px"><div style="width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.1);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.7"><path d="M11 5L6 9H2v6h4l5 4V5zM19 12a4 4 0 0 0-2-3.5v7A4 4 0 0 0 19 12z"/></svg></div><span>声音</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:10px"><div style="width:56px;height:56px;border-radius:14px;background:var(--accent);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.7"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span style="font-weight:600">格行</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:10px"><div style="width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.1);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><span>专注</span></div>
       </div>
-      <div class="la-progress">
-        <div class="la-pbar"><div class="la-pfill" style="width:67%"></div></div>
-        <span class="la-pct">67%</span>
-      </div>
-      <div class="la-task">Q3 OKR 评审材料</div>
-      <div style="margin-top:8px;font-size:9px;color:var(--muted)">预计完成：今天 18:00</div>
-    </div>
-    <div class="la-divider"></div>
-    <div class="la-card">
-      <div class="la-card-header">
-        <span class="la-title">🏃 健康</span>
-        <span class="la-badge" style="background:var(--success)">进行中</span>
-      </div>
-      <div class="la-progress">
-        <div class="la-pbar"><div class="la-pfill" style="width:45%;background:var(--success)"></div></div>
-        <span class="la-pct" style="color:var(--success)">45%</span>
-      </div>
-      <div class="la-task">每周跑步 3 次</div>
-      <div style="margin-top:8px;font-size:9px;color:var(--muted)">本周进度：2/3 次</div>
     </div>
   </div>
 </div>
 
 </body>
 </html>
-
-<!-- Gantt Widgets Section -->
-<div class="section">
-  <div class="section-title">iOS Gantt Widget</div>
-  <div class="row">
-    <div>
-      <div class="size-label">Medium — Gantt Bar</div>
-      <div style="width:329px;height:155px;background:var(--bg);padding:8px">
-        <div class="ios-wg-card" style="width:100%;height:100%">
-          <div class="ios-wg-inner">
-            <div class="ios-wg-header">
-              <span class="ios-wg-logo">Focal<span>.</span></span>
-              <span class="ios-wg-time">甘特图</span>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
-              <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-                  <span style="font-size:10px;font-weight:600;color:var(--fg)">产品增长</span>
-                  <span style="font-size:9px;color:var(--muted)">67%</span>
-                </div>
-                <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:67%;height:100%;background:var(--accent);border-radius:3px"></div></div>
-              </div>
-              <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-                  <span style="font-size:10px;font-weight:600;color:var(--fg)">健康管理</span>
-                  <span style="font-size:9px;color:var(--muted)">45%</span>
-                </div>
-                <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:45%;height:100%;background:var(--success);border-radius:3px"></div></div>
-              </div>
-              <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-                  <span style="font-size:10px;font-weight:600;color:var(--fg)">技能提升</span>
-                  <span style="font-size:9px;color:var(--muted)">30%</span>
-                </div>
-                <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:30%;height:100%;background:var(--warning);border-radius:3px"></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="section">
-  <div class="section-title">Android Gantt Widget</div>
-  <div class="row">
-    <div>
-      <div class="size-label">4×2 — Gantt Progress</div>
-      <div style="width:220px;height:110px;background:var(--bg);padding:6px">
-        <div class="and-wg" style="width:100%;height:100%">
-          <div class="and-wg-header">
-            <span class="and-wg-logo">Focal<span>.</span></span>
-            <span class="and-wg-time">甘特图</span>
-          </div>
-          <div class="and-wg-body">
-            <div style="margin-bottom:6px">
-              <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-                <span style="font-size:10px;font-weight:500;color:var(--fg)">产品增长</span>
-                <span style="font-size:9px;font-weight:700;color:var(--accent)">67%</span>
-              </div>
-              <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:67%;height:100%;background:var(--accent);border-radius:3px"></div></div>
-            </div>
-            <div style="margin-bottom:6px">
-              <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-                <span style="font-size:10px;font-weight:500;color:var(--fg)">健康管理</span>
-                <span style="font-size:9px;font-weight:700;color:var(--success)">45%</span>
-              </div>
-              <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:45%;height:100%;background:var(--success);border-radius:3px"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-                <span style="font-size:10px;font-weight:500;color:var(--fg)">技能提升</span>
-                <span style="font-size:9px;font-weight:700;color:var(--warning)">30%</span>
-              </div>
-              <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:30%;height:100%;background:var(--warning);border-radius:3px"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>

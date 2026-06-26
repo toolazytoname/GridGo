@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" fill="none" role="img" aria-label="格行 GridGo">
+  <!--
+    格行 GridGo · 完整 lockup
+    Apple design language:
+      - SF Pro Display 600 (Apple's dominant emphasis weight)
+      - Tracking -0.022em display / +0.08em subtitle (machined feel)
+      - Near-Black Ink #1d1d1f primary, Mid Border Gray #86868b secondary
+      - Single accent budget: zero chromatic accent on the mark itself
+      - Subtitle uses Title Case with positive tracking (Apple storefront pattern)
+  -->
+
+  <!-- G mark: precise geometric, refined 14-unit stroke -->
+  <path d="M 100 100 L 169 100 L 169 140 A 80 80 0 1 1 169 60"
+        stroke="#1d1d1f" stroke-width="14" fill="none"/>
+
+  <!-- Main wordmark: SF Pro Display semibold, Apple-tight tracking -->
+  <text x="100" y="226"
+        font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif"
+        font-size="34" font-weight="600" fill="#1d1d1f"
+        text-anchor="middle" letter-spacing="-0.022em">格行</text>
+
+  <!-- Subtitle: SF Pro Display medium, machined label treatment -->
+  <text x="100" y="252"
+        font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif"
+        font-size="13" font-weight="500" fill="#86868b"
+        text-anchor="middle" letter-spacing="0.08em">GridGo</text>
+</svg>

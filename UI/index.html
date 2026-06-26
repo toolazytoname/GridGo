@@ -1,73 +1,97 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Focal — OKR 人生规划</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>格行 GridGo · 项目总览</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:oklch(99% 0.002 240);--surface:oklch(100% 0 0);--fg:oklch(18% 0.012 250);--muted:oklch(54% 0.012 250);--border:oklch(92% 0.005 250);--accent:oklch(58% 0.18 255);--font:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif}
+    :root{
+      --bg:oklch(99% 0.002 240);--surface:oklch(100% 0 0);--surface-warm:oklch(98% 0.003 240);
+      --fg:oklch(18% 0.012 250);--fg-2:oklch(28% 0.012 250);--muted:oklch(54% 0.012 250);--meta:oklch(72% 0.008 250);
+      --border:oklch(92% 0.005 250);--border-soft:oklch(95% 0.004 250);
+      --accent:oklch(58% 0.18 255);--accent-hover:oklch(52% 0.19 255);--success:oklch(70% 0.16 145);--warning:oklch(70% 0.16 45);
+      --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;
+      --font-body:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;
+      --font-mono:'SF Mono',ui-monospace,'JetBrains Mono',Menlo,monospace;
+      --ease-standard:cubic-bezier(0.28,0,0.22,1);
+    }
     html{height:100%}
-    body{font-family:var(--font);background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;-webkit-font-smoothing:antialiased}
-    .logo{font-size:32px;font-weight:700;letter-spacing:-.04em;margin-bottom:8px}
-    .logo span{color:var(--accent)}
-    .tagline{font-size:16px;color:var(--muted);margin-bottom:48px;text-align:center}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;width:100%;max-width:800px}
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;text-decoration:none;color:var(--fg);transition:all .2s;display:flex;flex-direction:column;gap:8px}
-    .card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.06)}
-    .card-icon{font-size:32px;margin-bottom:4px}
-    .card-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
-    .card-desc{font-size:12px;color:var(--muted);line-height:1.5}
-    .card-badge{display:inline-flex;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:600;background:oklch(94% 0.008 255);color:var(--accent);margin-top:4px;width:fit-content}
+    body{font-family:var(--font-body);background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;-webkit-font-smoothing:antialiased;background:radial-gradient(ellipse at 50% 0%,oklch(97% 0.008 255) 0%,transparent 50%)}
+    .brand-logo{height:80px;width:auto;display:block;margin:0 auto 18px}
+    .logo{font-family:var(--font-display);font-size:40px;font-weight:700;letter-spacing:-.04em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+    .logo .dot{width:12px;height:12px;border-radius:50%;background:var(--accent)}
+    .logo .en{color:var(--accent);font-weight:500}
+    .tagline{font-size:15px;color:var(--muted);margin-bottom:8px;text-align:center;max-width:520px;line-height:1.6}
+    .subtag{font-size:12px;color:var(--meta);margin-bottom:48px;text-align:center;letter-spacing:.02em}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;width:100%;max-width:920px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-decoration:none;color:var(--fg);transition:all .25s var(--ease-standard);display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+    .card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.08)}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),oklch(48% 0.20 270));transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease-standard)}
+    .card:hover::before{transform:scaleX(1)}
+    .card-icon{width:36px;height:36px;border-radius:10px;background:oklch(96% 0.008 255);color:var(--accent);display:grid;place-items:center;margin-bottom:4px;transition:transform .25s var(--ease-spring)}
+    .card:hover .card-icon{transform:scale(1.08) rotate(-3deg)}
+    .card-icon svg{width:20px;height:20px}
+    .card-title{font-family:var(--font-display);font-size:15px;font-weight:600;letter-spacing:-.01em}
+    .card-desc{font-size:12px;color:var(--muted);line-height:1.5;flex:1}
+    .card-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;background:oklch(94% 0.008 255);color:var(--accent);margin-top:4px;width:fit-content}
     .card-badge.android{background:oklch(94% 0.008 145);color:var(--success)}
     .card-badge.web{background:oklch(94% 0.008 45);color:oklch(60% 0.16 45)}
     .card-badge.widget{background:oklch(94% 0.008 240);color:var(--muted)}
-    .footer{font-size:11px;color:var(--muted);margin-top:48px}
-    .footer a{color:var(--muted);text-decoration:none}
-    .footer a:hover{color:var(--fg)}
+    .card-badge.landing{background:oklch(94% 0.008 255);color:var(--accent)}
+    .footer{font-size:12px;color:var(--muted);margin-top:48px;text-align:center;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
+    .footer a{color:var(--muted);text-decoration:none;transition:color .15s}
+    .footer a:hover{color:var(--accent)}
+    .footer .dot{width:4px;height:4px;border-radius:50%;background:var(--border)}
   </style>
 </head>
 <body>
-  <div class="logo">Focal<span>.</span></div>
-  <p class="tagline">OKR 目标管理 · 艾森豪威尔矩阵 · 甘特图 · 日历</p>
+  <img class="brand-logo" src="logo.svg" alt="格行 GridGo" />
+  <p class="tagline">一格一事，循格而行</p>
+  <p class="subtag">OKR 目标管理 · 艾森豪威尔矩阵 · 甘特图 · 日历 · 成就中心</p>
 
   <div class="grid">
     <a href="landing.html" class="card">
-      <div class="card-icon">🌐</div>
+      <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></div>
       <div class="card-title">营销落地页</div>
-      <div class="card-desc">产品介绍、功能亮点、平台支持、品牌形象</div>
-      <span class="card-badge">Web</span>
+      <div class="card-desc">产品介绍、功能亮点、平台支持、品牌形象。适合对外展示与分享。</div>
+      <span class="card-badge landing">Landing</span>
     </a>
     <a href="app.html" class="card">
-      <div class="card-icon">📊</div>
-      <div class="card-title">主应用 — 响应式</div>
-      <div class="card-desc">四象限矩阵 · OKR 列表 · 甘特图 · 日历 · 成就中心</div>
-      <span class="card-badge">Responsive Web</span>
+      <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8h18"/></svg></div>
+      <div class="card-title">主应用 · 响应式</div>
+      <div class="card-desc">四象限 · 列表 · 日历 · 甘特图 · 成就中心。Web 端核心体验，360-1920px 自适应。</div>
+      <span class="card-badge web">Web · 360-1920px</span>
     </a>
     <a href="mobile-ios.html" class="card">
-      <div class="card-icon">📱</div>
+      <div class="card-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.04c-.03-2.75 2.25-4.07 2.35-4.13-1.28-1.87-3.27-2.13-3.98-2.16-1.69-.17-3.31 1-4.17 1-.87 0-2.19-.98-3.6-.95-1.85.03-3.55 1.07-4.5 2.73-1.92 3.33-.49 8.27 1.38 10.97.91 1.33 2 2.81 3.42 2.76 1.37-.06 1.89-.89 3.55-.89 1.65 0 2.13.89 3.59.86 1.48-.03 2.42-1.34 3.32-2.68 1.05-1.54 1.48-3.03 1.5-3.11-.03-.01-2.88-1.1-2.91-4.4zM14.45 4.1c.76-.92 1.27-2.2 1.13-3.47-1.09.04-2.42.73-3.21 1.64-.7.81-1.32 2.12-1.16 3.36 1.22.09 2.46-.62 3.24-1.53z"/></svg></div>
       <div class="card-title">iOS 原生应用</div>
-      <div class="card-desc">iPhone 15 Pro 框架 · 四象限 · 列表 · 日历 · 成就</div>
-      <span class="card-badge android">iOS</span>
+      <div class="card-desc">iPhone 15 Pro 框架 + Dynamic Island + Live Activity + Sheet 弹层 + Context Menu。</div>
+      <span class="card-badge">iOS 17+</span>
     </a>
     <a href="mobile-android.html" class="card">
-      <div class="card-icon">🤖</div>
+      <div class="card-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.27.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25S8.25 13.31 8.25 14 7.69 15.25 7 15.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg></div>
       <div class="card-title">Android 原生应用</div>
-      <div class="card-desc">Pixel 8 Pro 框架 · 四象限 · 列表 · 日历 · 成就</div>
-      <span class="card-badge android">Android</span>
+      <div class="card-desc">Material 3 · Extended FAB · Snackbar · 双向 Swipe · App Shortcuts · Quick Settings Tile。</div>
+      <span class="card-badge android">Android 14+</span>
     </a>
     <a href="widgets.html" class="card">
-      <div class="card-icon">🧩</div>
-      <div class="card-title">OS 组件</div>
-      <div class="card-desc">iOS WidgetKit (Small/Medium/Large) · Android Glance · Live Activity</div>
-      <span class="card-badge widget">Widgets</span>
+      <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+      <div class="card-title">OS 桌面组件</div>
+      <div class="card-desc">iOS WidgetKit (S/M/L) · Dynamic Island · StandBy · Android Glance 4×2/4×4。</div>
+      <span class="card-badge widget">桌面小组件</span>
     </a>
   </div>
 
-  <div class="footer">
-    Focal — 用目标驱动每一天 &nbsp;·&nbsp; <a href="app.html">打开应用</a>
-  </div>
+  <p class="footer">
+    <span>格行 <b style="color:var(--fg)">GridGo</b></span>
+    <span class="dot"></span>
+    <a href="app.html">打开主应用</a>
+    <span class="dot"></span>
+    <span>5 个产物 · 4 个平台 · 1 个 OKR</span>
+  </p>
 </body>
 </html>
