@@ -24,7 +24,12 @@
 
     /* ── Topbar ── */
     .topbar{height:52px;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:10px;position:sticky;top:0;z-index:50}
-    .topbar-logo{height:30px;width:auto;display:block;margin:0}
+    .topbar-logo{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--fg);line-height:1}
+    .topbar-mark{width:26px;height:26px;color:var(--fg);flex-shrink:0}
+    .topbar-wordmark{display:inline-flex;align-items:baseline;gap:4px;font-family:var(--font-display);font-size:15px;font-weight:600;letter-spacing:-0.02em;white-space:nowrap}
+    .topbar-wordmark b{font-weight:600;color:var(--fg)}
+    .topbar-wordmark i{font-style:normal;color:var(--accent);font-weight:500;font-size:13px;transform:translateY(-1px)}
+    .topbar-wordmark em{font-style:normal;font-weight:500;color:var(--meta);letter-spacing:-0.005em}
     .okr-selector{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--border);font-size:13px;font-weight:500;color:var(--fg);cursor:pointer;transition:all .15s}
     .okr-selector:hover{border-color:var(--muted)}
     .okr-selector svg{width:14px;height:14px;color:var(--muted)}
@@ -50,8 +55,16 @@
     .panel.active{display:block}
 
     /* ── Matrix ── */
-    .matrix-header{display:flex;justify-content:space-between;align-items:center;margin:6px 0 20px}
-    .matrix-header h2{font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:-0.02em}
+    .matrix-header{display:flex;justify-content:space-between;align-items:baseline;margin:8px 0 18px;gap:14px;flex-wrap:wrap}
+    .matrix-header h2{font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.025em;color:var(--fg);margin:0}
+    .matrix-header-date{font-family:var(--font-display);font-size:13px;font-weight:500;color:var(--meta);letter-spacing:-0.005em;margin-left:4px}
+    .matrix-header-summary{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+    .matrix-header-summary b{color:var(--fg);font-weight:600}
+    .matrix-focus-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px}
+    .matrix-focus-head{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
+    .matrix-focus-icon{width:14px;height:14px;color:var(--accent)}
+    .matrix-focus-body{font-size:12.5px;color:var(--muted);line-height:1.65}
+    .matrix-focus-body b{color:var(--fg);font-weight:600}
     .eisenhower-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;min-height:480px}
     .eq-cell{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;overflow:hidden}
     .eq-cell.q1{border-top:2.5px solid var(--accent)}
@@ -59,8 +72,8 @@
     .eq-cell.q3{border-top:2.5px solid var(--warning)}
     .eq-cell.q4{border-top:2.5px solid var(--muted)}
     .eq-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-    .eq-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
-    .eq-count{font-size:10px;font-weight:600;color:var(--muted);background:var(--bg);padding:2px 6px;border-radius:999px}
+    .eq-label{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2)}
+    .eq-count{font-size:10.5px;font-weight:600;color:var(--meta);background:var(--bg);border:1px solid var(--border-soft);padding:1px 7px;border-radius:999px;font-variant-numeric:tabular-nums}
     .eq-tasks{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
     .eq-task{display:flex;align-items:flex-start;gap:8px;padding:8px 9px;border-radius:8px;background:var(--bg);cursor:pointer;transition:background-color 220ms var(--ease-standard),transform 180ms cubic-bezier(0.34,1.56,0.64,1)}
     .eq-task:hover{background:oklch(96% 0.005 240)}
@@ -195,9 +208,9 @@
     .ach-okr-bar{height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
     .ach-okr-fill{height:100%;border-radius:3px;transition:width 600ms cubic-bezier(0.16,1,0.3,1)}
     .ach-okr-fill.o1{background:var(--accent)}
-    .ach-okr-fill.o2{background:#8B5CF6}
-    .ach-okr-fill.o3{background:#22D3EE}
-    .ach-okr-fill.o4{background:#DC2626}
+    .ach-okr-fill.o2{background:var(--success)}
+    .ach-okr-fill.o3{background:var(--warning)}
+    .ach-okr-fill.o4{background:var(--muted)}
     .ach-okr-pct{font-size:13px;font-weight:600;color:var(--success);font-variant-numeric:tabular-nums}
 
     /* ── 成就卡片入场（错落） ── */
@@ -207,6 +220,69 @@
     .ach-card:nth-child(3){animation-delay:80ms}
     .ach-card:nth-child(4){animation-delay:120ms}
     @keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+    /* ── 我的 Tab ── */
+    .me-profile{display:flex;align-items:center;gap:18px;padding:20px 22px;background:linear-gradient(135deg,color-mix(in oklab,var(--accent),white 86%),color-mix(in oklab,var(--accent),transparent 92%));border:1px solid var(--border);border-radius:18px;margin:6px 0 16px}
+    .me-avatar{width:64px;height:64px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--font-display);font-size:26px;font-weight:600;letter-spacing:.02em;box-shadow:0 6px 18px color-mix(in oklab,var(--accent),transparent 70%);flex-shrink:0}
+    .me-id{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+    .me-name-row{display:flex;align-items:center;gap:8px}
+    .me-name{font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.02em;color:var(--fg)}
+    .me-badge{font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 6px;border-radius:5px;background:color-mix(in oklab,var(--warn) 70%,white);color:color-mix(in oklab,var(--warn) 60%,#3a2400);line-height:1.3}
+    .me-role{font-size:12px;color:var(--fg-2);font-weight:500}
+    .me-bio{font-size:12px;color:var(--muted);line-height:1.45;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .me-edit{flex-shrink:0;align-self:flex-start;background:var(--bg);border:1px solid var(--border);color:var(--fg);font-size:12px;font-weight:500;padding:7px 12px;border-radius:8px;cursor:pointer;font-family:inherit}
+    .me-edit:hover{background:var(--surface);border-color:var(--muted)}
+    .me-edit:active{transform:scale(0.97)}
+
+    /* 数据条 */
+    .me-stats{display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 4px;margin-bottom:16px}
+    .me-stat{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+    .me-stat-num{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-0.03em;color:var(--fg);font-variant-numeric:tabular-nums;line-height:1.1}
+    .me-stat-label{font-size:11px;color:var(--muted);font-weight:500}
+    .me-stat-sep{width:1px;background:var(--border);margin:4px 0}
+
+    /* 快捷入口 */
+    .me-quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+    .me-quick-card{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:background .15s,border-color .15s}
+    .me-quick-card:hover{background:var(--surface);border-color:var(--muted)}
+    .me-quick-card:active{transform:scale(0.99)}
+    .me-quick-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;color:var(--accent);background:color-mix(in oklab,var(--accent),transparent 88%)}
+    .me-quick-icon.okr{color:var(--accent)}
+    .me-quick-icon.share{color:var(--success);background:color-mix(in oklab,var(--success),transparent 88%)}
+    .me-quick-icon svg{width:18px;height:18px}
+    .me-quick-text{flex:1;min-width:0}
+    .me-quick-title{font-size:13px;font-weight:600;color:var(--fg);line-height:1.3}
+    .me-quick-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3}
+    .me-chevron{width:14px;height:14px;color:var(--meta);flex-shrink:0}
+
+    /* 设置分组 */
+    .me-section-title{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:0 6px;margin:8px 0 8px}
+    .me-list{background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:18px}
+    .me-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border-soft);cursor:pointer;transition:background .15s}
+    .me-row:last-child{border-bottom:none}
+    .me-row:hover{background:var(--surface)}
+    .me-row:active{background:var(--surface)}
+    .me-row-icon{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;color:var(--accent);background:color-mix(in oklab,var(--accent),transparent 90%)}
+    .me-row-icon svg{width:16px;height:16px}
+    .me-row-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+    .me-row-title{font-size:13.5px;font-weight:500;color:var(--fg);line-height:1.3}
+    .me-row-sub{font-size:11.5px;color:var(--muted);line-height:1.3}
+    .me-row-danger .me-row-icon{color:var(--danger);background:color-mix(in oklab,var(--danger),transparent 90%)}
+    .me-row-danger .me-row-title{color:var(--danger)}
+
+    /* 我的 tab 入场（错落） */
+    .me-profile,.me-stats,.me-quick,.me-list{animation:cardIn 320ms cubic-bezier(0.16,1,0.3,1) both}
+    .me-profile{animation-delay:0ms}
+    .me-stats{animation-delay:40ms}
+    .me-quick{animation-delay:80ms}
+    .me-list{animation-delay:120ms}
+
+    .me-footer{text-align:center;font-size:11px;color:var(--meta);padding:8px 0 4px;letter-spacing:.04em}
+
+    @media (max-width:600px){
+      .me-quick{grid-template-columns:1fr}
+      .me-bio{display:none}
+    }
 
 
     /* ── Empty state block ── */
@@ -239,9 +315,9 @@
     /* ── OKR 类别图标（替代 emoji ） ── */
     .okr-dot{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:600;line-height:1;flex-shrink:0;box-shadow:0 1px 2px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,.15)}
     .okr-dot.o1{background:var(--accent);color:#fff}
-    .okr-dot.o2{background:#8B5CF6;color:#fff}
-    .okr-dot.o3{background:#22D3EE;color:#fff}
-    .okr-dot.o4{background:#DC2626;color:#fff}
+    .okr-dot.o2{background:var(--success);color:#fff}
+    .okr-dot.o3{background:var(--warning);color:#fff}
+    .okr-dot.o4{background:var(--muted);color:#fff}
     .okr-dot.t{background:var(--fg);color:#fff}
     .okr-dot.e{background:#0066cc;color:#fff}
     /* ── 分享目标 SVG 图标（替代 ） ── */
@@ -467,7 +543,9 @@
     /* Small mobile (≤360px) — iPhone SE 1st gen / compact */
     @media(max-width:360px){
       .topbar{padding:0 10px;gap:6px}
-      .topbar-logo{height:24px}
+      .topbar-mark{width:22px;height:22px}
+      .topbar-wordmark{font-size:13px;gap:3px}
+      .topbar-wordmark i{font-size:11px}
       .panel{padding:10px 10px var(--space-5)}
       .eisenhower-grid{gap:6px;min-height:auto}
       .eq-cell{min-height:0;padding:8px}
@@ -554,7 +632,9 @@
       .matrix-today-summary{grid-template-columns:repeat(3,1fr)}
       .gantt-summary-cards{grid-template-columns:repeat(3,1fr)}
       .auth-card{padding:24px;border-radius:16px}
-      .auth-logo{height:60px}
+      .auth-mark{width:38px;height:38px}
+      .auth-wordmark{font-size:24px;gap:5px}
+      .auth-wordmark i{font-size:20px}
     }
     /* Tablet (601-900px) — small tablets, foldable open */
     @media(min-width:601px) and (max-width:900px){
@@ -587,7 +667,12 @@
     .auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;place-items:center;z-index:300;backdrop-filter:blur(8px)}
     .auth-overlay.open{display:grid}
     .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;width:min(420px,92vw);box-shadow:0 30px 80px rgba(0,0,0,.2)}
-    .auth-logo{height:80px;width:auto;display:block;margin-bottom:10px}
+    .auth-logo{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--fg);margin-bottom:14px;line-height:1}
+    .auth-mark{width:48px;height:48px;color:var(--fg);flex-shrink:0}
+    .auth-wordmark{display:inline-flex;align-items:baseline;gap:6px;font-family:var(--font-display);font-size:30px;font-weight:600;letter-spacing:-0.025em;white-space:nowrap}
+    .auth-wordmark b{font-weight:600;color:var(--fg)}
+    .auth-wordmark i{font-style:normal;color:var(--accent);font-weight:500;font-size:24px;transform:translateY(-2px)}
+    .auth-wordmark em{font-style:normal;font-weight:500;color:var(--meta);letter-spacing:-0.005em}
     .auth-tagline{font-size:13px;color:var(--muted);margin-bottom:24px}
     .auth-tabs{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:20px}
     .auth-tab{flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;text-align:center;border:none;background:transparent}
@@ -635,28 +720,29 @@
     .retro-insight-text b{font-weight:600}
 
     /* ── 分享 (Share) ── */
-    .share-cover{background:linear-gradient(135deg,oklch(58% 0.18 255),oklch(48% 0.20 270));border-radius:18px;padding:24px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden}
-    .share-cover::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%}
-    .share-cover::before{content:'';position:absolute;bottom:-40px;left:20px;width:80px;height:80px;background:rgba(255,255,255,.05);border-radius:50%}
-    .share-cover-eyebrow{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin-bottom:6px}
-    .share-cover-title{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-0.02em;line-height:1.2;margin-bottom:14px;position:relative;z-index:1}
-    .share-cover-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;position:relative;z-index:1}
-    .share-cover-stat-num{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-0.02em;line-height:1}
-    .share-cover-stat-label{font-size:10px;opacity:.85;margin-top:4px}
+    .share-cover{background:linear-gradient(135deg,var(--accent),color-mix(in oklab,var(--accent),var(--fg) 25%));border-radius:16px;padding:18px 20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+    .share-cover::after{content:'';position:absolute;top:-40px;right:-20px;width:140px;height:140px;background:rgba(255,255,255,.06);border-radius:50%;pointer-events:none}
+    .share-cover-eyebrow{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.85;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+    .share-cover-eyebrow svg{width:11px;height:11px}
+    .share-cover-title{font-family:var(--font-display);font-size:19px;font-weight:600;letter-spacing:-0.022em;line-height:1.25;margin-bottom:10px;position:relative;z-index:1}
+    .share-cover-meta{font-size:11.5px;opacity:.85;position:relative;z-index:1;display:flex;align-items:center;gap:6px}
+    .share-cover-meta svg{width:12px;height:12px;opacity:.7;flex-shrink:0}
     .share-link-row{display:flex;gap:8px;margin-bottom:14px}
     .share-link-input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:12px;font-family:var(--font-mono);color:var(--fg);background:var(--bg)}
     .share-link-copy{padding:10px 14px;border-radius:10px;background:var(--accent);color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer}
-    .share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-    .share-target{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s}
-    .share-target:hover{border-color:var(--accent);transform:translateY(-1px)}
-    .share-target-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:color-mix(in oklab,var(--bg),var(--surface) 40%);transition:all .15s}
-    .share-target-label{font-size:11px;color:var(--fg);font-weight:500}
-    .share-visibility{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
-    .share-visibility h3{font-size:13px;font-weight:600;margin-bottom:10px}
-    .share-vis-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+    .share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+    .share-target{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all 220ms var(--ease-standard)}
+    .share-target:hover{border-color:var(--accent);background:var(--bg);transform:translateY(-1px)}
+    .share-target-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:var(--bg);border:1px solid var(--border-soft);transition:all 220ms var(--ease-standard)}
+    .share-target:hover .share-target-icon{border-color:transparent;background:color-mix(in oklab,var(--accent),transparent 92%)}
+    .share-target-label{font-size:11px;color:var(--fg);font-weight:500;letter-spacing:-0.005em}
+    .share-section-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:6px 0 10px}
+    .share-visibility{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:6px 16px}
+    .share-visibility h3{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:10px 0 6px}
+    .share-vis-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-soft)}
     .share-vis-row:last-child{border-bottom:none}
-    .share-vis-label{font-size:12px;color:var(--fg)}
-    .share-vis-sub{font-size:10px;color:var(--muted);margin-top:1px}
+    .share-vis-label{font-size:13px;color:var(--fg);font-weight:500}
+    .share-vis-sub{font-size:11px;color:var(--muted);margin-top:2px}
     /* ── Share overlay (calendar/gantt) ── */
     #share-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;place-items:center}
     #share-overlay.open{display:grid}
@@ -784,7 +870,10 @@
 <body>
 
 <div class="topbar">
-  <img class="topbar-logo" src="logo.png" alt="格行 GridGo" />
+  <a class="topbar-logo" href="#" aria-label="格行 GridGo">
+    <svg class="topbar-mark" viewBox="0 0 200 200" aria-hidden="true"><path d="M 100 100 L 169 100 L 169 140 A 80 80 0 1 1 169 60" fill="none" stroke="currentColor" stroke-width="14"/></svg>
+    <span class="topbar-wordmark"><b>格行</b><i aria-hidden="true">·</i><em>GridGo</em></span>
+  </a>
   <button type="button" class="okr-selector" onclick="openOkrMgr()" title="管理 OKR">
     <span>我的 OKR</span>
     <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
@@ -821,7 +910,10 @@
       <div class="sub-tab" onclick="switchSubTab('matrix','week',this)">本周</div>
     </div>
     <div class="sub-view active" data-subview="matrix-all">
-    <div class="matrix-header"></div>
+    <div class="matrix-header">
+      <h2>四象限  ·  <span class="matrix-header-date">7 月 18 日 周五</span></h2>
+      <div class="matrix-header-summary"><b>11</b> 项待办  ·  <b>3</b> 项进行中</div>
+    </div>
     <div class="eisenhower-grid">
       <div class="eq-cell q1">
         <div class="eq-header"><span class="eq-label">紧急 × 重要</span><span class="eq-count">3</span></div>
@@ -872,7 +964,10 @@
 
     <!-- 今日 -->
     <div class="sub-view" data-subview="matrix-today">
-      <div class="matrix-header"><span style="font-size:12px;color:var(--muted)">7 月 18 日 周五</span></div>
+      <div class="matrix-header">
+        <h2>今日  ·  <span class="matrix-header-date">7 月 18 日 周五</span></h2>
+        <div class="matrix-header-summary"><b>6</b> 项待办  ·  <b>2</b> 项紧急</div>
+      </div>
       <div class="matrix-today-summary">
         <div class="matrix-today-stat"><div class="matrix-today-stat-num q1">2</div><div class="matrix-today-stat-label">紧急×重要</div></div>
         <div class="matrix-today-stat"><div class="matrix-today-stat-num q2">3</div><div class="matrix-today-stat-label">重要不紧急</div></div>
@@ -905,15 +1000,18 @@
 
     <!-- 本周 -->
     <div class="sub-view" data-subview="matrix-week">
-      <div class="matrix-header"><span style="font-size:12px;color:var(--muted)">7/14 - 7/20</span></div>
+      <div class="matrix-header"><span class="matrix-header-date">7/14 - 7/20</span></div>
       <div class="matrix-today-summary">
         <div class="matrix-today-stat"><div class="matrix-today-stat-num q1">3</div><div class="matrix-today-stat-label">紧急×重要</div></div>
         <div class="matrix-today-stat"><div class="matrix-today-stat-num q2">6</div><div class="matrix-today-stat-label">重要不紧急</div></div>
         <div class="matrix-today-stat"><div class="matrix-today-stat-num q3">2</div><div class="matrix-today-stat-label">紧急不重要</div></div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
-        <div style="font-size:12px;font-weight:600;color:var(--fg);margin-bottom:10px" style="display:flex;align-items:center;gap:5px"><div class="icon-emoji">📌</div> 本周重点</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.7">本周聚焦 <b style="color:var(--fg)">产品增长 OKR</b> 的核心功能重构与 A/B 测试上线。建议每日 14:00 - 18:00 深度工作块专注于此。健康维度保持 3 次跑步（已达成 2/3）。</div>
+      <div class="matrix-focus-card">
+        <div class="matrix-focus-head">
+          <svg class="matrix-focus-icon" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/></svg>
+          <span>本周聚焦</span>
+        </div>
+        <div class="matrix-focus-body">聚焦 <b>产品增长 OKR</b> 的核心功能重构与 A/B 测试上线。建议每日 14:00 - 18:00 深度工作块专注于此。健康维度保持 3 次跑步（已达成 2/3）。</div>
       </div>
       <div class="eisenhower-grid">
         <div class="eq-cell q1"><div class="eq-header"><span class="eq-label">紧急 × 重要</span><span class="eq-count">3</span></div><div class="eq-tasks"><div class="eq-task" onclick="toggleCheck(this)"><div class="eq-task-check"></div><div><div class="eq-task-title">Q3 OKR 评审会议</div><div class="eq-task-meta">周五 14:00</div></div></div><div class="eq-task" onclick="toggleCheck(this)"><div class="eq-task-check"></div><div><div class="eq-task-title">核心功能重构联调</div><div class="eq-task-meta">周二 - 周四</div></div></div><div class="eq-task" onclick="toggleCheck(this)"><div class="eq-task-check"></div><div><div class="eq-task-title">客户紧急需求修复</div><div class="eq-task-meta">周三 EOD</div></div></div></div></div>
@@ -1559,41 +1657,89 @@
     </div>
   </div>
 
-  <!-- 成就 -->
+  <!-- 我的 -->
   <div class="panel" id="panel-achievements">
 
     <div class="ach-header"></div>
 
-    <!-- 关键数字（3 个） -->
-    <div class="ach-grid">
-      <div class="ach-card"><div class="ach-card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v2a2 2 0 0 0 2 2"/><path d="M17 6h3v2a2 2 0 0 1-2 2"/><path d="M9 21h6"/><path d="M12 17v4"/></svg></div><div class="ach-card-num">24</div><div class="ach-card-label">已完成</div></div>
-      <div class="ach-card"><div class="ach-card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg></div><div class="ach-card-num">86h</div><div class="ach-card-label">专注时间</div></div>
-      <div class="ach-card"><div class="ach-card-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22c4 0 7-3 7-6.5 0-2.2-1.2-3.6-2.5-5-.3 1.2-1 1.8-2 1.8 0-2 1-3.3 0-6.3-2.5 1.2-4 3.2-4 5.8 0 1 .2 1.8.7 2.7-.7-.2-1.2-.8-1.4-1.7-1.5 1.2-2.3 2.7-2.3 4.2 0 3 2 5 4.5 5z"/></svg></div><div class="ach-card-num">12</div><div class="ach-card-label">连胜天数</div></div>
+    <!-- 个人主页 header -->
+    <div class="me-profile">
+      <div class="me-avatar">林</div>
+      <div class="me-id">
+        <div class="me-name-row">
+          <span class="me-name">林小白</span>
+          <span class="me-badge">PRO</span>
+        </div>
+        <div class="me-role">独立 iOS 工程师  ·  在职</div>
+        <div class="me-bio">用一格一事的方式推进 OKR，把目标拆成可执行的格子。</div>
+      </div>
+      <button type="button" class="me-edit" onclick="openAuth()">编辑资料</button>
     </div>
 
-    <!-- OKR 进度（3 项核心） -->
-    <div class="ach-section">
-      <div class="ach-section-head"><span>OKR 进度</span><span class="ach-section-meta">3 项进行中</span></div>
-      <div class="ach-okr-list">
-        <div class="ach-okr-item">
-          <span class="okr-dot o1">P</span>
-          <div class="ach-okr-info"><div class="ach-okr-name">产品增长</div><div class="ach-okr-bar" role="progressbar" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100" aria-label="OKR 进度 67%"><div class="ach-okr-fill o1" style="width:67%"></div></div></div>
-          <div class="ach-okr-pct">67%</div>
-        </div>
-        <div class="ach-okr-item">
-          <span class="okr-dot o2">H</span>
-          <div class="ach-okr-info"><div class="ach-okr-name">健康管理</div><div class="ach-okr-bar" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" aria-label="OKR 进度 45%"><div class="ach-okr-fill o2" style="width:45%"></div></div></div>
-          <div class="ach-okr-pct">45%</div>
-        </div>
-        <div class="ach-okr-item">
-          <span class="okr-dot o3">S</span>
-          <div class="ach-okr-info"><div class="ach-okr-name">技能提升</div><div class="ach-okr-bar" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" aria-label="OKR 进度 30%"><div class="ach-okr-fill o3" style="width:30%"></div></div></div>
-          <div class="ach-okr-pct">30%</div>
-        </div>
+    <!-- 数据条（3 项 + 分隔线） -->
+    <div class="me-stats">
+      <div class="me-stat"><div class="me-stat-num">24</div><div class="me-stat-label">已完成</div></div>
+      <div class="me-stat-sep"></div>
+      <div class="me-stat"><div class="me-stat-num">86h</div><div class="me-stat-label">专注时长</div></div>
+      <div class="me-stat-sep"></div>
+      <div class="me-stat"><div class="me-stat-num">12</div><div class="me-stat-label">连胜天数</div></div>
+    </div>
+
+    <!-- 快捷入口（2 个卡片） -->
+    <div class="me-quick">
+      <button type="button" class="me-quick-card" onclick="openOkrMgr()">
+        <div class="me-quick-icon okr"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg></div>
+        <div class="me-quick-text"><div class="me-quick-title">我的 OKR</div><div class="me-quick-sub">3 项进行中  ·  点击管理</div></div>
+        <svg class="me-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+      </button>
+      <button type="button" class="me-quick-card" onclick="openShareCurrent()">
+        <div class="me-quick-icon share"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg></div>
+        <div class="me-quick-text"><div class="me-quick-title">分享我的进度</div><div class="me-quick-sub">生成只读链接，发给伙伴</div></div>
+        <svg class="me-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+
+    <!-- 设置分组 -->
+    <div class="me-section-title">偏好</div>
+    <div class="me-list">
+      <div class="me-row">
+        <div class="me-row-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22a10 10 0 100-20 10 10 0 000 20z"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="me-row-text"><div class="me-row-title">提醒时间</div><div class="me-row-sub">每日 09:00  ·  每周一回顾</div></div>
+        <svg class="me-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+      </div>
+      <div class="me-row">
+        <div class="me-row-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></div>
+        <div class="me-row-text"><div class="me-row-title">主题外观</div><div class="me-row-sub">跟随系统  ·  浅色</div></div>
+        <svg class="me-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+      </div>
+      <div class="me-row">
+        <div class="me-row-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19a2 2 0 004 0"/></svg></div>
+        <div class="me-row-text"><div class="me-row-title">通知提醒</div><div class="me-row-sub">截止前 24 小时推送</div></div>
+        <div class="switch on" onclick="this.classList.toggle('on')" role="switch" aria-checked="true"></div>
+      </div>
+      <div class="me-row">
+        <div class="me-row-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h16v4H4zM4 10h10v4H4zM4 14h16v6H4z"/></svg></div>
+        <div class="me-row-text"><div class="me-row-title">数据导出</div><div class="me-row-sub">导出 JSON / CSV</div></div>
+        <svg class="me-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
       </div>
     </div>
 
-    
+    <!-- 设置分组 -->
+    <div class="me-section-title">账号</div>
+    <div class="me-list">
+      <div class="me-row">
+        <div class="me-row-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div>
+        <div class="me-row-text"><div class="me-row-title">登录账号</div><div class="me-row-sub">GitHub OAuth  ·  linxiaobai@</div></div>
+        <svg class="me-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+      </div>
+      <div class="me-row me-row-danger">
+        <div class="me-row-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 17l5-5-5-5M21 12H9M12 21H5a2 2 0 01-2-2V5a2 2 0 012-2h7"/></svg></div>
+        <div class="me-row-text"><div class="me-row-title">退出登录</div></div>
+      </div>
+    </div>
+
+    <div class="me-footer">格行 GridGo  ·  v1.4.0  ·  一格一事，循格而行</div>
+
 </div>
 
 </div>
@@ -1607,11 +1753,15 @@
       <button type="button" class="share-panel-close" onclick="closeSharePanel()"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
     </div>
 
-    <div class="share-panel-preview">
-      <h3 id="share-preview-label" style="display:flex;align-items:center;gap:6px"><div class="icon-emoji">📅</div> 日历视图</h3>
-      <div class="share-panel-preview-hint">
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill-opacity="0.12"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.5" fill="none"/><circle cx="12" cy="11" r="0.9"/><rect x="11.4" y="13.5" width="1.2" height="4" rx="0.6"/></svg>
-        获取链接的人可查看只读视图，无法编辑
+    <div class="share-cover">
+      <div class="share-cover-eyebrow">
+        <svg aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="8" height="7" rx="1"/><path d="M4 2v2M8 2v2"/></svg>
+        <span id="share-preview-label">日历视图</span>
+      </div>
+      <div class="share-cover-title" id="share-preview-title">林小白 的 7 月进度</div>
+      <div class="share-cover-meta">
+        <svg aria-hidden="true" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"/><path d="M6 3.5V6l1.5 1"/></svg>
+        <span>获取链接的人可查看只读视图</span>
       </div>
     </div>
 
@@ -1620,6 +1770,7 @@
       <button type="button" class="share-link-copy" id="share-copy-btn" onclick="copyShareLink()">复制链接</button>
     </div>
 
+    <div class="share-section-label">分享到</div>
     <div class="share-grid">
       <div class="share-target" onclick="copyShareLink()"><div class="share-target-icon"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 4C5 4 2.5 6.2 2.5 9c0 1.6.9 3 2.3 4l-.6 2.1 2.2-1.1c.6.15 1.3.25 2 .3" stroke="#07C160" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M21.5 14.5c0-2.5-2.2-4.5-5-4.5s-5 2-5 4.5 2.2 4.5 5 4.5c.5 0 1-.05 1.5-.15L20 20l-.55-1.5c1.25-.9 2.05-2.2 2.05-4z" stroke="#07C160" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5.5" cy="8.5" r=".7" fill="#07C160"/><circle cx="8" cy="8.5" r=".7" fill="#07C160"/><circle cx="14" cy="14" r=".7" fill="#07C160"/><circle cx="16.5" cy="14" r=".7" fill="#07C160"/></svg></div><div class="share-target-label">微信</div></div>
       <div class="share-target" onclick="copyShareLink()"><div class="share-target-icon"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="6" width="19" height="14" rx="2.5" stroke="#1296DB" stroke-width="1.7" stroke-linejoin="round"/><path d="M7 6l1.5-2h7L17 6" stroke="#1296DB" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" stroke="#1296DB" stroke-width="1.7"/><circle cx="17.5" cy="9" r=".8" fill="#1296DB"/></svg></div><div class="share-target-label">朋友圈</div></div>
@@ -1627,8 +1778,8 @@
       <div class="share-target" onclick="copyShareLink()"><div class="share-target-icon"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="5" width="19" height="14" rx="2.5" stroke="#4A5560" stroke-width="1.7" stroke-linejoin="round"/><path d="M3 7l9 6.5L21 7" stroke="#4A5560" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="share-target-label">邮件</div></div>
     </div>
 
+    <div class="share-section-label">隐私设置</div>
     <div class="share-visibility">
-      <h3>隐私设置</h3>
       <div class="share-vis-row"><div><div class="share-vis-label">隐藏未完成任务</div><div class="share-vis-sub">只展示已完成的项</div></div><div class="switch" onclick="this.classList.toggle('on')"></div></div>
       <div class="share-vis-row"><div><div class="share-vis-label">显示任务详情</div><div class="share-vis-sub">包含描述和子任务</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
       <div class="share-vis-row"><div><div class="share-vis-label">显示 OKR 标签</div><div class="share-vis-sub">展示任务所属目标</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
@@ -1664,8 +1815,8 @@
     <span>甘特图</span>
   </div>
   <div class="tab-item" onclick="switchTab('achievements',this)">
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
-    <span>成就</span>
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    <span>我的</span>
   </div>
 </div>
 
@@ -1880,7 +2031,10 @@
 <!-- Login / Register Modal -->
 <div class="auth-overlay" id="auth-overlay" onclick="if(event.target===this)closeAuth()">
   <div class="auth-card">
-    <img class="auth-logo" src="logo.png" alt="格行 GridGo" />
+    <a class="auth-logo" href="#" aria-label="格行 GridGo">
+      <svg class="auth-mark" viewBox="0 0 200 200" aria-hidden="true"><path d="M 100 100 L 169 100 L 169 140 A 80 80 0 1 1 169 60" fill="none" stroke="currentColor" stroke-width="14"/></svg>
+      <span class="auth-wordmark"><b>格行</b><i aria-hidden="true">·</i><em>GridGo</em></span>
+    </a>
     <div class="auth-tagline">登录后同步你的 OKR 到所有设备，与关心你的人分享进度。</div>
 
     <div class="auth-tabs">
