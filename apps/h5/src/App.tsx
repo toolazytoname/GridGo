@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { useUIStore } from './store/ui'
+import { useTasksStore } from './store/tasks'
 import { Topbar } from './components/Topbar'
 import { TabBar } from './components/TabBar'
 import { MatrixView } from './views/MatrixView'
@@ -20,7 +22,12 @@ const VIEWS: Record<string, () => JSX.Element> = {
 
 export function App() {
   const activeTab = useUIStore((s) => s.activeTab)
+  const init = useTasksStore((s) => s.init)
   const ActiveView = VIEWS[activeTab] ?? MatrixView
+
+  useEffect(() => {
+    init()
+  }, [init])
 
   return (
     <div className="gg-app">

@@ -30,9 +30,9 @@ export function TaskModal() {
   const [due, setDue] = useState('')
   const [estimate, setEstimate] = useState<number | ''>('')
 
-  const submit = () => {
+  const submit = async () => {
     if (!title.trim()) return
-    add({
+    await add({
       title: title.trim(),
       notes: null,
       quadrant,
