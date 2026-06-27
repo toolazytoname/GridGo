@@ -43,7 +43,7 @@ export function Topbar() {
           <path d="M12 2v14" />
         </svg>
       </button>
-      <button type="button" className="gg-topbar-avatar" title="林小白" aria-label="账号">林</button>
+      <button type="button" className="gg-topbar-avatar" title="林小白" aria-label="账号" onClick={useUIStore.getState().openAuth}>林</button>
     </header>
   )
 }

@@ -1,18 +1,76 @@
+import { useState, useMemo } from 'react'
+import { useTasksStore } from '../store/tasks'
+
 export function CalendarView() {
+  const tasks = useTasksStore((s) => s.tasks)
+  const [cursor, setCursor] = useState(() => {
+    const d = new Date()
+    return new Date(d.getFullYear(), d.getMonth(), 1)
+  })
+
+  const monthLabel = useMemo(() => `${cursor.getFullYear()} 年 ${cursor.getMonth() + 1} 月`, [cursor])
+
+  const grid = useMemo(() => {
+    const firstDay = new Date(cursor)
+    const start = new Date(firstDay)
+    start.setDate(1 - firstDay.getDay())
+    const cells: Date[] = []
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start)
+      d.setDate(start.getDate() + i)
+      cells.push(d)
+    }
+    return cells
+  }, [cursor])
+
+  const tasksByDate = useMemo(() => {
+    const out: Record<string, typeof tasks> = {}
+    for (const t of tasks) {
+      if (!t.due_date) continue
+      ;(out[t.due_date] ||= []).push(t)
+    }
+    return out
+  }, [tasks])
+
+  const today = new Date()
+  const todayKey = today.toISOString().slice(0, 10)
+
   return (
     <div className="gg-view">
-      <h2 className="gg-view-title">
-        日历 <span className="gg-view-title-sub">·  月 / 周 / 日</span>
-      </h2>
-      <div className="gg-placeholder">
-        <div className="gg-placeholder-icon">
-          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="3" y="4" width="18" height="18" rx="2" />
-            <path d="M16 2v4M8 2v4M3 10h18" />
-          </svg>
-        </div>
-        <div className="gg-placeholder-title">日历 Tab 占位</div>
-        <div className="gg-placeholder-sub">对应 BACKLOG F-014，下一轮实现</div>
+      <div className="gg-cal-header">
+        <button type="button" className="gg-cal-nav" onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))} aria-label="上个月">
+          ‹
+        </button>
+        <span className="gg-cal-month">{monthLabel}</span>
+        <button type="button" className="gg-cal-nav" onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))} aria-label="下个月">
+          ›
+        </button>
+      </div>
+
+      <div className="gg-cal-grid">
+        {['日', '一', '二', '三', '四', '五', '六'].map((d) => (
+          <div key={d} className="gg-cal-dow">{d}</div>
+        ))}
+        {grid.map((d) => {
+          const key = d.toISOString().slice(0, 10)
+          const items = tasksByDate[key] ?? []
+          const inMonth = d.getMonth() === cursor.getMonth()
+          const isToday = key === todayKey
+          return (
+            <div
+              key={key}
+              className={`gg-cal-cell ${inMonth ? '' : 'gg-cal-out'} ${isToday ? 'gg-cal-today' : ''}`}
+            >
+              <span className="gg-cal-num">{d.getDate()}</span>
+              {items.slice(0, 3).map((t) => (
+                <div key={t.id} className={`gg-cal-evt gg-cal-evt-${t.quadrant ?? 'q4'}`} title={t.title}>
+                  {t.title}
+                </div>
+              ))}
+              {items.length > 3 && <div className="gg-cal-more">+{items.length - 3}</div>}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

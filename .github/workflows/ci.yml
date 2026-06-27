@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  test:
+    name: Test & Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm -r typecheck
+      - name: Unit tests
+        run: pnpm -r test
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      - name: Build H5
+        run: pnpm --filter @gridgo/h5 build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+  score:
+    name: Score
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Compute score for this PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          echo "PR#$PR_NUMBER score stub — full LLM review 在 loop 里跑"
+          mkdir -p .scoring/F-$PR_NUMBER
+          echo '{"score":75,"notes":"stub — implement in scoring/score.mjs"}' > .scoring/F-$PR_NUMBER/visual.json
+          echo '{"score":80,"notes":"stub"}' > .scoring/F-$PR_NUMBER/test.json
+          echo '{"score":75,"notes":"stub — implement LLM reviewer"}' > .scoring/F-$PR_NUMBER/llm.json
+          node packages/scoring/score.mjs F-$PR_NUMBER | tee .scoring/F-$PR_NUMBER/total.json
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: scoring
+          message: |
+            ## 评分 (${{ github.event.pull_request.base.ref }} ← ${{ github.head_ref }})
+            ```json
+            $(cat .scoring/F-$PR_NUMBER/total.json)
+            ```

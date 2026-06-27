@@ -6,6 +6,9 @@ import { ListView } from './views/ListView'
 import { CalendarView } from './views/CalendarView'
 import { GanttView } from './views/GanttView'
 import { ProfileView } from './views/ProfileView'
+import { OkrManager } from './modals/OkrManager'
+import { TaskModal } from './modals/TaskModal'
+import { AuthModal } from './modals/AuthModal'
 
 const VIEWS: Record<string, () => JSX.Element> = {
   matrix: MatrixView,
@@ -26,6 +29,9 @@ export function App() {
         <ActiveView />
       </main>
       <TabBar />
+      <OkrManager />
+      <TaskModal />
+      <AuthModal />
     </div>
   )
 }
