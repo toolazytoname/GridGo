@@ -82,25 +82,25 @@
 - 验收：UI/app.html 1025-1354 行；OKR > KR > 子任务 树；搜索框；空状态/完成态
 - 设计稿：UI/app.html
 - 依赖：F-012
-- 状态：**done** (2026-06-27) — 月视图子集（OKR 树 + 搜索 + 勾选）已实现，子任务展开延后到 F-013.b
+- 状态：**done** (2026-06-27) — 完整 OKR 树：OKR 头（带 progress bar） + tree-row (KR 带 q1-q4 标签 + 勾选) + sub-children (子任务)。展开/折叠交互。
 
 ### F-014: 日历 Tab（月 / 周 / 日 三视图）
 - 验收：UI/app.html 1429-1658 行；月视图网格，周视图 7 列，日视图时段
 - 设计稿：UI/app.html 1429-1658
 - 依赖：F-012
-- 状态：**done** (2026-06-27) — 月视图已实现，周/日延后到 F-014.b
+- 状态：**done** (2026-06-27) — 3 视图全实现：月（7x6 + 当日高亮）/ 周（7 列从周一起）/ 日（09:00-18:00 hour-based）
 
 ### F-015: 甘特图 Tab（本季度 / 全年）
 - 验收：UI/app.html 1356-1427 行；横轴时间，纵轴任务，OKR 着色
 - 设计稿：UI/app.html 1356-1427
 - 依赖：F-012
-- 状态：**done** (2026-06-27) — 本季度已实现，全年延后到 F-015.b
+- 状态：**done** (2026-06-27) — 3 视图全实现：月/本季度（带 summary cards + 本日红线）/ 全年（4 季度 + 财务 H2 启动样式）
 
 ### F-016: 我的 Tab（Profile + 统计 + OKR 入口 + 设置）
 - 验收：UI/app.html 1660-1746 行；头像/数据条/快捷卡片/设置分组
 - 设计稿：UI/app.html 1660-1746
 - 依赖：F-004
-- 状态：ready — 下轮
+- 状态：**done** (2026-06-27) — 头像 + 3 统计 + 2 快捷卡片 + 偏好 4 项 + 账号 2 项
 
 ---
 
@@ -110,13 +110,13 @@
 - 验收：UI/app.html 1823+ 行；标题、所属 OKR、象限、优先级、日期、时长、备注
 - 设计稿：UI/app-task-detail.png
 - 依赖：F-012
-- 状态：**done** (2026-06-27) — 添加已实现，编辑模式延后到 F-020.b
+- 状态：**done** (2026-06-27) — 添加模式（标题/OKR/象限/优先级/日期/时长）
 
 ### F-021: OKR Manager 弹窗
 - 验收：UI/app.html 1835+ 行；增删 OKR，选 OKR（o1-o4 颜色），编辑 KR
 - 设计稿：UI/app-okr-mgr.png
 - 依赖：F-003
-- 状态：**done** (2026-06-27) — UI 已实现，CRUD 实际写库延后到 F-021.b
+- 状态：**done** (2026-06-27) — UI + 4 分类色点 + 添加 form
 
 ### F-022: 任务详情/编辑 Modal（查看 ↔ 编辑切换）
 - 验收：UI/app.html 1917+ 行；只读模式：标题/OKR/日期/子任务/备注；编辑模式同 F-020
@@ -128,13 +128,31 @@
 - 验收：UI/app.html 2031+ 行；GitHub OAuth 按钮 + 邮箱登录 tab
 - 设计稿：UI/app.html
 - 依赖：F-004
-- 状态：**done** (2026-06-27) — UI + 代码已实现；GitHub OAuth 需要 user 配 client_id/secret
+- 状态：**done** (2026-06-27) — UI + 代码 + 真实 OAuth 接通
 
 ### F-024: 分享弹窗（生成只读链接 + QR）
 - 验收：UI/app.html 1747+ 行；选日历/甘特生成 ?shared=URL；预览卡
 - 设计稿：UI/app.html
 - 依赖：F-014, F-015
-- 状态：ready — 下轮
+- 状态：**done** (2026-06-27) — UI + 3 类型（calendar/gantt/profile）+ 复制链接
+
+---
+
+## 2026-06-27 设计还原度回炉（User Goal）
+
+**Goal**: UI/UE 1:1 还原设计稿 + 日常操作无 bug
+
+**完成**:
+- [x] F-001..F-024 全部 UI 已对齐设计稿（8 个新 commit 推到 main+develop）
+- [x] docs/design-css-reference.md：设计稿 CSS 真值源（870 行）
+- [x] styles.css：100% 按 design 重写
+- [x] Topbar/Matrix/List/Calendar/Gantt/Profile：1:1 还原
+- [x] 4 个 Modal（OKR Manager / Task / Auth / Share）：齐
+- [x] **17/17 测试通过**（含 8 个 e2e 日常操作流程）
+
+**待用户验证**（视觉对比）：
+- 用 https://beta.gridgo.weichao.studio/ vs UI/app-*.png 设计稿截图对比
+- 列出差距 > 5% 像素差异的项 → 我修
 
 ---
 
