@@ -11,6 +11,7 @@ import { ProfileView } from './views/ProfileView'
 import { OkrManager } from './modals/OkrManager'
 import { TaskModal } from './modals/TaskModal'
 import { AuthModal } from './modals/AuthModal'
+import { ShareModal } from './modals/ShareModal'
 
 const VIEWS: Record<string, () => JSX.Element> = {
   matrix: MatrixView,
@@ -39,6 +40,14 @@ export function App() {
       <OkrManager />
       <TaskModal />
       <AuthModal />
+      <ShareModalGate />
     </div>
   )
+}
+
+function ShareModalGate() {
+  const open = useUIStore((s) => s.shareOpen)
+  const kind = useUIStore((s) => s.shareKind)
+  const close = useUIStore((s) => s.closeShare)
+  return <ShareModal open={open} onClose={close} kind={kind} />
 }

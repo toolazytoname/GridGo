@@ -28,7 +28,7 @@ export function ProfileView() {
             <span className="gg-me-name">
               {user?.user_metadata?.display_name ?? user?.email?.split('@')[0] ?? '未登录'}
             </span>
-            {user && <span className="gg-me-badge">PRO</span>}
+            {user && <span className="gg-me-badge" data-testid="pro-badge">PRO</span>}
           </div>
           <div className="gg-me-role">
             {user?.user_metadata?.role ?? (user ? '已登录 · ' + (user.email ?? '') : '游客 · 点击头像登录')}
@@ -76,7 +76,7 @@ export function ProfileView() {
             <path d="M6 4l4 4-4 4" />
           </svg>
         </button>
-        <button type="button" className="gg-me-quick-card" onClick={() => alert('分享 TODO')}>
+        <button type="button" className="gg-me-quick-card" onClick={() => useUIStore.getState().openShare('profile')}>
           <div className="gg-me-quick-icon gg-me-quick-icon-share">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
               <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7" />

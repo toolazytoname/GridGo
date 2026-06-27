@@ -9,6 +9,8 @@ interface UIState {
   okrMgrOpen: boolean
   taskModalOpen: boolean
   authOpen: boolean
+  shareOpen: boolean
+  shareKind: 'calendar' | 'gantt' | 'profile'
   setActiveTab: (t: TabKey) => void
   setMatrixSub: (m: MatrixSubTab) => void
   openOkrMgr: () => void
@@ -17,6 +19,8 @@ interface UIState {
   closeTaskModal: () => void
   openAuth: () => void
   closeAuth: () => void
+  openShare: (kind?: 'calendar' | 'gantt' | 'profile') => void
+  closeShare: () => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -25,6 +29,8 @@ export const useUIStore = create<UIState>((set) => ({
   okrMgrOpen: false,
   taskModalOpen: false,
   authOpen: false,
+  shareOpen: false,
+  shareKind: 'calendar',
   setActiveTab: (t) => set({ activeTab: t }),
   setMatrixSub: (m) => set({ matrixSub: m }),
   openOkrMgr: () => set({ okrMgrOpen: true }),
@@ -33,4 +39,6 @@ export const useUIStore = create<UIState>((set) => ({
   closeTaskModal: () => set({ taskModalOpen: false }),
   openAuth: () => set({ authOpen: true }),
   closeAuth: () => set({ authOpen: false }),
+  openShare: (kind) => set({ shareOpen: true, shareKind: kind ?? 'calendar' }),
+  closeShare: () => set({ shareOpen: false }),
 }))

@@ -23,6 +23,7 @@
     "supabase:types": "supabase gen types typescript --local > packages/api/database.types.ts"
   },
   "devDependencies": {
+    "@testing-library/react": "^14.3.1",
     "@types/node": "^20.11.0",
     "typescript": "^5.4.5"
   }

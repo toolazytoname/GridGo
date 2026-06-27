@@ -54,7 +54,7 @@ export function Topbar() {
           <path d="M6.5 13a1.5 1.5 0 0 0 3 0" />
         </svg>
       </button>
-      <button type="button" className="gg-topbar-share" onClick={() => alert('分享 TODO')} title="分享当前内容" aria-label="分享">
+      <button type="button" className="gg-topbar-share" onClick={() => useUIStore.getState().openShare()} title="分享当前内容" aria-label="分享">
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="18" cy="5" r="3" />
           <circle cx="6" cy="12" r="3" />
