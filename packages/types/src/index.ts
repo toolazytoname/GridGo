@@ -10,6 +10,7 @@ export interface Profile {
   bio: string | null
   avatar_color: string
   created_at: string
+  updated_at: string
 }
 
 export interface Okr {
@@ -18,9 +19,10 @@ export interface Okr {
   title: string
   description: string | null
   category: OkrCategory
-  quarter: string // e.g. "2026-Q3"
-  progress: number // 0..1
+  quarter: string
+  progress: number
   archived: boolean
+  sort_order: number
   created_at: string
   updated_at: string
 }
@@ -29,10 +31,20 @@ export interface KeyResult {
   id: string
   okr_id: string
   title: string
-  progress: number // 0..1
+  progress: number
   due_date: string | null
   done: boolean
+  sort_order: number
   created_at: string
+}
+
+export interface SubTask {
+  id: string
+  task_id: string
+  title: string
+  done: boolean
+  estimate_min: number | null
+  sort_order: number
 }
 
 export interface Task {
@@ -68,7 +80,7 @@ export interface CalendarEvent {
 export interface Achievement {
   id: string
   user_id: string
-  key: string // 唯一标识 e.g. "streak-7"
+  key: string
   title: string
   description: string | null
   unlocked_at: string

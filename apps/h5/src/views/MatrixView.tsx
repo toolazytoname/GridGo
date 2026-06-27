@@ -1,20 +1,26 @@
 import { useMemo } from 'react'
 import { useUIStore, type MatrixSubTab } from '../store/ui'
 import { useTasksStore, okrColorClass } from '../store/tasks'
-import type { Quadrant, Task } from '@gridgo/types'
+import type { Quadrant, Task, OkrCategory } from '@gridgo/types'
 
-const QUADRANTS: { key: Quadrant; label: string; sub: string }[] = [
-  { key: 'q1', label: '紧急 × 重要', sub: '立刻做' },
-  { key: 'q2', label: '重要 × 不紧急', sub: '计划做' },
-  { key: 'q3', label: '紧急 × 不重要', sub: '快速处理' },
-  { key: 'q4', label: '都不紧急 / 不重要', sub: '减少做' },
+const QUADRANTS: { key: Quadrant; label: string }[] = [
+  { key: 'q1', label: '紧急 × 重要' },
+  { key: 'q2', label: '重要 × 不紧急' },
+  { key: 'q3', label: '紧急 × 不重要' },
+  { key: 'q4', label: '紧急 × 不重要' },
 ]
+
+const QUADRANT_LABELS: Record<Quadrant, string> = {
+  q1: '紧急 × 重要',
+  q2: '重要 × 不紧急',
+  q3: '紧急 × 不重要',
+  q4: '紧急 × 不重要',
+}
 
 function isToday(iso: string | null) {
   if (!iso) return false
   return iso === new Date().toISOString().slice(0, 10)
 }
-
 function isThisWeek(iso: string | null) {
   if (!iso) return false
   const d = new Date(iso)
@@ -25,6 +31,12 @@ function isThisWeek(iso: string | null) {
   const end = new Date(start)
   end.setDate(start.getDate() + 7)
   return d >= start && d < end
+}
+function formatDate(d: Date) {
+  const m = d.getMonth() + 1
+  const day = d.getDate()
+  const wk = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()]
+  return `${m} 月 ${day} 日 · 周${wk}`
 }
 
 export function MatrixView() {
@@ -46,6 +58,9 @@ export function MatrixView() {
     if (t.quadrant) grouped[t.quadrant].push(t)
   }
 
+  const totalCount = filtered.length
+  const doingCount = filtered.filter((t) => !t.done).length
+
   return (
     <div className="gg-view">
       <div className="gg-subtabs" role="tablist" aria-label="四象限视图">
@@ -63,27 +78,37 @@ export function MatrixView() {
         ))}
       </div>
 
-      <h2 className="gg-view-title">
-        四象限 <span className="gg-view-title-sub">·  {formatDate(new Date())}</span>
-      </h2>
+      <div className="gg-matrix-header">
+        <h2>
+          四象限 <span className="gg-matrix-header-date">· {formatDate(new Date())}</span>
+        </h2>
+        <div className="gg-matrix-header-summary">
+          <b>{totalCount}</b> 项待办 · <b>{doingCount}</b> 项进行中
+        </div>
+      </div>
 
       {sub === 'week' && (
-        <div className="gg-focus-card">
-          <span className="gg-focus-label">本周聚焦</span>
-          <div className="gg-focus-body">
-            聚焦 <b>产品增长 OKR</b> 的核心功能重构与 A/B 测试上线。
-            建议每日 14:00 - 18:00 深度工作块专注于此。健康维度保持 3 次跑步（已达成 2/3）。
+        <div className="gg-matrix-focus-card">
+          <div className="gg-matrix-focus-head">
+            <svg className="gg-matrix-focus-icon" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="8" cy="8" r="6" />
+              <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none" />
+            </svg>
+            <span>本周聚焦</span>
+          </div>
+          <div className="gg-matrix-focus-body">
+            聚焦 <b>产品增长 OKR</b> 的核心功能重构与 A/B 测试上线。建议每日 14:00 - 18:00 深度工作块专注于此。健康维度保持 3 次跑步（已达成 2/3）。
           </div>
         </div>
       )}
 
-      <div className="gg-matrix">
+      <div className="gg-eisenhower-grid">
         {QUADRANTS.map((q) => {
           const items = grouped[q.key]
           return (
-            <div key={q.key} className={`gg-eq-cell gg-eq-${q.key}`}>
+            <div key={q.key} className={`gg-eq-cell ${q.key}`}>
               <div className="gg-eq-header">
-                <span className="gg-eq-label">{q.label}</span>
+                <span className="gg-eq-label">{QUADRANT_LABELS[q.key]}</span>
                 <span className="gg-eq-count">{items.length}</span>
               </div>
               <div className="gg-eq-tasks">
@@ -92,7 +117,7 @@ export function MatrixView() {
                   return (
                     <div
                       key={t.id}
-                      className={`gg-eq-task ${t.done ? 'gg-eq-task-done' : ''}`}
+                      className="gg-eq-task"
                       onClick={() => toggle(t.id)}
                     >
                       <div className={`gg-eq-check ${t.done ? 'gg-eq-check-on' : ''}`}>
@@ -106,13 +131,9 @@ export function MatrixView() {
                         <div className={`gg-eq-task-title ${t.done ? 'done' : ''}`}>{t.title}</div>
                         {(okr || t.due_date) && (
                           <div className="gg-eq-task-meta">
-                            {okr && (
-                              <span className={`gg-okr-dot ${okrColorClass[okr.category]}`} title={okr.title}>
-                                {okr.title[0]}
-                              </span>
-                            )}
-                            {okr && <span style={{ marginLeft: 4 }}>{okr.title.split('·')[1]?.trim() ?? okr.title}</span>}
-                            {t.due_date && !okr && <span>{t.due_date}</span>}
+                            {okr && <span className={`gg-okr-dot ${okrColorClass[okr.category as OkrCategory]}`} />}
+                            {okr && <span>{okr.title.split('·')[0]?.trim() || okr.title}</span>}
+                            {!okr && t.due_date && <span>{t.due_date}</span>}
                           </div>
                         )}
                       </div>
@@ -129,11 +150,4 @@ export function MatrixView() {
       </div>
     </div>
   )
-}
-
-function formatDate(d: Date) {
-  const m = d.getMonth() + 1
-  const day = d.getDate()
-  const wk = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()]
-  return `${m} 月 ${day} 日 · 周${wk}`
 }
