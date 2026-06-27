@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "pnpm --filter @gridgo/h5 dev",
-    "build": "pnpm --filter @gridgo/h5 build:h5",
+    "build": "pnpm --filter @gridgo/h5 build",
     "build:mp-weixin": "pnpm --filter @gridgo/h5 build:mp-weixin",
     "build:rn": "pnpm --filter @gridgo/h5 build:rn",
     "test": "pnpm -r test",
