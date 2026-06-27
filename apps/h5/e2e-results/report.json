@@ -1,0 +1,37 @@
+{
+  "steps": [
+    {
+      "name": "打开主页 → 默认在 Matrix Tab",
+      "pass": true
+    },
+    {
+      "name": "点 Q2 添加任务 → 填标题 → 提交",
+      "pass": true
+    },
+    {
+      "name": "Q2 应该看到新任务",
+      "pass": true
+    },
+    {
+      "name": "切到 List Tab",
+      "pass": true
+    },
+    {
+      "name": "切到 Calendar Tab",
+      "pass": true
+    },
+    {
+      "name": "切到 Gantt Tab",
+      "pass": true
+    },
+    {
+      "name": "切到 成就 Tab",
+      "pass": true
+    },
+    {
+      "name": "切回 Matrix 验证任务持久",
+      "pass": true
+    }
+  ],
+  "pass": true
+}

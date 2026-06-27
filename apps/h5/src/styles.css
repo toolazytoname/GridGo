@@ -319,8 +319,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 10px;
-  min-height: 480px;
+  gap: 8px;
+  min-height: 460px;
 }
 @media (max-width: 540px) {
   .gg-eisenhower-grid { min-height: 380px; gap: 6px; }
@@ -330,7 +330,7 @@
   background: var(--gg-surface);
   border: 1px solid var(--gg-border);
   border-radius: 12px;
-  padding: 14px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -375,7 +375,7 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  padding: 6px 8px;
+  padding: 4px 6px;
   border-radius: var(--gg-radius-sm);
   cursor: pointer;
   transition: background 0.12s var(--gg-ease-standard);
@@ -405,7 +405,7 @@
 .gg-eq-task-title {
   font-size: 13px;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.35;
   color: var(--gg-fg);
 }
 .gg-eq-task-title.done { text-decoration: line-through; color: var(--gg-muted); font-weight: 400; }
@@ -415,7 +415,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 /* ── OKR dot (1:1 design line 316-322) ─────── */
