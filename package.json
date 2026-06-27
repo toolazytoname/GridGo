@@ -1,0 +1,29 @@
+{
+  "name": "gridgo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "格行 GridGo — 一格一事，循格而行。跨端 OKR/任务管理 App。",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @gridgo/h5 dev",
+    "build": "pnpm --filter @gridgo/h5 build:h5",
+    "build:mp-weixin": "pnpm --filter @gridgo/h5 build:mp-weixin",
+    "build:rn": "pnpm --filter @gridgo/h5 build:rn",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter @gridgo/h5 test:e2e",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "score": "node packages/scoring/score.mjs",
+    "loop": "node packages/scoring/loop.mjs",
+    "supabase:start": "supabase start",
+    "supabase:reset": "supabase db reset",
+    "supabase:types": "supabase gen types typescript --local > packages/api/database.types.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.5"
+  }
+}

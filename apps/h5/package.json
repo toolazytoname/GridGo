@@ -1,0 +1,43 @@
+{
+  "name": "@gridgo/h5",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/app.tsx",
+  "scripts": {
+    "dev": "taro build --type h5 --watch",
+    "build": "taro build --type h5",
+    "build:h5": "taro build --type h5",
+    "build:mp-weixin": "taro build --type mp-weixin",
+    "build:mp-alipay": "taro build --type mp-alipay",
+    "build:mp-toutiao": "taro build --type mp-toutiao",
+    "build:rn": "taro build --type rn",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "lint": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gridgo/api": "workspace:*",
+    "@gridgo/store": "workspace:*",
+    "@gridgo/types": "workspace:*",
+    "@gridgo/ui": "workspace:*",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.0",
+    "@tarojs/cli": "^4.0.0",
+    "@tarojs/vite-runner": "^4.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "happy-dom": "^14.12.0",
+    "sass": "^1.77.0",
+    "typescript": "^5.4.5",
+    "unocss": "^0.61.0",
+    "vite": "^5.3.0",
+    "vitest": "^1.6.0"
+  }
+}

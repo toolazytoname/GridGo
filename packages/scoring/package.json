@@ -1,0 +1,11 @@
+{
+  "name": "@gridgo/scoring",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "score.mjs",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": { "typescript": "^5.4.5" }
+}

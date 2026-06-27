@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.taro/
+.vercel/
+.turbo/
+
+# Env & secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+**/service-role.json
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+
+# Test artifacts
+playwright-report/
+test-results/
+coverage/
+screenshots/diff/
+*.png.tmp
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Cache
+.cache/
+.eslintcache
+.turbo-cache/

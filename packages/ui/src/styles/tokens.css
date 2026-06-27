@@ -1,0 +1,90 @@
+/* ──────────────────────────────────────────────────────────
+   GridGo Design Tokens
+   单一事实源：所有跨端样式只引用这里的 CSS 变量。
+   设计稿源：/UI/app.html （v1.4.0, 2026-06）
+   ────────────────────────────────────────────────────────── */
+
+:root {
+  /* 颜色（OKLCH，与设计稿一致） */
+  --gg-bg: oklch(99% 0.002 240);
+  --gg-surface: oklch(100% 0 0);
+  --gg-surface-warm: oklch(98% 0.003 240);
+
+  --gg-fg: oklch(18% 0.012 250);
+  --gg-fg-2: oklch(28% 0.012 250);
+  --gg-muted: oklch(54% 0.012 250);
+  --gg-meta: oklch(72% 0.008 250);
+
+  --gg-border: oklch(92% 0.005 250);
+  --gg-border-soft: oklch(95% 0.004 250);
+
+  --gg-accent: oklch(58% 0.18 255);
+  --gg-accent-hover: oklch(52% 0.19 255);
+  --gg-accent-active: oklch(46% 0.20 255);
+
+  --gg-success: oklch(70% 0.16 145);
+  --gg-warning: oklch(70% 0.16 45);
+  --gg-danger: oklch(65% 0.20 25);
+
+  /* OKR 类别色（设计稿 o1-o4） */
+  --gg-okr-1: oklch(58% 0.18 255); /* 产品 P */
+  --gg-okr-2: oklch(70% 0.16 145); /* 健康 H */
+  --gg-okr-3: oklch(70% 0.16 45);  /* 技能 S */
+  --gg-okr-4: oklch(58% 0.18 280); /* 财务 $ */
+
+  /* 四象限色（与 OKR 区分） */
+  --gg-q1: var(--gg-danger);    /* 紧急×重要 */
+  --gg-q2: var(--gg-accent);   /* 不紧急×重要 */
+  --gg-q3: var(--gg-warning);  /* 紧急×不重要 */
+  --gg-q4: var(--gg-muted);    /* 都不 */
+
+  /* 字体栈 */
+  --gg-font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  --gg-font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  --gg-font-mono: 'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+
+  /* 间距 (4 / 8 / 12 / 16 / 20 / 24 / 32 / 48) */
+  --gg-space-1: 4px;
+  --gg-space-2: 8px;
+  --gg-space-3: 12px;
+  --gg-space-4: 16px;
+  --gg-space-5: 20px;
+  --gg-space-6: 24px;
+  --gg-space-8: 32px;
+  --gg-space-12: 48px;
+
+  /* 圆角 */
+  --gg-radius-sm: 8px;
+  --gg-radius-md: 12px;
+  --gg-radius-lg: 18px;
+  --gg-radius-pill: 980px;
+
+  /* 动画 */
+  --gg-ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+  --gg-dur-fast: 120ms;
+  --gg-dur-base: 200ms;
+  --gg-dur-slow: 320ms;
+
+  /* 层级 */
+  --gg-z-sticky: 50;
+  --gg-z-modal: 100;
+  --gg-z-toast: 200;
+
+  /* 顶/底栏 */
+  --gg-topbar-h: 52px;
+  --gg-tabbar-h: 64px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gg-bg: oklch(15% 0.01 250);
+    --gg-surface: oklch(19% 0.01 250);
+    --gg-surface-warm: oklch(17% 0.01 250);
+    --gg-fg: oklch(96% 0.005 240);
+    --gg-fg-2: oklch(82% 0.008 240);
+    --gg-muted: oklch(64% 0.012 250);
+    --gg-meta: oklch(50% 0.008 250);
+    --gg-border: oklch(28% 0.008 250);
+    --gg-border-soft: oklch(24% 0.008 250);
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@gridgo/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": { "typecheck": "tsc --noEmit" },
+  "dependencies": {
+    "@gridgo/types": "workspace:*",
+    "@supabase/supabase-js": "^2.43.0"
+  },
+  "devDependencies": { "typescript": "^5.4.5" }
+}
