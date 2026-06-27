@@ -84,6 +84,8 @@
   color: var(--gg-fg);
   cursor: pointer;
   transition: all 0.15s var(--gg-ease-standard);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .gg-okr-selector:hover { border-color: var(--gg-muted); }
 .gg-okr-selector svg { width: 14px; height: 14px; color: var(--gg-muted); }
@@ -130,6 +132,8 @@
   border: 0;
   cursor: pointer;
   transition: opacity 0.15s var(--gg-ease-standard);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .gg-login-cta:hover { opacity: 0.88; }
 
@@ -211,10 +215,39 @@
   border: 0;
   cursor: pointer;
   transition: all 0.15s var(--gg-ease-standard);
+  white-space: nowrap;
 }
 .gg-subtab-active {
   background: var(--gg-fg);
   color: #fff;
+}
+/* Underline variant (设计 line 1678 数据/勋章/复盘/分享) */
+.gg-subtabs-underline {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--gg-border);
+  width: 100%;
+  margin: 0 0 var(--gg-space-4);
+  display: flex;
+  gap: 0;
+}
+.gg-subtab-underline {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gg-muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: all 0.15s var(--gg-ease-standard);
+}
+.gg-subtab-underline-active {
+  color: var(--gg-accent);
+  border-bottom-color: var(--gg-accent);
 }
 .gg-subtabs-full { width: 100%; }
 .gg-subtabs-full .gg-subtab { flex: 1; text-align: center; }
@@ -1254,7 +1287,112 @@
   padding: 16px 0 8px;
 }
 
-/* ── Placeholders ───────────────────────────── */
+/* ── Achievements (1:1 app-ach-fixed.png) ──── */
+.gg-ach-hero {
+  text-align: center;
+  padding: 16px 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.gg-ach-big-num {
+  font-family: var(--gg-font-display);
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gg-accent);
+  letter-spacing: -0.03em;
+}
+.gg-ach-big-label {
+  font-size: 12px;
+  color: var(--gg-muted);
+  margin-top: 2px;
+}
+.gg-ach-streak {
+  display: flex;
+  gap: 4px;
+  margin-top: 14px;
+  justify-content: center;
+}
+.gg-ach-streak-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--gg-bg);
+  border: 1px solid var(--gg-border-soft);
+}
+.gg-ach-streak-done {
+  background: var(--gg-success);
+  border-color: var(--gg-success);
+}
+.gg-ach-streak-today {
+  background: var(--gg-surface);
+  border: 1.5px solid var(--gg-success);
+  border-style: dashed;
+}
+
+.gg-ach-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0 18px;
+}
+.gg-ach-card {
+  background: var(--gg-surface);
+  border: 1px solid var(--gg-border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.2s var(--gg-ease-standard);
+}
+.gg-ach-card:hover { background: var(--gg-bg); border-color: var(--gg-muted); }
+.gg-ach-card-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 24px;
+  margin-bottom: 6px;
+  font-size: 22px;
+}
+.gg-ach-card-num {
+  font-family: var(--gg-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--gg-fg);
+}
+.gg-ach-card-label {
+  font-size: 11px;
+  color: var(--gg-muted);
+  margin-top: 4px;
+}
+
+.gg-ach-okr {
+  background: var(--gg-surface);
+  border: 1px solid var(--gg-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.gg-ach-okr-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+.gg-ach-okr-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gg-fg);
+}
+.gg-ach-okr-pct {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gg-success);
+  font-variant-numeric: tabular-nums;
+}
 .gg-placeholder {
   background: var(--gg-surface);
   border: 1px dashed var(--gg-border);
