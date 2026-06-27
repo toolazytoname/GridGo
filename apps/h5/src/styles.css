@@ -1036,6 +1036,42 @@
 .gg-gantt-bar.o3 { background: var(--gg-warning); }
 .gg-gantt-bar.o4 { background: var(--gg-meta); }
 
+.gg-gantt-summary-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.gg-gantt-summary {
+  background: var(--gg-bg);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.gg-gantt-summary-num {
+  font-family: var(--gg-font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gg-fg);
+  font-variant-numeric: tabular-nums;
+}
+.gg-gantt-summary-num.good { color: var(--gg-success); }
+.gg-gantt-summary-num.warn { color: var(--gg-warning); }
+.gg-gantt-summary-label { font-size: 10px; color: var(--gg-muted); margin-top: 2px; }
+
+.gg-gantt-okr { padding: 8px 0; border-bottom: 1px solid var(--gg-border-soft); }
+.gg-gantt-okr:last-child { border-bottom: none; }
+.gg-gantt-okr-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gg-fg);
+  margin-bottom: 6px;
+  padding: 0 8px;
+}
+
 /* ── Me: profile + stats (1:1 design line 1660-1720) ── */
 .gg-me-profile {
   background: var(--gg-surface);
