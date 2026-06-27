@@ -398,6 +398,103 @@
   padding: var(--gg-space-6) 0 var(--gg-space-2);
 }
 
+/* ── Me: quick cards ─────────────────────────── */
+.gg-me-quick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gg-space-3);
+}
+.gg-me-quick-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--gg-space-3);
+  background: var(--gg-surface);
+  border: 1px solid var(--gg-border);
+  border-radius: var(--gg-radius-md);
+  text-align: left;
+  transition: all 0.15s var(--gg-ease-standard);
+  cursor: pointer;
+}
+.gg-me-quick-card:hover { border-color: var(--gg-muted); }
+.gg-me-quick-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--gg-radius-sm);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #fff;
+}
+.gg-me-quick-icon-okr { background: var(--gg-accent); }
+.gg-me-quick-icon-share { background: var(--gg-okr-4); }
+.gg-me-quick-text { flex: 1; min-width: 0; }
+.gg-me-quick-title { font-size: 13px; font-weight: 600; color: var(--gg-fg); }
+.gg-me-quick-sub { font-size: 11px; color: var(--gg-muted); margin-top: 2px; }
+.gg-me-chevron { color: var(--gg-meta); flex-shrink: 0; }
+
+/* ── Me: section rows ────────────────────────── */
+.gg-me-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gg-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0 4px;
+  margin-top: var(--gg-space-2);
+}
+.gg-me-row {
+  display: flex;
+  align-items: center;
+  gap: var(--gg-space-3);
+  padding: var(--gg-space-3) var(--gg-space-4);
+  border-bottom: 1px solid var(--gg-border-soft);
+  cursor: pointer;
+  transition: background 0.12s var(--gg-ease-standard);
+}
+.gg-me-row:last-child { border-bottom: 0; }
+.gg-me-row:hover { background: var(--gg-surface-warm); }
+.gg-me-row-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--gg-radius-sm);
+  background: var(--gg-bg);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.gg-me-row-text { flex: 1; min-width: 0; }
+.gg-me-row-title { font-size: 13px; font-weight: 500; color: var(--gg-fg); }
+.gg-me-row-sub { font-size: 11px; color: var(--gg-muted); margin-top: 2px; }
+.gg-me-row-danger .gg-me-row-title { color: var(--gg-danger); }
+
+/* ── Switch ──────────────────────────────────── */
+.gg-switch {
+  width: 38px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--gg-border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s var(--gg-ease-standard);
+  flex-shrink: 0;
+}
+.gg-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s var(--gg-ease-standard);
+}
+.gg-switch-on { background: var(--gg-success); }
+.gg-switch-on::after { transform: translateX(16px); }
+
 /* ── Placeholders (List / Calendar / Gantt) ── */
 .gg-placeholder {
   background: var(--gg-surface);
