@@ -50,7 +50,15 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     set({ loading: true })
     try {
       const tasks = await api.listTasks()
-      set({ tasks, loading: false })
+      const okrs = await api.listOkrs()
+      // 新用户：登录了但 0 task → 自动 seed 让他不空
+      if (tasks.length === 0 && get().isAuthed) {
+        console.log('[tasks] new user detected, seeding demo data')
+        const seeded = await seedForNewUser()
+        set({ tasks: seeded, okrs: await api.listOkrs(), loading: false })
+      } else {
+        set({ tasks, okrs, loading: false })
+      }
     } catch (e) {
       console.error('[tasks] reload failed:', e)
       set({ loading: false })
@@ -107,6 +115,45 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     }
   },
 }))
+
+async function seedForNewUser() {
+  const now = new Date()
+  const today = now.toISOString().slice(0, 10)
+  const week = new Date(now.getTime() + 5 * 86400000).toISOString().slice(0, 10)
+  const month = new Date(now.getTime() + 10 * 86400000).toISOString().slice(0, 10)
+
+  // 4 OKR
+  const okrDefs = [
+    { category: 'product' as const, title: '产品增长 · Q3 月活提升 30%', progress: 0.5 },
+    { category: 'health' as const, title: '健康管理 · 养成运动习惯', progress: 0.45 },
+    { category: 'skill' as const, title: '技能提升 · TS 进阶 + TS 实战', progress: 0.78 },
+    { category: 'finance' as const, title: '财务健康 · 应急基金 5 万', progress: 0.30 },
+  ]
+  const createdOkrs: { id: string; category: OkrCategory }[] = []
+  for (const o of okrDefs) {
+    const r = await api.createOkr?.({ title: o.title, category: o.category, quarter: '2026-Q3', progress: o.progress })
+    if (r) createdOkrs.push({ id: r.id, category: o.category })
+  }
+  // 8 task
+  const taskDefs: Array<{ title: string; quadrant: Task['quadrant']; priority: Task['priority']; due_date: string; estimate_min: number; notes: null; okr_id: string | null; _okrIdx?: number }> = [
+    { _okrIdx: 0, title: 'Q3 OKR 评审材料', quadrant: 'q1', priority: 'high', due_date: today, estimate_min: 120, notes: null, okr_id: '' },
+    { _okrIdx: 0, title: '核心功能重构联调', quadrant: 'q1', priority: 'high', due_date: week, estimate_min: 480, notes: null, okr_id: '' },
+    { title: '客户紧急需求修复', quadrant: 'q1', priority: 'high', due_date: today, estimate_min: 120, notes: null, okr_id: '' },
+    { _okrIdx: 1, title: '每周跑步 3 次', quadrant: 'q2', priority: 'med', due_date: week, estimate_min: 30, notes: null, okr_id: '' },
+    { _okrIdx: 2, title: 'TS 进阶章节阅读', quadrant: 'q2', priority: 'med', due_date: week, estimate_min: 60, notes: null, okr_id: '' },
+    { _okrIdx: 0, title: '用户访谈 3 位', quadrant: 'q2', priority: 'med', due_date: week, estimate_min: 90, notes: null, okr_id: '' },
+    { title: '处理积压邮件', quadrant: 'q3', priority: 'low', due_date: month, estimate_min: 30, notes: null, okr_id: '' },
+    { title: '整理浏览器收藏夹', quadrant: 'q4', priority: 'low', due_date: month, estimate_min: 60, notes: null, okr_id: '' },
+  ]
+  const out: Task[] = []
+  for (const t of taskDefs) {
+    const { _okrIdx, ...taskData } = t
+    const okr = _okrIdx !== undefined ? createdOkrs[_okrIdx] : null
+    const created = await api.createTask({ ...taskData, okr_id: okr?.id ?? null })
+    if (created) out.push(created)
+  }
+  return out
+}
 
 export const quadrantLabel: Record<Quadrant, string> = {
   q1: '紧急 × 重要',

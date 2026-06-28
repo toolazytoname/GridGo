@@ -1548,6 +1548,25 @@
 .gg-msg-ok { background: oklch(96% 0.04 145); color: oklch(35% 0.12 145); }
 .gg-msg-err { background: oklch(96% 0.04 25); color: oklch(40% 0.15 25); }
 
+.gg-btn-block { width: 100%; }
+
+.gg-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 12px;
+  color: var(--gg-muted);
+  font-size: 11px;
+}
+.gg-auth-divider::before,
+.gg-auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gg-border);
+}
+
+
 /* ── Modal (1:1 design line 1818-1830) ─────── */
 .gg-modal-overlay {
   position: fixed;

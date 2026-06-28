@@ -86,7 +86,7 @@ export function MatrixView() {
           <div className="gg-empty-state-icon">📋</div>
           <div className="gg-empty-state-title">还没有任务</div>
           <div className="gg-empty-state-sub">添加你的第一个任务，按紧急和重要程度分到 4 个象限</div>
-          <button type="button" className="gg-btn gg-btn-primary" onClick={openTaskModal}>
+          <button type="button" className="gg-btn gg-btn-primary" onClick={() => openTaskModal()}>
             + 添加第一个任务
           </button>
         </div>
@@ -176,7 +176,7 @@ export function MatrixView() {
                     </div>
                   )
                 })}
-                <button type="button" className="gg-eq-add" onClick={() => openTaskModal()}>
+                <button type="button" className="gg-eq-add" onClick={(e) => { e.stopPropagation(); openTaskModal() }}>
                   + 添加任务
                 </button>
               </div>

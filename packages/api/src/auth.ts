@@ -4,8 +4,27 @@ import type { User } from '@supabase/supabase-js'
 export interface AuthError { message: string }
 
 /**
- * 邮箱魔法链接登录。supabase 会发一封邮件，用户点链接完成登录。
- * 需要在 Supabase Dashboard → Auth → Providers → Email 启用。
+ * 邮箱 + 密码登录（Supabase 已开 autoconfirm 不需邮件确认）
+ */
+export async function signInWithPassword(email: string, password: string): Promise<{ error: AuthError | null }> {
+  const { error } = await getSupabase().auth.signInWithPassword({ email, password })
+  return error ? { error: { message: error.message } } : { error: null }
+}
+
+/**
+ * 邮箱 + 密码注册（autoconfirm 开 = 不用邮件确认）
+ */
+export async function signUpWithPassword(email: string, password: string): Promise<{ error: AuthError | null }> {
+  const { error } = await getSupabase().auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: window.location.origin },
+  })
+  return error ? { error: { message: error.message } } : { error: null }
+}
+
+/**
+ * 邮箱魔法链接登录（备用，保留兼容）
  */
 export async function signInWithEmail(email: string): Promise<{ error: AuthError | null }> {
   const { error } = await getSupabase().auth.signInWithOtp({
@@ -16,12 +35,7 @@ export async function signInWithEmail(email: string): Promise<{ error: AuthError
 }
 
 /**
- * GitHub OAuth 登录。需要：
- *  1. GitHub 创建 OAuth App
- *     https://github.com/settings/developers → New OAuth App
- *     Authorization callback URL: https://etecmcnuxochcydednky.supabase.co/auth/v1/callback
- *  2. 把 client_id / client_secret 填到 Supabase Dashboard → Auth → Providers → GitHub
- *  3. 在 supabase/config.toml 把 [auth.external.github] enabled 设为 true
+ * GitHub OAuth
  */
 export async function signInWithGithub(): Promise<{ error: AuthError | null }> {
   const { error } = await getSupabase().auth.signInWithOAuth({

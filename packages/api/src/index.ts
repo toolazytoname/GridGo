@@ -1,5 +1,6 @@
 export { getSupabase } from './client'
 export * from './auth'
 export * from './tasks'
+export * from './okrs'
 export type { User } from '@supabase/supabase-js'
 export type { Profile, Okr, KeyResult, Task, CalendarEvent, Achievement, OkrCategory, Quadrant } from '@gridgo/types'

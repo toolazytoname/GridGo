@@ -1,0 +1,47 @@
+{
+  "email": "e2e-pipeline-4842@gridgo.test",
+  "steps": [
+    {
+      "name": "0. 打开主页",
+      "pass": true
+    },
+    {
+      "name": "1. 打开 auth 弹窗",
+      "pass": true
+    },
+    {
+      "name": "2. 切到 注册 tab",
+      "pass": true
+    },
+    {
+      "name": "3. 填邮箱 + 密码 + 注册",
+      "pass": true
+    },
+    {
+      "name": "4. 验证已登录 (avatar 显示)",
+      "pass": true
+    },
+    {
+      "name": "5. 验证四象限自动 seed 8 个 task",
+      "pass": true
+    },
+    {
+      "name": "6. 切到 list 看 OKR 树",
+      "pass": true
+    },
+    {
+      "name": "7. 加一个新 task",
+      "pass": true
+    },
+    {
+      "name": "8. 标记 PIPELINE 任务完成",
+      "pass": true
+    },
+    {
+      "name": "9. 注销登录",
+      "pass": true
+    }
+  ],
+  "pass": true,
+  "consoleErrors": []
+}
