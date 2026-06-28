@@ -414,9 +414,33 @@
   color: var(--gg-muted);
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 1px;
+  gap: 5px;
+  margin-top: 2px;
+  line-height: 1.4;
+  flex-wrap: wrap;
 }
+.gg-eq-task-meta-label { color: var(--gg-fg-2); font-weight: 500; }
+.gg-eq-task-meta-sep { color: var(--gg-meta); margin: 0 1px; }
+
+/* 20x20 OKR pill (设计稿 line 316) */
+.gg-okr-dot-lg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.gg-okr-dot-product { background: var(--gg-accent); }
+.gg-okr-dot-health { background: var(--gg-success); }
+.gg-okr-dot-skill { background: var(--gg-warning); }
+.gg-okr-dot-finance { background: var(--gg-muted); }
 
 /* ── OKR dot (1:1 design line 316-322) ─────── */
 .gg-okr-dot {

@@ -1,21 +1,14 @@
 import { useMemo } from 'react'
 import { useUIStore, type MatrixSubTab } from '../store/ui'
-import { useTasksStore, okrColorClass } from '../store/tasks'
+import { useTasksStore } from '../store/tasks'
 import type { Quadrant, Task, OkrCategory } from '@gridgo/types'
 
 const QUADRANTS: { key: Quadrant; label: string }[] = [
   { key: 'q1', label: '紧急 × 重要' },
   { key: 'q2', label: '重要 × 不紧急' },
   { key: 'q3', label: '紧急 × 不重要' },
-  { key: 'q4', label: '紧急 × 不重要' },
+  { key: 'q4', label: '都不紧急 / 不重要' },
 ]
-
-const QUADRANT_LABELS: Record<Quadrant, string> = {
-  q1: '紧急 × 重要',
-  q2: '重要 × 不紧急',
-  q3: '紧急 × 不重要',
-  q4: '紧急 × 不重要',
-}
 
 function isToday(iso: string | null) {
   if (!iso) return false
@@ -37,6 +30,31 @@ function formatDate(d: Date) {
   const day = d.getDate()
   const wk = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()]
   return `${m} 月 ${day} 日 · 周${wk}`
+}
+
+function formatDateShort(iso: string): string {
+  const today = new Date()
+  const d = new Date(iso)
+  const diff = Math.round((d.getTime() - today.getTime()) / 86400000)
+  if (diff === 0) return '今天'
+  if (diff === 1) return '明天'
+  if (diff === -1) return '昨天'
+  if (diff > 1 && diff < 7) return `${diff} 天后`
+  if (diff < 0 && diff > -7) return `${-diff} 天前`
+  if (d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()) return `${d.getDate()} 日`
+  return `${d.getMonth() + 1}/${d.getDate()}`
+}
+
+function formatMeta(task: Task): string {
+  const today = new Date().toISOString().slice(0, 10)
+  const datePart = task.due_date
+    ? task.due_date === today ? '今天截止' : formatDateShort(task.due_date)
+    : null
+  const timePart = task.estimate_min ? `${task.estimate_min} 分钟` : null
+  if (datePart && timePart) return `${datePart} · ${timePart}`
+  if (datePart) return datePart
+  if (timePart) return timePart
+  return ''
 }
 
 export function MatrixView() {
@@ -108,18 +126,15 @@ export function MatrixView() {
           return (
             <div key={q.key} className={`gg-eq-cell ${q.key}`}>
               <div className="gg-eq-header">
-                <span className="gg-eq-label">{QUADRANT_LABELS[q.key]}</span>
+                <span className="gg-eq-label">{q.label}</span>
                 <span className="gg-eq-count">{items.length}</span>
               </div>
               <div className="gg-eq-tasks">
                 {items.map((t) => {
                   const okr = okrs.find((o) => o.id === t.okr_id)
+                  const meta = formatMeta(t)
                   return (
-                    <div
-                      key={t.id}
-                      className="gg-eq-task"
-                      onClick={() => toggle(t.id)}
-                    >
+                    <div key={t.id} className="gg-eq-task" onClick={() => toggle(t.id)}>
                       <div className={`gg-eq-check ${t.done ? 'gg-eq-check-on' : ''}`}>
                         {t.done && (
                           <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2">
@@ -129,11 +144,17 @@ export function MatrixView() {
                       </div>
                       <div className="gg-eq-task-body">
                         <div className={`gg-eq-task-title ${t.done ? 'done' : ''}`}>{t.title}</div>
-                        {(okr || t.due_date) && (
+                        {(okr || meta) && (
                           <div className="gg-eq-task-meta">
-                            {okr && <span className={`gg-okr-dot ${okrColorClass[okr.category as OkrCategory]}`} />}
-                            {okr && <span>{okr.title.split('·')[0]?.trim() || okr.title}</span>}
-                            {!okr && t.due_date && <span>{t.due_date}</span>}
+                            {okr && (
+                              <span className={`gg-okr-dot-lg gg-okr-dot-${okr.category}`}>
+                                {okr.category === 'product' ? 'P' : okr.category === 'health' ? 'H' : okr.category === 'skill' ? 'S' : '$'}
+                              </span>
+                            )}
+                            {okr && <span className="gg-eq-task-meta-label">{okr.title.split('·')[0]?.trim() || okr.title}</span>}
+                            {!okr && meta && <span>{meta}</span>}
+                            {okr && meta && <span className="gg-eq-task-meta-sep">·</span>}
+                            {okr && meta && <span>{meta}</span>}
                           </div>
                         )}
                       </div>
