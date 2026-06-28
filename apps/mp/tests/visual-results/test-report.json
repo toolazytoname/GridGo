@@ -1,0 +1,92 @@
+{
+  "logic": {
+    "steps": [
+      {
+        "name": "matrix",
+        "pass": true,
+        "keys": [
+          "sub",
+          "quadrants",
+          "rawTasks",
+          "isAuthed",
+          "isDemo"
+        ]
+      },
+      {
+        "name": "list",
+        "pass": true,
+        "keys": [
+          "sub",
+          "okrs",
+          "expandedOkrs",
+          "rawTasks",
+          "isAuthed",
+          "isDemo"
+        ]
+      },
+      {
+        "name": "calendar",
+        "pass": true,
+        "keys": [
+          "sub",
+          "cursor",
+          "grid",
+          "monthLabel",
+          "dows",
+          "rawTasks",
+          "isAuthed",
+          "isDemo"
+        ]
+      },
+      {
+        "name": "gantt",
+        "pass": true,
+        "keys": [
+          "sub",
+          "monthLabels",
+          "pcts",
+          "rows",
+          "summary",
+          "isAuthed",
+          "isDemo"
+        ]
+      },
+      {
+        "name": "profile",
+        "pass": true,
+        "keys": [
+          "user",
+          "isAuthed",
+          "isDemo",
+          "doneCount"
+        ]
+      }
+    ],
+    "pass": true
+  },
+  "visual": {
+    "steps": [
+      {
+        "name": "matrix",
+        "pass": true
+      },
+      {
+        "name": "list",
+        "pass": true
+      },
+      {
+        "name": "calendar",
+        "pass": true
+      },
+      {
+        "name": "gantt",
+        "pass": true
+      },
+      {
+        "name": "profile",
+        "pass": true
+      }
+    ],
+    "pass": true
+  }
+}

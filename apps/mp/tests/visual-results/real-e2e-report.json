@@ -1,0 +1,37 @@
+{
+  "steps": [
+    {
+      "name": "0. 打开 H5 主页",
+      "pass": true
+    },
+    {
+      "name": "1. 打开 MP 主页 (matrix tab)",
+      "pass": true
+    },
+    {
+      "name": "2. 截图 矩阵 (demo 模式)",
+      "pass": true
+    },
+    {
+      "name": "3. 切到 list tab",
+      "pass": true
+    },
+    {
+      "name": "4. 切到 calendar tab",
+      "pass": true
+    },
+    {
+      "name": "5. 切到 gantt tab",
+      "pass": true
+    },
+    {
+      "name": "6. 切到 我的 tab",
+      "pass": true
+    },
+    {
+      "name": "7. 5 page 路径（matrix → list → calendar → gantt → profile）有完整 DOM",
+      "pass": true
+    }
+  ],
+  "pass": true
+}
