@@ -1,0 +1,23 @@
+<view class="view" style="padding:20px 16px;">
+  <view class="m-subtabs gg-subtabs-full" style="width:100%;">
+    <view class="m-subtab {{mode==='login'?'active':''}}" data-mode="login" bindtap="onModeTap" style="flex:1;text-align:center;">登录</view>
+    <view class="m-subtab {{mode==='register'?'active':''}}" data-mode="register" bindtap="onModeTap" style="flex:1;text-align:center;">注册</view>
+  </view>
+
+  <view class="gg-form" style="margin-top:16px;">
+    <view class="gg-field" style="margin-bottom:12px;">
+      <text style="font-size:11px;font-weight:600;color:var(--fg-2);display:block;margin-bottom:4px;">邮箱</text>
+      <input type="text" class="input" placeholder="you@example.com" value="{{email}}" data-field="email" bindinput="onInput" />
+    </view>
+    <view class="gg-field" style="margin-bottom:12px;">
+      <text style="font-size:11px;font-weight:600;color:var(--fg-2);display:block;margin-bottom:4px;">密码</text>
+      <input password="true" class="input" placeholder="至少 6 位" value="{{password}}" data-field="password" bindinput="onInput" />
+    </view>
+    <view wx:if="{{mode==='register'}}" class="gg-field" style="margin-bottom:12px;">
+      <text style="font-size:11px;font-weight:600;color:var(--fg-2);display:block;margin-bottom:4px;">确认密码</text>
+      <input password="true" class="input" placeholder="再输一次" value="{{password2}}" data-field="password2" bindinput="onInput" />
+    </view>
+    <button class="btn btn-primary btn-block" bindtap="onSubmit" disabled="{{busy}}">{{busy?'...':(mode==='login'?'登录':'注册')}}</button>
+    <view wx:if="{{msg}}" style="margin-top:12px;padding:8px 10px;border-radius:8px;font-size:12px;background:{{msg.kind==='ok'?'#e8f5e9':'#ffebee'}};color:{{msg.kind==='ok'?'#2e7d32':'#c62828'}};">{{msg.text}}</view>
+  </view>
+</view>

@@ -1,0 +1,32 @@
+<view class="view">
+  <view class="m-subtabs">
+    <view class="m-subtab {{sub==='month'?'active':''}}" data-sub="month" bindtap="onSubTap">月</view>
+    <view class="m-subtab {{sub==='week'?'active':''}}" data-sub="week" bindtap="onSubTap">周</view>
+    <view class="m-subtab {{sub==='day'?'active':''}}" data-sub="day" bindtap="onSubTap">日</view>
+  </view>
+
+  <view wx:if="{{isDemo}}" style="background:#e3f2fd;padding:8px 12px;margin:12px 16px;border-radius:8px;font-size:12px;color:#1976d2;">
+    演示数据
+  </view>
+
+  <view style="padding:14px 16px;">
+    <view class="cal-head">
+      <text style="font-size:15px;font-weight:700;">{{monthLabel}}</text>
+      <view class="cal-nav">
+        <view class="topbar-btn" bindtap="onPrev">‹</view>
+        <view class="topbar-btn" bindtap="onNext">›</view>
+      </view>
+    </view>
+    <view class="cal-grid">
+      <view wx:for="{{dows}}" wx:for-item="d" wx:key="*this" class="cal-dow">{{d}}</view>
+      <block wx:for="{{grid}}" wx:for-item="c" wx:key="day">
+        <view class="cal-cell {{c.out?'out':''}} {{c.today?'cal-cell-today':''}}">
+          <text>{{c.day}}</text>
+          <block wx:for="{{c.events}}" wx:for-item="ev" wx:key="id">
+            <view class="cal-evt q{{ev.quadrant?ev.quadrant[1]:'4'}}">{{ev.title}}</view>
+          </block>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

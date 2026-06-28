@@ -1,0 +1,101 @@
+<view class="view" style="padding:14px 16px;">
+  <view wx:if="{{isDemo}}" style="background:#e3f2fd;padding:8px 12px;margin-bottom:12px;border-radius:8px;font-size:12px;color:#1976d2;">
+    演示模式 · 登录后查看你的真实数据
+  </view>
+
+  <!-- 资料卡 -->
+  <view style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+    <view style="width:48px;height:48px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:18px;font-weight:600;flex-shrink:0;">
+      {{user.user_metadata.display_name?user.user_metadata.display_name[0]:(user.email?user.email[0].toUpperCase():'?')}}
+    </view>
+    <view style="flex:1;min-width:0;">
+      <view style="display:flex;align-items:center;gap:6px;">
+        <text style="font-size:15px;font-weight:600;">{{user.user_metadata.display_name || (user.email?user.email.split('@')[0]:'未登录')}}</text>
+        <text wx:if="{{isAuthed}}" style="background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;font-size:9px;font-weight:600;padding:1px 5px;border-radius:8px;">PRO</text>
+      </view>
+      <text style="font-size:11px;color:var(--muted);margin-top:2px;display:block;">{{user.email || '游客'}}</text>
+      <text style="font-size:11px;color:var(--muted);display:block;margin-top:2px;">用一格一事的方式推进 OKR</text>
+    </view>
+    <view wx:if="{{isAuthed}}" class="btn" bindtap="onEditProfile" style="font-size:11px;padding:4px 10px;">编辑</view>
+    <view wx:else class="btn btn-primary" bindtap="onLogin" style="font-size:11px;padding:4px 10px;">登录</view>
+  </view>
+
+  <!-- 3 统计 -->
+  <view style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 0;display:flex;margin-bottom:14px;">
+    <view style="flex:1;text-align:center;">
+      <text style="font-size:18px;font-weight:700;display:block;">{{doneCount || 0}}</text>
+      <text style="font-size:10px;color:var(--muted);display:block;margin-top:2px;">已完成</text>
+    </view>
+    <view style="width:1px;background:var(--border);"></view>
+    <view style="flex:1;text-align:center;">
+      <text style="font-size:18px;font-weight:700;display:block;">86h</text>
+      <text style="font-size:10px;color:var(--muted);display:block;margin-top:2px;">专注时长</text>
+    </view>
+    <view style="width:1px;background:var(--border);"></view>
+    <view style="flex:1;text-align:center;">
+      <text style="font-size:18px;font-weight:700;display:block;">12</text>
+      <text style="font-size:10px;color:var(--muted);display:block;margin-top:2px;">连胜天数</text>
+    </view>
+  </view>
+
+  <!-- 2 快捷入口 -->
+  <view style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+    <view class="btn" bindtap="onOpenOkr" style="padding:12px;display:flex;align-items:center;gap:8px;justify-content:flex-start;">
+      <view style="width:32px;height:32px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:600;">🎯</view>
+      <view style="flex:1;">
+        <text style="font-size:12px;font-weight:600;display:block;">我的 OKR</text>
+        <text style="font-size:10px;color:var(--muted);display:block;">3 项进行中</text>
+      </view>
+    </view>
+    <view class="btn" style="padding:12px;display:flex;align-items:center;gap:8px;justify-content:flex-start;">
+      <view style="width:32px;height:32px;border-radius:8px;background:#7c3aed;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:600;">📤</view>
+      <view style="flex:1;">
+        <text style="font-size:12px;font-weight:600;display:block;">分享我的进度</text>
+        <text style="font-size:10px;color:var(--muted);display:block;">生成只读链接</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 设置 -->
+  <view style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;">
+    <view style="padding:12px 14px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;">
+      <text style="font-size:14px;">⏰</text>
+      <view style="flex:1;">
+        <text style="font-size:12px;font-weight:500;display:block;">提醒时间</text>
+        <text style="font-size:10px;color:var(--muted);display:block;margin-top:2px;">每日 09:00 · 每周一回顾</text>
+      </view>
+      <text style="color:var(--meta);">›</text>
+    </view>
+    <view style="padding:12px 14px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;">
+      <text style="font-size:14px;">☀</text>
+      <view style="flex:1;">
+        <text style="font-size:12px;font-weight:500;display:block;">主题外观</text>
+        <text style="font-size:10px;color:var(--muted);display:block;margin-top:2px;">跟随系统 · 浅色</text>
+      </view>
+      <text style="color:var(--meta);">›</text>
+    </view>
+    <view style="padding:12px 14px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;">
+      <text style="font-size:14px;">🔔</text>
+      <view style="flex:1;">
+        <text style="font-size:12px;font-weight:500;display:block;">通知提醒</text>
+        <text style="font-size:10px;color:var(--muted);display:block;margin-top:2px;">截止前 24 小时推送</text>
+      </view>
+      <view style="width:36px;height:20px;border-radius:10px;background:var(--success);"></view>
+    </view>
+    <view style="padding:12px 14px;display:flex;align-items:center;gap:10px;">
+      <text style="font-size:14px;">⬇</text>
+      <view style="flex:1;">
+        <text style="font-size:12px;font-weight:500;display:block;">数据导出</text>
+        <text style="font-size:10px;color:var(--muted);display:block;margin-top:2px;">导出 JSON / CSV</text>
+      </view>
+      <text style="color:var(--meta);">›</text>
+    </view>
+  </view>
+
+  <!-- 账号 -->
+  <view wx:if="{{isAuthed}}" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;">
+    <view style="padding:14px;text-align:center;color:var(--danger);font-size:13px;" bindtap="onSignOut">退出登录</view>
+  </view>
+
+  <view style="text-align:center;font-size:10px;color:var(--meta);padding:10px;">格行 GridGo · v0.1.0 · 一格一事，循格而行</view>
+</view>

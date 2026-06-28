@@ -1,0 +1,40 @@
+<view class="view">
+  <view class="m-subtabs">
+    <view class="m-subtab {{sub==='month'?'active':''}}" data-sub="month" bindtap="onSubTap">本月</view>
+    <view class="m-subtab {{sub==='quarter'?'active':''}}" data-sub="quarter" bindtap="onSubTap">本季度</view>
+    <view class="m-subtab {{sub==='year'?'active':''}}" data-sub="year" bindtap="onSubTap">全年</view>
+  </view>
+
+  <view wx:if="{{isDemo}}" style="background:#e3f2fd;padding:8px 12px;margin:12px 16px;border-radius:8px;font-size:12px;color:#1976d2;">
+    演示数据
+  </view>
+
+  <view style="padding:14px 16px;">
+    <view class="gantt-card">
+      <view class="gantt-head">
+        <text>任务</text>
+        <view style="display:flex;gap:8px;flex:1;justify-content:space-around;">
+          <block wx:for="{{monthLabels}}" wx:for-item="m" wx:key="*this">
+            <text style="font-size:10px;font-weight:600;color:var(--muted);">{{m}}月</text>
+          </block>
+        </view>
+      </view>
+      <block wx:for="{{rows}}" wx:for-item="row" wx:key="id">
+        <view style="padding:6px 0;">
+          <view style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <view class="okr-dot" style="background:var(--accent);"></view>
+            <text style="font-size:12px;font-weight:600;">{{row.title}}</text>
+          </view>
+          <block wx:for="{{row.bars}}" wx:for-item="bar" wx:key="id">
+            <view class="gantt-row">
+              <text style="font-size:10px;width:80px;flex-shrink:0;">{{bar.title}}</text>
+              <view style="flex:1;position:relative;height:16px;background:var(--bg);border-radius:3px;">
+                <view class="gantt-bar q1" style="position:absolute;left:{{bar.left}}%;width:{{bar.width}}%;"></view>
+              </view>
+            </view>
+          </block>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

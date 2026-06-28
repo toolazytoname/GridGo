@@ -1,0 +1,29 @@
+{
+  "pages": [
+    "pages/matrix/matrix",
+    "pages/list/list",
+    "pages/calendar/calendar",
+    "pages/gantt/gantt",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "格行 GridGo",
+    "backgroundColor": "#fafafa"
+  },
+  "tabBar": {
+    "color": "#7a7a82",
+    "selectedColor": "#3b6df6",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {"pagePath": "pages/matrix/matrix", "text": "四象限"},
+      {"pagePath": "pages/list/list", "text": "列表"},
+      {"pagePath": "pages/calendar/calendar", "text": "日历"},
+      {"pagePath": "pages/gantt/gantt", "text": "甘特图"},
+      {"pagePath": "pages/profile/profile", "text": "我的"}
+    ]
+  }
+}

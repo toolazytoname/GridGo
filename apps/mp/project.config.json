@@ -1,0 +1,14 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "gridgo",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": false,
+    "minified": false,
+    "newFeature": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.0.0",
+  "appid": "touristappid"
+}

@@ -1,0 +1,25 @@
+<view class="view" style="padding:14px 16px;">
+  <text style="font-size:16px;font-weight:600;margin-bottom:12px;display:block;">OKR 管理</text>
+
+  <block wx:for="{{okrs}}" wx:for-item="o" wx:key="id">
+    <view style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+      <view class="okr-dot" style="background:var(--accent);"></view>
+      <view style="flex:1;min-width:0;">
+        <text style="font-size:13px;font-weight:600;display:block;">{{o.title}}</text>
+        <text style="font-size:10px;color:var(--muted);">{{o.category}} · 进度 {{o.progress*100}}%</text>
+      </view>
+      <view class="btn" data-id="{{o.id}}" bindtap="onDelete" style="font-size:11px;color:var(--danger);">删除</view>
+    </view>
+  </block>
+
+  <view style="margin-top:14px;padding:12px;border:1px dashed var(--border);border-radius:10px;">
+    <text style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:8px;">+ 添加新 OKR</text>
+    <input class="input" placeholder="例如：写作能力 · 月更 4 篇" value="{{newTitle}}" bindinput="onTitleInput" style="margin-bottom:8px;" />
+    <view style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">
+      <block wx:for="{{['product','health','skill','finance']}}" wx:for-item="c" wx:key="*this">
+        <view class="btn" data-cat="{{c}}" bindtap="onCatTap" style="font-size:11px;padding:4px 8px;background:{{newCat===c?'var(--fg)':'var(--surface)'}};color:{{newCat===c?'#fff':'var(--fg-2)'}};">{{c==='product'?'产品 P':c==='health'?'健康 H':c==='skill'?'技能 S':'财务 $'}}</view>
+      </block>
+    </view>
+    <button class="btn btn-primary btn-block" bindtap="onAdd" disabled="{{!newTitle.trim() || busy}}">{{busy?'...':'添加 OKR'}}</button>
+  </view>
+</view>

@@ -1,0 +1,4 @@
+/* calendar 专属 */
+.cal-cell-today { background: oklch(98% 0.005 255); }
+.cal-cell { min-height: 50px; padding: 2px 4px; font-size: 10px; background: var(--surface); }
+.cal-cell.out { color: var(--meta); background: var(--bg); }

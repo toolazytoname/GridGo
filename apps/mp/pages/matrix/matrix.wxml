@@ -1,0 +1,38 @@
+<view class="view">
+  <view class="m-subtabs">
+    <view class="m-subtab {{sub==='all'?'active':''}}" data-sub="all" bindtap="onSubTap">全部</view>
+    <view class="m-subtab {{sub==='today'?'active':''}}" data-sub="today" bindtap="onSubTap">今日</view>
+    <view class="m-subtab {{sub==='week'?'active':''}}" data-sub="week" bindtap="onSubTap">本周</view>
+  </view>
+
+  <view wx:if="{{isDemo}}" style="background:#e3f2fd;padding:8px 12px;margin:12px 16px;border-radius:8px;font-size:12px;color:#1976d2;">
+    演示数据 · 登录后查看你的真实任务
+  </view>
+
+  <view class="eq2grid" style="padding:12px 16px;">
+    <block wx:for="{{quadrants}}" wx:for-item="q" wx:key="key">
+      <view class="eq2 {{q.key}}">
+        <view class="eq2h">
+          <text class="eq2l">{{q.label}}</text>
+          <text class="eq2c">{{q.count}}</text>
+        </view>
+        <view class="eq2t">
+          <block wx:for="{{q.tasks}}" wx:for-item="task" wx:key="id">
+            <view class="eq2item" data-id="{{task.id}}" bindtap="onToggle">
+              <view class="eq2ck {{task.done?'done':''}}"></view>
+              <view style="flex:1;min-width:0;">
+                <view class="eq2item-title {{task.done?'done':''}}">{{task.title}}</view>
+                <view wx:if="{{task.due_date || task.estimate_min}}" class="eq2tag">
+                  {{task.due_date || ''}}{{task.due_date && task.estimate_min?' · ':''}}{{task.estimate_min?task.estimate_min+'分钟':''}}
+                </view>
+              </view>
+            </view>
+          </block>
+          <view class="eq2item" style="justify-content:center;color:var(--muted);" bindtap="onAddTask">
+            <text>+ 添加任务</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

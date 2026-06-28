@@ -1,0 +1,38 @@
+<view class="view">
+  <view class="m-subtabs">
+    <view class="m-subtab {{sub==='all'?'active':''}}" data-sub="all" bindtap="onSubTap">全部</view>
+    <view class="m-subtab {{sub==='today'?'active':''}}" data-sub="today" bindtap="onSubTap">进行中</view>
+    <view class="m-subtab {{sub==='done'?'active':''}}" data-sub="done" bindtap="onSubTap">已完成</view>
+  </view>
+
+  <view wx:if="{{isDemo}}" style="background:#e3f2fd;padding:8px 12px;margin:12px 16px;border-radius:8px;font-size:12px;color:#1976d2;">
+    演示数据 · 登录后查看你的真实 OKR 树
+  </view>
+
+  <view style="padding:14px 16px;">
+    <block wx:for="{{okrs}}" wx:for-item="okr" wx:key="id">
+      <view class="okr-card">
+        <view class="okr-h" data-id="{{okr.id}}" bindtap="onToggleOkr">
+          <view class="okr-exp {{expandedOkrs[okr.id]?'open':''}}">▸</view>
+          <view class="okr-dot" style="background:var(--accent);"></view>
+          <view class="okr-n">{{okr.title}}</view>
+          <view class="okr-pbar"><view class="okr-pfill" style="width:{{okr.progress*100}}%;"></view></view>
+          <text class="okr-pl">{{okr.progress*100}}%</text>
+        </view>
+        <view wx:if="{{expandedOkrs[okr.id]}}" class="kr-body open">
+          <block wx:for="{{rawTasks}}" wx:for-item="task" wx:key="id">
+            <view wx:if="{{task.okr_id===okr.id}}" class="kr-row" data-id="{{task.id}}" bindtap="onToggleTask">
+              <view class="kr-ck {{task.done?'done':''}}"></view>
+              <view class="kr-tx {{task.done?'done':''}}">{{task.title}}</view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{okrs.length === 0}}" class="empty">
+      <view class="empty-icon">📋</view>
+      <view class="empty-title">还没有 OKR</view>
+      <view class="empty-sub">登录后开始你的真实数据</view>
+    </view>
+  </view>
+</view>
