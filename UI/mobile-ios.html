@@ -45,6 +45,29 @@
     .m-subview{display:none;padding:14px 16px 20px;animation:subIn 240ms var(--ease-ios) both}
     .m-subview.active{display:block}
     @keyframes subIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    /* ── List search bar (iOS-style) ── */
+    .list-search{display:flex;align-items:center;gap:6px;margin:10px 16px 0;padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:9px}
+    .list-search svg{width:14px;height:14px;color:var(--muted);flex-shrink:0}
+    .list-search input{flex:1;border:none;outline:none;background:transparent;font-size:12px;font-family:var(--font-body);color:var(--fg)}
+    /* ── KR sub-children (nested tasks) ── */
+    .kr-row-expandable{cursor:pointer}
+    .kr-exp-mark{width:14px;height:14px;color:var(--muted);display:grid;place-items:center;margin-left:auto;transition:transform .15s var(--ease-ios)}
+    .kr-row-expandable.open .kr-exp-mark{transform:rotate(90deg)}
+    .kr-sub-list{max-height:0;overflow:hidden;transition:max-height .25s var(--ease-ios);padding-left:24px}
+    .kr-sub-list.open{max-height:300px;padding-top:4px;padding-bottom:4px}
+    .kr-sub{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11px;color:var(--muted)}
+    .kr-sub-dot{width:6px;height:6px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0}
+    .kr-sub-dot.done{background:var(--success);border-color:var(--success)}
+    .kr-sub-tx{flex:1;line-height:1.4}
+    .kr-sub-tx.done{text-decoration:line-through;color:var(--meta)}
+    .kr-sub-meta{font-size:9px;color:var(--meta);font-variant-numeric:tabular-nums}
+    /* ── Completed groups (本周/上周/更早) ── */
+    .completed-group{margin-bottom:14px}
+    .completed-group-header{display:flex;align-items:center;gap:6px;padding:0 4px;margin-bottom:6px}
+    .completed-group-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .completed-group-name{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+    .completed-group-count{font-size:9px;color:var(--meta);font-weight:600;margin-left:auto;font-variant-numeric:tabular-nums}
+    .okr-card.hidden{display:none}
     /* ── Matrix ── */
     .eq2grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     .eq2{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;min-height:130px;display:flex;flex-direction:column;overflow:hidden}
@@ -103,7 +126,7 @@
     .cal-nbtn svg{width:12px;height:12px}
     .cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
     .cal-dow{font-size:9px;font-weight:700;color:var(--muted);text-align:center;letter-spacing:.05em;padding:2px 0}
-    .cal-d{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 2px;cursor:pointer;min-height:42px;transition:background-color .12s}
+    .cal-d{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 2px;cursor:pointer;min-height:48px;transition:background-color .12s}
     .cal-d:active{background:oklch(94% 0.005 240)}
     .cal-d.oth{opacity:.3}
     .cal-d.today{background:oklch(94% 0.008 255)}
@@ -112,6 +135,88 @@
     .cal-dts{display:flex;gap:1px;margin-top:2px}
     .cal-dt{width:4px;height:4px;border-radius:50%}
     .cal-dt.a{background:var(--accent)}.cal-dt.b{background:var(--success)}.cal-dt.c{background:var(--warning)}
+    /* ── Month-view: fixed calendar grid + independently scrollable task list ── */
+    .m-subview[data-msubview="calendar-month"].active{display:flex;flex-direction:column;flex:1;min-height:0;padding:14px 16px 0}
+    #vb-calendar.has-month-flex{overflow:hidden}
+    .cal-month-fixed{flex:0 0 auto;background:#fafaf7;position:relative;z-index:2;padding-bottom:6px}
+    .cal-month-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:24px;scrollbar-width:none}
+    .cal-month-scroll::-webkit-scrollbar{display:none}
+    .cal-month-scroll .cal-today-panel{margin-top:0}
+    .cal-today-section-title{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:10px 4px 8px;display:flex;align-items:center;gap:6px}
+    .cal-today-section-title::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent)}
+    /* ── Month-view: today panel (fills blank area below the grid) ── */
+    .cal-today-panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:14px}
+    .cal-today-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+    .cal-today-day{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+    .cal-today-full{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--fg);margin-top:2px;letter-spacing:-.01em}
+    .cal-today-count{font-size:11px;font-weight:700;color:var(--muted);background:var(--bg);padding:3px 10px;border-radius:999px;font-variant-numeric:tabular-nums}
+    .cal-today-list{display:flex;flex-direction:column}
+    .cal-today-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background-color .12s}
+    .cal-today-item:last-child{border-bottom:none}
+    .cal-today-item:active{background:oklch(96% 0.005 240)}
+    .cal-today-time{font-size:10px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;min-width:34px;flex-shrink:0}
+    .cal-today-bar{width:3px;align-self:stretch;border-radius:2px;flex-shrink:0}
+    .cal-today-bar.q1{background:var(--accent)}
+    .cal-today-bar.q2{background:var(--success)}
+    .cal-today-bar.q3{background:var(--warning)}
+    .cal-today-bar.q4{background:var(--meta)}
+    .cal-today-body{flex:1;min-width:0}
+    .cal-today-title{font-size:12px;font-weight:500;color:var(--fg);line-height:1.35}
+    .cal-today-meta{font-size:9px;color:var(--muted);margin-top:1px;letter-spacing:.01em}
+    /* ── Week view (vertical 7-day list, full-width) ── */
+    .week-list{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .week-row{display:flex;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border);transition:background-color .12s}
+    .week-row:last-child{border-bottom:none}
+    .week-row:active{background:oklch(96% 0.005 240)}
+    .week-row.today{background:oklch(94% 0.008 255)}
+    .week-row-day{flex:0 0 44px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:1px}
+    .week-row-dow{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+    .week-row-num{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums;line-height:1.1;margin-top:2px}
+    .week-row.today .week-row-dow{color:var(--accent)}
+    .week-row.today .week-row-num{color:var(--accent)}
+    .week-row-events{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0}
+    .week-event{font-size:11px;padding:5px 8px;border-radius:6px;border-left:2.5px solid var(--accent);background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:6px;line-height:1.3}
+    .week-event b{font-weight:600;color:var(--fg);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .week-event span{font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0}
+    .week-event.q1{border-left-color:var(--accent)}
+    .week-event.q2{border-left-color:var(--success)}
+    .week-event.q3{border-left-color:var(--warning)}
+    .week-event.q4{border-left-color:var(--meta)}
+
+    /* ── Day view (timeline + summary stats) ── */
+    .day-summary{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 6px;margin-bottom:14px}
+    .day-summary-stat{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+    .day-summary-num{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+    .day-summary-l{font-size:9px;color:var(--muted);font-weight:500}
+    .day-summary-sep{width:1px;height:20px;background:var(--border)}
+    .day-timeline{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .day-time-row{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);transition:background-color .12s}
+    .day-time-row:last-child{border-bottom:none}
+    .day-time-row:active{background:oklch(96% 0.005 240)}
+    .day-time-hour{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;min-width:42px;padding-top:1px;flex-shrink:0}
+    .day-time-event{flex:1;border-left:3px solid var(--accent);padding:4px 0 4px 10px;border-radius:2px;min-width:0}
+    .day-time-event-head{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:2px}
+    .day-time-event-head b{font-size:12px;font-weight:600;color:var(--fg);line-height:1.3;flex:1;min-width:0}
+    .day-time-event-head b.done{text-decoration:line-through;color:var(--muted)}
+    .day-time-dur{font-size:9px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0;background:var(--bg);padding:1px 6px;border-radius:6px}
+    .day-time-event-meta{font-size:10px;color:var(--muted);line-height:1.4}
+    .day-time-event.q1{border-left-color:var(--accent)}
+    .day-time-event.q2{border-left-color:var(--success)}
+    .day-time-event.q3{border-left-color:var(--warning)}
+    .day-time-event.q4{border-left-color:var(--meta)}
+    .day-time-event.done{opacity:.65}
+    /* ── Matrix Today Stats + Focus Card ── */
+    .matrix-today-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;text-align:center}
+    .matrix-today-stat-num{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+    .matrix-today-stat-num.q1{color:var(--accent)}
+    .matrix-today-stat-num.q2{color:var(--success)}
+    .matrix-today-stat-num.q3{color:var(--warning)}
+    .matrix-today-stat-l{font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:.02em}
+    .matrix-focus-card{background:linear-gradient(135deg,oklch(58% 0.18 255),oklch(48% 0.20 270));border-radius:12px;padding:14px;margin-bottom:12px;color:#fff}
+    .matrix-focus-head{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;opacity:.9;margin-bottom:6px}
+    .matrix-focus-head svg{width:14px;height:14px}
+    .matrix-focus-body{font-size:12px;line-height:1.6;opacity:.92}
+    .matrix-focus-body b{font-weight:600;background:rgba(255,255,255,.18);padding:1px 6px;border-radius:4px}
     /* ── Achievements ── */
     .ach-hero{background:linear-gradient(135deg,oklch(58% 0.18 255),oklch(48% 0.20 270));border-radius:18px;padding:18px 16px 16px;text-align:center;margin-bottom:12px;color:#fff;position:relative;overflow:hidden}
     .ach-hero::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%}
@@ -159,6 +264,10 @@
     .topbar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,oklch(58% 0.18 255),oklch(48% 0.20 270));color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;border:none;cursor:pointer;flex-shrink:0;transition:transform .15s var(--ease-spring);letter-spacing:-.02em}
     .topbar-avatar:active{transform:scale(.9)}
     .topbar-avatar.loggedout{background:var(--surface);border:1px solid var(--border);color:var(--accent);font-weight:600}
+    /* ── Topbar 分享按钮 (pill, accent-tinted, 显眼) ── */
+    .topbar-share{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 11px;border-radius:15px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font-body);letter-spacing:.01em;flex-shrink:0;transition:transform .15s var(--ease-spring),background-color .15s var(--ease-spring);box-shadow:0 2px 6px oklch(58% 0.18 255 / .25)}
+    .topbar-share:active{transform:scale(.94);background:var(--accent-active)}
+    .topbar-share svg{width:13px;height:13px}
 
     /* ── iOS Sheet (Bottom Sheet) ── */
     .sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:none;z-index:200;align-items:flex-end;backdrop-filter:blur(2px)}
@@ -273,6 +382,29 @@
     .task-btn:active{transform:scale(.96)}
     .task-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
     .task-btn.danger{color:var(--danger)}
+    /* ── Task Edit Mode ── */
+    .form-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .task-form-quad{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+    .task-form-quad-cell{font-size:11px;font-weight:600;padding:8px 6px;border-radius:7px;text-align:center;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);transition:all .15s;line-height:1.3}
+    .task-form-quad-cell.q1.sel{background:oklch(94% 0.008 255);border-color:var(--accent);color:var(--accent)}
+    .task-form-quad-cell.q2.sel{background:oklch(94% 0.008 145);border-color:var(--success);color:var(--success)}
+    .task-form-quad-cell.q3.sel{background:oklch(94% 0.008 45);border-color:var(--warning);color:var(--warning)}
+    .task-form-quad-cell.q4.sel{background:var(--surface);border-color:var(--muted);color:var(--muted)}
+    .task-form-quad-cell:active{transform:scale(.97)}
+    #taskEditMode .form-field input,#taskEditMode .form-field select,#taskEditMode .form-field textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:var(--font-body);color:var(--fg);background:var(--bg);outline:none;transition:border-color .15s}
+    #taskEditMode .form-field input:focus,#taskEditMode .form-field select:focus,#taskEditMode .form-field textarea:focus{border-color:var(--accent)}
+    #taskEditMode .form-field label{display:block;font-size:10px;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+    #taskEditMode .form-field textarea{resize:vertical;min-height:64px;line-height:1.5}
+    .task-edit-subtasks{margin-top:4px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:6px 10px}
+    .task-edit-sub{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+    .task-edit-sub:last-child{border-bottom:none}
+    .task-edit-sub-del{width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:var(--meta);cursor:pointer;display:grid;place-items:center;margin-left:auto}
+    .task-edit-sub-del:active{background:oklch(94% 0.008 30);color:var(--danger)}
+    .task-edit-sub-del svg{width:9px;height:9px}
+    .task-edit-sub-add{margin-top:6px}
+    .task-edit-sub-add input{width:100%;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;font-size:12px;background:transparent;color:var(--fg);outline:none;font-family:var(--font-body)}
+    .task-edit-sub-add input:focus{border-style:solid;border-color:var(--accent);background:var(--bg)}
+    .task-foot-row{display:flex;gap:8px;width:100%}
 
     /* ── iOS OKR Manager Sheet ── */
     .okr-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:none;z-index:260;align-items:flex-end;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
@@ -302,6 +434,30 @@
     .okr-kr-add{display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)}
     .okr-kr-input{flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg);color:var(--fg);outline:none;font-family:var(--font-body)}
     .okr-kr-input:focus{border-color:var(--accent)}
+    .kr-row-del{width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:var(--meta);cursor:pointer;display:none;align-items:center;justify-content:center;flex-shrink:0;margin-left:2px}
+    .okr-kr-row:hover .kr-row-del{display:inline-flex}
+    .kr-row-del:active{background:oklch(94% 0.008 30);color:var(--danger)}
+    .kr-row-del svg{width:9px;height:9px}
+    /* inline-edit */
+    .okr-list-name{cursor:text;border-radius:4px;padding:1px 4px;margin-left:-4px}
+    .okr-list-name:hover{background:oklch(96% 0.005 240)}
+    .okr-list-name[contenteditable="true"]{background:var(--surface);outline:2px solid var(--accent);padding:1px 4px}
+    .kr-name{cursor:text;border-radius:3px}
+    .kr-name:hover{background:oklch(96% 0.005 240)}
+    .kr-name[contenteditable="true"]{background:var(--surface);outline:1.5px solid var(--accent);padding:0 3px}
+    .kr-pct{cursor:text;border-radius:3px}
+    .kr-pct:hover{background:oklch(96% 0.005 240)}
+    .kr-pct[contenteditable="true"]{background:var(--surface);outline:1.5px solid var(--accent);padding:0 3px}
+    /* delete confirm overlay */
+    .confirm-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:none;z-index:280;align-items:center;justify-content:center;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);padding:0 32px}
+    .confirm-overlay.open{display:flex;animation:overlayIn .18s var(--ease-ios)}
+    .confirm-box{background:var(--surface);border-radius:14px;width:100%;max-width:280px;overflow:hidden;animation:menuIn .25s var(--ease-spring)}
+    .confirm-title{padding:18px 18px 6px;font-family:var(--font-display);font-size:15px;font-weight:700;text-align:center;color:var(--fg)}
+    .confirm-msg{padding:0 18px 16px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+    .confirm-actions{display:flex;border-top:1px solid var(--border)}
+    .confirm-btn{flex:1;padding:13px;border:none;background:transparent;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);color:var(--fg);transition:background-color .12s}
+    .confirm-btn:active{background:oklch(96% 0.005 240)}
+    .confirm-btn.danger{color:var(--danger);border-left:1px solid var(--border)}
     .okr-add-form{background:var(--bg);border:1px dashed var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
     .okr-add-color-pick{display:flex;gap:6px;margin-bottom:8px}
     .okr-color-dot{width:16px;height:16px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .12s}
@@ -316,8 +472,11 @@
     .me-card::before{content:'';position:absolute;bottom:-40px;left:-20px;width:90px;height:90px;background:rgba(255,255,255,.05);border-radius:50%;pointer-events:none}
     .me-av-lg{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;font-family:var(--font-display);font-size:20px;font-weight:700;border:2px solid rgba(255,255,255,.4);flex-shrink:0;position:relative;z-index:1;letter-spacing:-.02em}
     .me-info{flex:1;min-width:0;position:relative;z-index:1}
+    .me-name-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
     .me-name{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
-    .me-sub{font-size:11px;opacity:.85;margin-top:3px;letter-spacing:.01em}
+    .me-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.22);color:#fff;letter-spacing:.06em;border:1px solid rgba(255,255,255,.3)}
+    .me-role{font-size:11px;opacity:.85;margin-top:4px;letter-spacing:.01em}
+    .me-bio{font-size:11px;opacity:.75;margin-top:3px;line-height:1.4;letter-spacing:.005em}
     .me-edit-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);display:grid;place-items:center;cursor:pointer;color:#fff;flex-shrink:0;position:relative;z-index:1;transition:transform .12s var(--ease-spring)}
     .me-edit-btn:active{transform:scale(.9);background:rgba(255,255,255,.28)}
     .me-edit-btn svg{width:15px;height:15px}
@@ -354,6 +513,15 @@
     .me-li-ic svg{width:16px;height:16px}
     .me-li-name{flex:1;font-size:13px;font-weight:500;color:var(--fg)}
     .me-li-meta{font-size:11px;color:var(--muted);text-align:right}
+    .me-li-tx{flex:1;min-width:0}
+    .me-li-sub{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:.005em}
+    .me-li-danger .me-li-ic,.me-li-danger .me-li-name{color:var(--danger)}
+    .me-chevron-sm{width:12px;height:12px;color:var(--meta);flex-shrink:0}
+    /* iOS Switch (HIG) */
+    .ios-switch{width:42px;height:26px;border-radius:13px;background:var(--border);position:relative;cursor:pointer;transition:background-color .18s var(--ease-ios);flex-shrink:0}
+    .ios-switch::after{content:'';position:absolute;top:2px;left:2px;width:22px;height:22px;background:#fff;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.15);transition:transform .18s var(--ease-spring)}
+    .ios-switch.on{background:var(--success)}
+    .ios-switch.on::after{transform:translateX(16px)}
     /* 退出按钮 + footer */
     .me-logout{width:100%;padding:13px;border-radius:11px;font-size:13px;font-weight:600;color:var(--danger);background:var(--surface);border:1px solid var(--border);cursor:pointer;margin-top:18px;font-family:var(--font-body);transition:all .12s}
     .me-logout:active{background:oklch(96% 0.008 30);border-color:var(--danger)}
@@ -369,6 +537,34 @@
     /* ── Haptic Tap pseudo (visual only) ── */
     .haptic-target{transition:transform .12s var(--ease-spring)}
     .haptic-target:active{transform:scale(.96)}
+
+    /* ── Search Sheet ── */
+    .search-results{max-height:50vh;overflow-y:auto;margin-top:6px}
+    .search-empty{text-align:center;font-size:12px;color:var(--muted);padding:30px 0}
+    .search-row{display:flex;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid var(--border);cursor:pointer;transition:background-color .12s}
+    .search-row:active{background:oklch(96% 0.005 240)}
+    .search-row:last-child{border-bottom:none}
+    .search-row-mark{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .search-row-body{flex:1;min-width:0}
+    .search-row-title{font-size:13px;font-weight:500;color:var(--fg);line-height:1.35}
+    .search-row-meta{font-size:10px;color:var(--muted);margin-top:2px}
+
+    /* ── Notification Sheet ── */
+    .notif-list{max-height:60vh;overflow-y:auto}
+    .notif-item{display:flex;align-items:center;gap:10px;padding:12px 6px;border-bottom:1px solid var(--border);transition:background-color .12s}
+    .notif-item:active{background:oklch(96% 0.005 240)}
+    .notif-item:last-child{border-bottom:none}
+    .notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+    .notif-item:not(.unread) .notif-dot{display:none}
+    .notif-body{flex:1;min-width:0}
+    .notif-title{font-size:13px;font-weight:500;color:var(--fg);line-height:1.35}
+    .notif-item.unread .notif-title{font-weight:600}
+    .notif-meta{font-size:10px;color:var(--muted);margin-top:2px}
+    .notif-time{font-size:10px;color:var(--meta);flex-shrink:0;font-variant-numeric:tabular-nums}
+
+    /* ── Topbar dot indicator (notification badge) ── */
+    .topbar-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--danger);border-radius:50%;border:1.5px solid #fafaf7}
+    .topbar-btn{position:relative}
     /* ── Responsive: full-screen on real iPhone ── */
     @media(max-width:430px){
       .phone-wrap{padding:0}
@@ -399,7 +595,12 @@
       <div class="app-topbar">
         <img class="app-logo-img" src="logo-mark.svg" alt="格行 GridGo" />
         <button class="okr-chip" onclick="openOkrSwitcher()"><span>Q3 OKR</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></button>
-        <button class="topbar-btn" onclick="openShareSheet()" title="分享" aria-label="分享"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2v12M7 7l5-5 5 5M5 14h14v6H5z"/></svg></button>
+        <button class="topbar-btn" onclick="openSearch()" title="搜索" aria-label="搜索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg></button>
+        <button class="topbar-btn" onclick="openNotification()" title="通知" aria-label="通知"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 19a2 2 0 004 0"/></svg><span class="topbar-dot"></span></button>
+        <button class="topbar-share" onclick="openShareSheet()" title="分享季度成长" aria-label="分享">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3l4-1-1 4M14.5 2.5L8 9M12 11v2.5A1.5 1.5 0 0 1 10.5 15H4a1.5 1.5 0 0 1-1.5-1.5V6.5A1.5 1.5 0 0 1 4 5h3"/></svg>
+          <span>分享</span>
+        </button>
         <button class="topbar-avatar" id="topbarAvatar" onclick="openAuth()" title="登录 / 我的" aria-label="登录 / 我的">
           <span id="avatarInitial">林</span>
         </button>
@@ -484,15 +685,22 @@
           </div>
         </div>
         <div class="m-subview" data-msubview="matrix-today">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;margin-bottom:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">今日任务</div><div style="font-size:24px;font-weight:700;color:var(--fg);font-family:var(--font-display)">6 项</div></div>
+          <div class="matrix-today-summary">
+            <div class="matrix-today-stat"><div class="matrix-today-stat-num q1">2</div><div class="matrix-today-stat-l">紧急 × 重要</div></div>
+            <div class="matrix-today-stat"><div class="matrix-today-stat-num q2">3</div><div class="matrix-today-stat-l">重要</div></div>
+            <div class="matrix-today-stat"><div class="matrix-today-stat-num q3">1</div><div class="matrix-today-stat-l">紧急</div></div>
+          </div>
           <div class="eq2 q1" style="margin-bottom:8px"><div class="eq2h"><span class="eq2l">紧急重要</span><span class="eq2c">2</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">Q3 OKR 评审材料</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">客户紧急修复</div></div></div></div>
           <div class="eq2 q2" style="margin-bottom:8px"><div class="eq2h"><span class="eq2l">重要</span><span class="eq2c">3</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck done"></div><div class="eq2item-title done">深度工作 4h</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">每周跑步</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">阅读《原子习惯》</div></div></div></div>
           <div class="eq2 q3"><div class="eq2h"><span class="eq2l">紧急</span><span class="eq2c">1</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">处理积压邮件</div></div></div></div>
         </div>
         <div class="m-subview" data-msubview="matrix-week">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px">
-            <div style="font-size:12px;font-weight:600;color:var(--fg);margin-bottom:8px">本周重点</div>
-            <div style="font-size:11px;color:var(--muted);line-height:1.7">聚焦 <b style="color:var(--fg)">产品增长 OKR</b> 核心功能重构与 A/B 测试上线。每日 14:00-18:00 深度工作块。</div>
+          <div class="matrix-focus-card">
+            <div class="matrix-focus-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+              <span>本周聚焦</span>
+            </div>
+            <div class="matrix-focus-body">聚焦 <b>产品增长 OKR</b> 核心功能重构与 A/B 测试上线。每日 14:00-18:00 深度工作块，目标完成 3 项 KR。</div>
           </div>
           <div class="eq2 q1" style="margin-bottom:8px"><div class="eq2h"><span class="eq2l">紧急重要</span><span class="eq2c">3</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">Q3 OKR 评审会议 周五</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">核心功能联调</div></div></div></div>
           <div class="eq2 q2"><div class="eq2h"><span class="eq2l">重要</span><span class="eq2c">6</span></div><div class="eq2t"><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">每周跑步 3 次</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">TS 进阶阅读</div></div><div class="eq2item"><div class="eq2ck"></div><div class="eq2item-title">用户访谈 3 位</div></div></div></div>
@@ -506,6 +714,7 @@
           <div class="m-subtab" onclick="switchMSub('list','progress',this)">进行中</div>
           <div class="m-subtab" onclick="switchMSub('list','done',this)">已完成</div>
         </div>
+        <div class="list-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg><input type="search" placeholder="搜索任务 / OKR / KR…" oninput="filterList(this.value)" /></div>
         <div class="m-subview active" data-msubview="list-all">
           <div class="okr-card swipe-row" data-task-id="okr1">
             <div class="row-body">
@@ -517,7 +726,17 @@
                 <span class="okr-pl">67%</span>
               </div>
               <div class="kr-body open">
-                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx done">完成核心功能重构</span><span class="kr-tag q1">紧急</span></div>
+                <div class="kr-row kr-row-expandable" onclick="iosKrSub(this)">
+                  <div class="kr-ck done" onclick="event.stopPropagation();iosKr(event,this)"></div>
+                  <span class="kr-tx done">完成核心功能重构</span>
+                  <span class="kr-tag q1">紧急</span>
+                  <span class="kr-exp-mark"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2l4 3-4 3"/></svg></span>
+                </div>
+                <div class="kr-sub-list open">
+                  <div class="kr-sub"><div class="kr-sub-dot"></div><span class="kr-sub-tx done">编写技术方案文档</span><span class="kr-sub-meta">2h</span></div>
+                  <div class="kr-sub"><div class="kr-sub-dot done"></div><span class="kr-sub-tx done">联调 & 自测</span><span class="kr-sub-meta">3h</span></div>
+                  <div class="kr-sub"><div class="kr-sub-dot"></div><span class="kr-sub-tx">代码评审</span><span class="kr-sub-meta">1h</span></div>
+                </div>
                 <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx">上线 A/B 测试</span><span class="kr-tag q2">重要</span></div>
                 <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck" onclick="event.stopPropagation();iosKr(event,this)"></div><span class="kr-tx">用户访谈 10 位</span><span class="kr-tag q2">重要</span></div>
               </div>
@@ -563,13 +782,32 @@
           </div>
         </div>
         <div class="m-subview" data-msubview="list-done">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:10px">已完成 24 项 · 满满成就感</div>
-          <div class="okr-card">
-            <div class="okr-h"><div class="okr-dot" style="background:var(--muted)"></div><span class="okr-n">本周 · 8 项</span></div>
-            <div class="kr-body open" style="padding-left:14px">
-              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">准备产品演示</span></div>
-              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">深度工作 4h</span></div>
-              <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">周一跑步 5km</span></div>
+          <div class="completed-group">
+            <div class="completed-group-header"><span class="completed-group-dot" style="background:var(--accent)"></span><span class="completed-group-name">本周</span><span class="completed-group-count">8 项</span></div>
+            <div class="okr-card">
+              <div class="kr-body open" style="padding-left:8px">
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">准备产品演示</span></div>
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">深度工作 4h</span></div>
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">周一跑步 5km</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="completed-group">
+            <div class="completed-group-header"><span class="completed-group-dot" style="background:var(--success)"></span><span class="completed-group-name">上周</span><span class="completed-group-count">10 项</span></div>
+            <div class="okr-card">
+              <div class="kr-body open" style="padding-left:8px">
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">完成 Q2 OKR 复盘</span></div>
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">用户访谈 6 位</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="completed-group">
+            <div class="completed-group-header"><span class="completed-group-dot" style="background:var(--muted)"></span><span class="completed-group-name">更早</span><span class="completed-group-count">6 项</span></div>
+            <div class="okr-card">
+              <div class="kr-body open" style="padding-left:8px">
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">财务复盘 6 月</span></div>
+                <div class="kr-row" onclick="openTaskDetail(this)"><div class="kr-ck done"></div><span class="kr-tx done">应急基金达成 50%</span></div>
+              </div>
             </div>
           </div>
         </div>
@@ -583,62 +821,191 @@
           <div class="m-subtab" onclick="switchMSub('calendar','day',this)">日</div>
         </div>
         <div class="m-subview active" data-msubview="calendar-month">
-          <div class="cal-head"><h2>2025 年 7 月</h2><div class="cal-nav"><button class="cal-nbtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2L3 6l4 4"/></svg></button><button class="cal-nbtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2l4 4-4 4"/></svg></button></div></div>
-          <div class="cal-g">
-            <div class="cal-dow">一</div><div class="cal-dow">二</div><div class="cal-dow">三</div><div class="cal-dow">四</div><div class="cal-dow">五</div><div class="cal-dow">六</div><div class="cal-dow">日</div>
-            <div class="cal-d oth"><div class="cal-dn">30</div></div>
-            <div class="cal-d"><div class="cal-dn">1</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
-            <div class="cal-d"><div class="cal-dn">2</div></div>
-            <div class="cal-d"><div class="cal-dn">3</div></div>
-            <div class="cal-d"><div class="cal-dn">4</div><div class="cal-dts"><span class="cal-dt b"></span></div></div>
-            <div class="cal-d"><div class="cal-dn">5</div></div>
-            <div class="cal-d"><div class="cal-dn">6</div></div>
-            <div class="cal-d"><div class="cal-dn">7</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
-            <div class="cal-d"><div class="cal-dn">8</div></div>
-            <div class="cal-d"><div class="cal-dn">9</div><div class="cal-dts"><span class="cal-dt a"></span><span class="cal-dt c"></span></div></div>
-            <div class="cal-d"><div class="cal-dn">10</div></div>
-            <div class="cal-d"><div class="cal-dn">11</div><div class="cal-dts"><span class="cal-dt b"></span></div></div>
-            <div class="cal-d"><div class="cal-dn">12</div></div>
-            <div class="cal-d"><div class="cal-dn">13</div></div>
-            <div class="cal-d"><div class="cal-dn">14</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
-            <div class="cal-d"><div class="cal-dn">15</div></div>
-            <div class="cal-d"><div class="cal-dn">16</div></div>
-            <div class="cal-d"><div class="cal-dn">17</div></div>
-            <div class="cal-d today"><div class="cal-dn">18</div><div class="cal-dts"><span class="cal-dt b"></span><span class="cal-dt c"></span></div></div>
-            <div class="cal-d"><div class="cal-dn">19</div></div>
-            <div class="cal-d"><div class="cal-dn">20</div></div>
-            <div class="cal-d"><div class="cal-dn">21</div></div>
-            <div class="cal-d"><div class="cal-dn">22</div></div>
-            <div class="cal-d"><div class="cal-dn">23</div></div>
-            <div class="cal-d"><div class="cal-dn">24</div></div>
-            <div class="cal-d"><div class="cal-dn">25</div><div class="cal-dts"><span class="cal-dt b"></span><span class="cal-dt a"></span></div></div>
-            <div class="cal-d"><div class="cal-dn">26</div></div>
-            <div class="cal-d"><div class="cal-dn">27</div></div>
-            <div class="cal-d"><div class="cal-dn">28</div></div>
-            <div class="cal-d"><div class="cal-dn">29</div></div>
-            <div class="cal-d"><div class="cal-dn">30</div></div>
-            <div class="cal-d"><div class="cal-dn">31</div></div>
-            <div class="cal-d oth"><div class="cal-dn">1</div></div>
-            <div class="cal-d oth"><div class="cal-dn">2</div></div>
-            <div class="cal-d oth"><div class="cal-dn">3</div></div>
+          <div class="cal-month-fixed">
+            <div class="cal-head"><h2 id="calMonthLabel">2025 年 7 月</h2><div class="cal-nav"><button class="cal-nbtn" onclick="calNav('month',-1)" aria-label="上月"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2L3 6l4 4"/></svg></button><button class="cal-nbtn" onclick="calNav('month',1)" aria-label="下月"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2l4 4-4 4"/></svg></button></div></div>
+            <div class="cal-g" id="calGrid">
+              <div class="cal-dow">一</div><div class="cal-dow">二</div><div class="cal-dow">三</div><div class="cal-dow">四</div><div class="cal-dow">五</div><div class="cal-dow">六</div><div class="cal-dow">日</div>
+              <div class="cal-d oth"><div class="cal-dn">30</div></div>
+              <div class="cal-d"><div class="cal-dn">1</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
+              <div class="cal-d"><div class="cal-dn">2</div></div>
+              <div class="cal-d"><div class="cal-dn">3</div></div>
+              <div class="cal-d"><div class="cal-dn">4</div><div class="cal-dts"><span class="cal-dt b"></span></div></div>
+              <div class="cal-d"><div class="cal-dn">5</div></div>
+              <div class="cal-d"><div class="cal-dn">6</div></div>
+              <div class="cal-d"><div class="cal-dn">7</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
+              <div class="cal-d"><div class="cal-dn">8</div></div>
+              <div class="cal-d"><div class="cal-dn">9</div><div class="cal-dts"><span class="cal-dt a"></span><span class="cal-dt c"></span></div></div>
+              <div class="cal-d"><div class="cal-dn">10</div></div>
+              <div class="cal-d"><div class="cal-dn">11</div><div class="cal-dts"><span class="cal-dt b"></span></div></div>
+              <div class="cal-d"><div class="cal-dn">12</div></div>
+              <div class="cal-d"><div class="cal-dn">13</div></div>
+              <div class="cal-d"><div class="cal-dn">14</div><div class="cal-dts"><span class="cal-dt a"></span></div></div>
+              <div class="cal-d"><div class="cal-dn">15</div></div>
+              <div class="cal-d"><div class="cal-dn">16</div></div>
+              <div class="cal-d"><div class="cal-dn">17</div></div>
+              <div class="cal-d today"><div class="cal-dn">18</div><div class="cal-dts"><span class="cal-dt b"></span><span class="cal-dt c"></span></div></div>
+              <div class="cal-d"><div class="cal-dn">19</div></div>
+              <div class="cal-d"><div class="cal-dn">20</div></div>
+              <div class="cal-d"><div class="cal-dn">21</div></div>
+              <div class="cal-d"><div class="cal-dn">22</div></div>
+              <div class="cal-d"><div class="cal-dn">23</div></div>
+              <div class="cal-d"><div class="cal-dn">24</div></div>
+              <div class="cal-d"><div class="cal-dn">25</div><div class="cal-dts"><span class="cal-dt b"></span><span class="cal-dt a"></span></div></div>
+              <div class="cal-d"><div class="cal-dn">26</div></div>
+              <div class="cal-d"><div class="cal-dn">27</div></div>
+              <div class="cal-d"><div class="cal-dn">28</div></div>
+              <div class="cal-d"><div class="cal-dn">29</div></div>
+              <div class="cal-d"><div class="cal-dn">30</div></div>
+              <div class="cal-d"><div class="cal-dn">31</div></div>
+              <div class="cal-d oth"><div class="cal-dn">1</div></div>
+              <div class="cal-d oth"><div class="cal-dn">2</div></div>
+              <div class="cal-d oth"><div class="cal-dn">3</div></div>
+            </div>
+          </div>
+          <div class="cal-month-scroll">
+            <div class="cal-today-section-title">今日 · 7 月 18 日  ·  5 项</div>
+            <div class="cal-today-panel">
+            <div class="cal-today-head">
+              <div class="cal-today-date">
+                <div class="cal-today-day">今天</div>
+                <div class="cal-today-full">7 月 18 日  ·  周五</div>
+              </div>
+              <div class="cal-today-count">5 项</div>
+            </div>
+            <div class="cal-today-list">
+              <div class="cal-today-item" onclick="openTaskDetail(this)">
+                <div class="cal-today-time">09:00</div>
+                <div class="cal-today-bar q3"></div>
+                <div class="cal-today-body"><div class="cal-today-title">晨会</div><div class="cal-today-meta">产品组站会  ·  30min</div></div>
+              </div>
+              <div class="cal-today-item" onclick="openTaskDetail(this)">
+                <div class="cal-today-time">10:00</div>
+                <div class="cal-today-bar q1"></div>
+                <div class="cal-today-body"><div class="cal-today-title">深度工作 · Q3 OKR 评审材料</div><div class="cal-today-meta">紧急重要  ·  2h</div></div>
+              </div>
+              <div class="cal-today-item" onclick="openTaskDetail(this)">
+                <div class="cal-today-time">13:00</div>
+                <div class="cal-today-bar q1"></div>
+                <div class="cal-today-body"><div class="cal-today-title">客户需求紧急修复</div><div class="cal-today-meta">紧急重要  ·  2h</div></div>
+              </div>
+              <div class="cal-today-item" onclick="openTaskDetail(this)">
+                <div class="cal-today-time">14:00</div>
+                <div class="cal-today-bar q1"></div>
+                <div class="cal-today-body"><div class="cal-today-title">Q3 OKR 评审会议</div><div class="cal-today-meta">紧急重要  ·  90min</div></div>
+              </div>
+              <div class="cal-today-item" onclick="openTaskDetail(this)">
+                <div class="cal-today-time">17:00</div>
+                <div class="cal-today-bar q4"></div>
+                <div class="cal-today-body"><div class="cal-today-title">周报撰写</div><div class="cal-today-meta">不紧急不重要  ·  45min</div></div>
+              </div>
+            </div>
+          </div>
           </div>
         </div>
         <div class="m-subview" data-msubview="calendar-week">
-          <div style="font-size:13px;font-weight:600;margin-bottom:10px">本周 7/14 – 7/20</div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <div class="haptic-target" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周一 7/14</div><div style="font-size:11px">深度工作 4h · 每周跑步</div></div>
-            <div class="haptic-target" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周二 7/15</div><div style="font-size:11px">处理积压邮件 · 会议记录同步 · 用户访谈</div></div>
-            <div class="haptic-target" style="background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:10px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">周五 7/18 今天</div><div style="font-size:11px">Q3 OKR 评审会议 · 每周跑步 · 周报撰写</div></div>
+          <div class="cal-head"><h2 id="calWeekLabel">7/14 – 7/20  ·  本周</h2><div class="cal-nav"><button class="cal-nbtn" onclick="calNav('week',-1)" aria-label="上周"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2L3 6l4 4"/></svg></button><button class="cal-nbtn" onclick="calNav('week',1)" aria-label="下周"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2l4 4-4 4"/></svg></button></div></div>
+          <div class="week-list">
+            <div class="week-row">
+              <div class="week-row-day"><div class="week-row-dow">周一</div><div class="week-row-num">14</div></div>
+              <div class="week-row-events">
+                <div class="week-event q2"><b>深度工作</b><span>4h</span></div>
+                <div class="week-event q2"><b>跑步</b><span>5km</span></div>
+              </div>
+            </div>
+            <div class="week-row">
+              <div class="week-row-day"><div class="week-row-dow">周二</div><div class="week-row-num">15</div></div>
+              <div class="week-row-events">
+                <div class="week-event q3"><b>处理邮件</b><span>1h</span></div>
+                <div class="week-event q3"><b>会议记录</b><span>30min</span></div>
+                <div class="week-event q2"><b>用户访谈</b><span>3位</span></div>
+              </div>
+            </div>
+            <div class="week-row">
+              <div class="week-row-day"><div class="week-row-dow">周三</div><div class="week-row-num">16</div></div>
+              <div class="week-row-events">
+                <div class="week-event q2"><b>代码评审</b><span>2h</span></div>
+              </div>
+            </div>
+            <div class="week-row">
+              <div class="week-row-day"><div class="week-row-dow">周四</div><div class="week-row-num">17</div></div>
+              <div class="week-row-events">
+                <div class="week-event q2"><b>联调</b><span>3h</span></div>
+              </div>
+            </div>
+            <div class="week-row today">
+              <div class="week-row-day"><div class="week-row-dow">周五</div><div class="week-row-num">18</div></div>
+              <div class="week-row-events">
+                <div class="week-event q1"><b>Q3 OKR 评审</b><span>14:00</span></div>
+                <div class="week-event q2"><b>跑步</b><span>5km</span></div>
+                <div class="week-event q4"><b>周报撰写</b><span>45min</span></div>
+              </div>
+            </div>
+            <div class="week-row">
+              <div class="week-row-day"><div class="week-row-dow">周六</div><div class="week-row-num">19</div></div>
+              <div class="week-row-events">
+                <div class="week-event q4"><b>整理收藏夹</b><span></span></div>
+              </div>
+            </div>
+            <div class="week-row">
+              <div class="week-row-day"><div class="week-row-dow">周日</div><div class="week-row-num">20</div></div>
+              <div class="week-row-events">
+                <div class="week-event q4"><b>下周计划</b><span>30min</span></div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="m-subview" data-msubview="calendar-day">
-          <div style="font-size:13px;font-weight:600;margin-bottom:10px">今日 · 7/18 周五</div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
-            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">09:00</div><div style="font-size:11px"><b>晨会</b><br><span style="color:var(--muted);font-size:10px">产品组站会 30min</span></div></div>
-            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">10:00</div><div style="font-size:11px"><b>深度工作</b><br><span style="color:var(--muted);font-size:10px">Q3 OKR 评审材料 2h</span></div></div>
-            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">13:00</div><div style="font-size:11px"><b>客户需求修复</b><br><span style="color:var(--muted);font-size:10px">紧急修复上线 2h</span></div></div>
-            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">14:00</div><div style="font-size:11px"><b>Q3 OKR 评审会议</b><br><span style="color:var(--muted);font-size:10px">全员参与 90min</span></div></div>
-            <div class="haptic-target" style="display:flex;gap:10px;padding:10px 12px"><div style="font-size:10px;font-weight:600;color:var(--muted);min-width:42px">17:00</div><div style="font-size:11px"><b>周报撰写</b><br><span style="color:var(--muted);font-size:10px">本周总结 45min</span></div></div>
+          <div class="cal-head"><h2 id="calDayLabel">今日 · 7/18 周五</h2><div class="cal-nav"><button class="cal-nbtn" onclick="calNav('day',-1)" aria-label="前一天"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2L3 6l4 4"/></svg></button><button class="cal-nbtn" onclick="calNav('day',1)" aria-label="后一天"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2l4 4-4 4"/></svg></button></div></div>
+          <div class="day-summary">
+            <div class="day-summary-stat"><div class="day-summary-num">5</div><div class="day-summary-l">已排程</div></div>
+            <div class="day-summary-sep"></div>
+            <div class="day-summary-stat"><div class="day-summary-num">6.5h</div><div class="day-summary-l">总时长</div></div>
+            <div class="day-summary-sep"></div>
+            <div class="day-summary-stat"><div class="day-summary-num">2</div><div class="day-summary-l">已完成</div></div>
+          </div>
+          <div class="day-timeline">
+            <div class="day-time-row">
+              <div class="day-time-hour">09:00</div>
+              <div class="day-time-event q3">
+                <div class="day-time-event-head"><b>晨会</b><span class="day-time-dur">30min</span></div>
+                <div class="day-time-event-meta">产品组站会  ·  会议室 A</div>
+              </div>
+            </div>
+            <div class="day-time-row">
+              <div class="day-time-hour">10:00</div>
+              <div class="day-time-event q1">
+                <div class="day-time-event-head"><b>深度工作 · Q3 OKR 评审材料</b><span class="day-time-dur">2h</span></div>
+                <div class="day-time-event-meta">紧急重要  ·  产品增长 OKR</div>
+              </div>
+            </div>
+            <div class="day-time-row">
+              <div class="day-time-hour">13:00</div>
+              <div class="day-time-event q1">
+                <div class="day-time-event-head"><b>客户需求紧急修复</b><span class="day-time-dur">2h</span></div>
+                <div class="day-time-event-meta">紧急重要  ·  需今日上线</div>
+              </div>
+            </div>
+            <div class="day-time-row">
+              <div class="day-time-hour">14:00</div>
+              <div class="day-time-event q1">
+                <div class="day-time-event-head"><b>Q3 OKR 评审会议</b><span class="day-time-dur">90min</span></div>
+                <div class="day-time-event-meta">紧急重要  ·  全员参与</div>
+              </div>
+            </div>
+            <div class="day-time-row">
+              <div class="day-time-hour">17:00</div>
+              <div class="day-time-event q4">
+                <div class="day-time-event-head"><b>周报撰写</b><span class="day-time-dur">45min</span></div>
+                <div class="day-time-event-meta">本周总结  ·  发送至团队</div>
+              </div>
+            </div>
+            <div class="day-time-row">
+              <div class="day-time-hour">19:00</div>
+              <div class="day-time-event q2 done">
+                <div class="day-time-event-head"><b class="done">每日跑步</b><span class="day-time-dur">30min</span></div>
+                <div class="day-time-event-meta">已完成  ·  5km</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -705,6 +1072,18 @@
             <div class="gantt-okr-row"><div class="gantt-okr-name">健康管理</div><div class="gantt-okr-meta">全年</div></div>
             <div class="gantt-track"><div class="gantt-fill" style="width:100%;background:linear-gradient(90deg,var(--success),oklch(70% 0.16 145))">全年</div></div>
           </div>
+          <div class="gantt-card">
+            <div class="gantt-okr-row"><div class="gantt-okr-name">技能提升</div><div class="gantt-okr-meta">全年</div></div>
+            <div class="gantt-track"><div class="gantt-fill" style="width:100%;background:linear-gradient(90deg,var(--warning),oklch(70% 0.16 45))">全年</div></div>
+          </div>
+          <div class="gantt-card">
+            <div class="gantt-okr-row"><div class="gantt-okr-name">财务健康</div><div class="gantt-okr-meta">H2 启动</div></div>
+            <div class="gantt-track"><div class="gantt-fill" style="width:35%;background:linear-gradient(90deg,var(--danger),oklch(65% 0.20 25))">35%</div></div>
+          </div>
+          <div class="gantt-card">
+            <div class="gantt-okr-row"><div class="gantt-okr-name">团队建设</div><div class="gantt-okr-meta">Q4 启动</div></div>
+            <div class="gantt-track"><div class="gantt-fill" style="width:15%;background:linear-gradient(90deg,#8B5CF6,oklch(60% 0.20 290))">15%</div></div>
+          </div>
         </div>
       </div>
 
@@ -714,8 +1093,12 @@
         <div class="me-card" id="meCard">
           <div class="me-av-lg" id="meAvLg">林</div>
           <div class="me-info">
-            <div class="me-name" id="meName">林小白</div>
-            <div class="me-sub" id="meSub">已登录 · 7/18 加入 · Q3 进行中</div>
+            <div class="me-name-row">
+              <span class="me-name" id="meName">林小白</span>
+              <span class="me-badge">PRO</span>
+            </div>
+            <div class="me-role">独立 iOS 工程师  ·  在职</div>
+            <div class="me-bio">用一格一事的方式推进 OKR，把目标拆成可执行的格子。</div>
           </div>
           <button class="me-edit-btn haptic-target" onclick="openAuth()" aria-label="切换账号">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
@@ -764,43 +1147,46 @@
           </div>
         </div>
 
-        <!-- 偏好与账户 -->
-        <div class="me-section-title">偏好与账户</div>
+        <!-- 偏好 -->
+        <div class="me-section-title">偏好</div>
         <div class="me-list">
-          <div class="me-li haptic-target" onclick="showToast('通知设置','即将开放')">
-            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21a2 2 0 0 0 4 0"/></svg></div>
-            <span class="me-li-name">通知设置</span>
-            <span class="me-li-meta">已开启 3 项</span>
+          <div class="me-li haptic-target" onclick="showToast('提醒时间','即将开放')">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg></div>
+            <div class="me-li-tx"><div class="me-li-name">提醒时间</div><div class="me-li-sub">每日 09:00  ·  每周一回顾</div></div>
+            <svg class="me-chevron-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
           </div>
           <div class="me-li haptic-target" onclick="showToast('主题外观','即将开放')">
-            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
-            <span class="me-li-name">主题外观</span>
-            <span class="me-li-meta">跟随系统</span>
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></div>
+            <div class="me-li-tx"><div class="me-li-name">主题外观</div><div class="me-li-sub">跟随系统  ·  浅色</div></div>
+            <svg class="me-chevron-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
           </div>
-          <div class="me-li haptic-target" onclick="showToast('数据同步','iCloud 已同步 · 刚刚')">
-            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 12a9 9 0 1 1-3.5-7.1M21 4v5h-5"/></svg></div>
-            <span class="me-li-name">数据同步</span>
-            <span class="me-li-meta">刚刚</span>
+          <div class="me-li haptic-target">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 8a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19a2 2 0 004 0"/></svg></div>
+            <div class="me-li-tx"><div class="me-li-name">通知提醒</div><div class="me-li-sub">截止前 24 小时推送</div></div>
+            <div class="ios-switch on" onclick="this.classList.toggle('on')" role="switch" aria-checked="true"></div>
           </div>
-          <div class="me-li haptic-target" onclick="showToast('隐私设置','即将开放')">
-            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-            <span class="me-li-name">隐私</span>
-            <span class="me-li-meta">仅自己可见</span>
-          </div>
-          <div class="me-li haptic-target" onclick="showToast('帮助与反馈','感谢使用 GridGo')">
-            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-1 1-2 1.5-2 3M12 17h.01"/></svg></div>
-            <span class="me-li-name">帮助与反馈</span>
-            <span class="me-li-meta"></span>
-          </div>
-          <div class="me-li haptic-target" onclick="showToast('关于','格行 GridGo · v0.1.0')">
-            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg></div>
-            <span class="me-li-name">关于</span>
-            <span class="me-li-meta">v0.1.0</span>
+          <div class="me-li haptic-target" onclick="showToast('数据导出','即将开放')">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h16v4H4zM4 10h10v4H4zM4 14h16v6H4z"/></svg></div>
+            <div class="me-li-tx"><div class="me-li-name">数据导出</div><div class="me-li-sub">导出 JSON / CSV</div></div>
+            <svg class="me-chevron-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
           </div>
         </div>
 
-        <button class="me-logout haptic-target" onclick="logout()">退出登录</button>
-        <div class="me-footer">格行 GridGo · 让 OKR 真正被看见</div>
+        <!-- 账号 -->
+        <div class="me-section-title">账号</div>
+        <div class="me-list">
+          <div class="me-li haptic-target" onclick="openAuth()">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div>
+            <div class="me-li-tx"><div class="me-li-name">登录账号</div><div class="me-li-sub">GitHub OAuth  ·  linxiaobai@</div></div>
+            <svg class="me-chevron-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4l4 4-4 4"/></svg>
+          </div>
+          <div class="me-li me-li-danger haptic-target" onclick="logout()">
+            <div class="me-li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 17l5-5-5-5M21 12H9M12 21H5a2 2 0 01-2-2V5a2 2 0 012-2h7"/></svg></div>
+            <div class="me-li-tx"><div class="me-li-name">退出登录</div></div>
+          </div>
+        </div>
+
+        <div class="me-footer">格行 GridGo  ·  v1.4.0  ·  一格一事，循格而行</div>
       </div>
     </div>
 
@@ -815,7 +1201,7 @@
       <div class="tab-item" onclick="tabBar(this,'list')" aria-label="列表"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>列表</span></div>
       <div class="tab-item" onclick="tabBar(this,'calendar')" aria-label="日历"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>日历</span></div>
       <div class="tab-item" onclick="tabBar(this,'gantt')" aria-label="甘特图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="18" y2="6"/><line x1="3" y1="12" x2="14" y2="12"/><line x1="3" y1="18" x2="10" y2="18"/></svg><span>甘特图</span></div>
-      <div class="tab-item" onclick="tabBar(this,'ach')" aria-label="成就"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg><span>成就</span></div>
+      <div class="tab-item" onclick="tabBar(this,'ach')" aria-label="我的"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span>我的</span></div>
     </div>
 
     <!-- iOS Sheet (添加任务) -->
@@ -830,6 +1216,58 @@
         <div class="sheet-actions">
           <button class="sheet-btn cancel" onclick="closeAddSheet()">取消</button>
           <button class="sheet-btn primary" onclick="closeAddSheet();showToast('任务已添加')">添加任务</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- iOS Search Sheet -->
+    <div class="sheet-overlay" id="searchSheet" onclick="if(event.target===this)closeSearch()">
+      <div class="sheet">
+        <div class="sheet-grabber"></div>
+        <h3>搜索</h3>
+        <div class="form-field"><label>关键词</label><input type="search" id="searchInput" placeholder="搜索任务 / OKR / KR…" oninput="filterSearch(this.value)" autocomplete="off" /></div>
+        <div class="search-results" id="searchResults">
+          <div class="search-empty">输入关键词开始搜索</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- iOS Notification Sheet -->
+    <div class="sheet-overlay" id="notifSheet" onclick="if(event.target===this)closeNotification()">
+      <div class="sheet">
+        <div class="sheet-grabber"></div>
+        <h3>通知</h3>
+        <div class="notif-list">
+          <div class="notif-item unread">
+            <div class="notif-dot"></div>
+            <div class="notif-body">
+              <div class="notif-title">Q3 OKR 评审材料</div>
+              <div class="notif-meta">今天 18:00 截止  ·  产品增长</div>
+            </div>
+            <div class="notif-time">2h</div>
+          </div>
+          <div class="notif-item unread">
+            <div class="notif-dot"></div>
+            <div class="notif-body">
+              <div class="notif-title">每周跑步 3 次</div>
+              <div class="notif-meta">本周还差 1 次  ·  健康管理</div>
+            </div>
+            <div class="notif-time">4h</div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-body">
+              <div class="notif-title">汇总 OKR 数据</div>
+              <div class="notif-meta">已完成  ·  7/15</div>
+            </div>
+            <div class="notif-time">3d</div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-body">
+              <div class="notif-title">月度财务复盘</div>
+              <div class="notif-meta">明天 09:00  ·  财务健康</div>
+            </div>
+            <div class="notif-time">5d</div>
+          </div>
         </div>
       </div>
     </div>
@@ -887,6 +1325,18 @@
       <div class="ios-toast-body"><div class="ios-toast-title" id="toastTitle">操作完成</div><div class="ios-toast-msg" id="toastMsg">已成功保存到你的 OKR</div></div>
     </div>
 
+    <!-- iOS Confirm Overlay -->
+    <div class="confirm-overlay" id="confirmOverlay" onclick="if(event.target===this)closeConfirm()">
+      <div class="confirm-box">
+        <div class="confirm-title" id="confirmTitle">确认删除？</div>
+        <div class="confirm-msg" id="confirmMsg">该操作无法撤销。</div>
+        <div class="confirm-actions">
+          <button type="button" class="confirm-btn" onclick="closeConfirm()">取消</button>
+          <button type="button" class="confirm-btn danger" id="confirmOkBtn">删除</button>
+        </div>
+      </div>
+    </div>
+
     <!-- iOS Task Detail Sheet (大sheet, 含标签/状态/元信息/描述/子任务/评论) -->
     <div class="task-overlay" id="taskSheet" onclick="if(event.target===this)closeTask()">
       <div class="task-sheet">
@@ -901,7 +1351,7 @@
           </button>
         </div>
 
-        <div class="task-body">
+        <div class="task-body" id="taskViewMode">
           <div class="task-title" id="task-title">Q3 OKR 评审材料</div>
 
           <div class="task-meta">
@@ -958,13 +1408,68 @@
           </div>
         </div>
 
-        <div class="task-foot">
-          <div class="task-foot-left">
-            <button type="button" class="task-btn danger" onclick="closeTask();showToast('已删除','任务已从 OKR 中移除')">删除</button>
+        <!-- Edit Mode (iOS form) -->
+        <div class="task-body" id="taskEditMode" style="display:none">
+          <div class="form-field" style="margin-bottom:12px">
+            <label>任务名称</label>
+            <input type="text" id="editTitle" value="Q3 OKR 评审材料" />
           </div>
-          <div class="task-foot-right">
+          <div class="form-field" style="margin-bottom:12px">
+            <label>所属 OKR</label>
+            <select id="editOkr">
+              <option>产品增长  ·  Q3 月活提升 30%</option>
+              <option>健康管理  ·  养成运动习惯</option>
+              <option>技能提升  ·  掌握 TypeScript</option>
+              <option>财务健康  ·  建立应急基金</option>
+            </select>
+          </div>
+          <div class="form-field" style="margin-bottom:12px">
+            <label>象限</label>
+            <div class="task-form-quad">
+              <div class="task-form-quad-cell q1 sel" data-q="q1" onclick="pickEditQ(this)">紧急 × 重要</div>
+              <div class="task-form-quad-cell q2" data-q="q2" onclick="pickEditQ(this)">不紧急 × 重要</div>
+              <div class="task-form-quad-cell q3" data-q="q3" onclick="pickEditQ(this)">紧急 × 不重要</div>
+              <div class="task-form-quad-cell q4" data-q="q4" onclick="pickEditQ(this)">不紧急 × 不重要</div>
+            </div>
+          </div>
+          <div class="form-field-row">
+            <div class="form-field" style="margin-bottom:12px">
+              <label>截止日期</label>
+              <input type="date" id="editDue" value="2025-07-18" />
+            </div>
+            <div class="form-field" style="margin-bottom:12px">
+              <label>预计耗时</label>
+              <input type="text" id="editEstimate" value="2 小时" />
+            </div>
+          </div>
+          <div class="form-field" style="margin-bottom:12px">
+            <label>描述</label>
+            <textarea id="editDesc" rows="3">撰写 Q3 OKR 评审会议的材料,包含进度回顾、下季度规划、风险与依赖项。需要同步给所有相关人。</textarea>
+          </div>
+          <div class="form-field" style="margin-bottom:12px">
+            <label>子任务</label>
+            <div class="task-edit-subtasks" id="taskEditSubtasks">
+              <div class="task-edit-sub"><div class="task-sub-check done"></div><span class="task-sub-text done">汇总 OKR 数据</span><button type="button" class="task-edit-sub-del" onclick="this.parentElement.remove()" aria-label="删除"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button></div>
+              <div class="task-edit-sub"><div class="task-sub-check"></div><span class="task-sub-text">起草评审文档大纲</span><button type="button" class="task-edit-sub-del" onclick="this.parentElement.remove()" aria-label="删除"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button></div>
+              <div class="task-edit-sub"><div class="task-sub-check"></div><span class="task-sub-text">邀请评审参与者</span><button type="button" class="task-edit-sub-del" onclick="this.parentElement.remove()" aria-label="删除"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button></div>
+            </div>
+            <div class="task-edit-sub-add">
+              <input type="text" id="taskNewSubtask" placeholder="+ 添加子任务…" onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtaskFromEdit();}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="task-foot">
+          <div class="task-foot-left" id="taskFootLeft">
+            <button type="button" class="task-btn danger" onclick="deleteTask()">删除</button>
+          </div>
+          <div class="task-foot-right" id="taskFootRight">
             <button type="button" class="task-btn" onclick="toggleTaskDone()">标记完成</button>
-            <button type="button" class="task-btn primary" onclick="closeTask();showToast('已编辑','任务信息已保存')">编辑</button>
+            <button type="button" class="task-btn primary" id="taskEditBtn" onclick="switchToEdit()">编辑</button>
+          </div>
+          <div class="task-foot-row" id="taskEditFoot" style="display:none">
+            <button type="button" class="task-btn" style="flex:1" onclick="switchToView()">取消</button>
+            <button type="button" class="task-btn primary" style="flex:2" onclick="saveTask()">保存修改</button>
           </div>
         </div>
       </div>
@@ -989,8 +1494,8 @@
           <div class="okr-list-row">
             <div class="okr-list-head">
               <div class="okr-list-dot" style="background:var(--accent)"></div>
-              <span class="okr-list-name">产品增长 · Q3 月活提升 30%</span>
-              <button type="button" class="okr-act-btn danger" title="删除" onclick="this.closest('.okr-list-row').style.display='none';showToast('已删除','OKR 已移除')">
+              <span class="okr-list-name" onclick="editOkrName(this)">产品增长 · Q3 月活提升 30%</span>
+              <button type="button" class="okr-act-btn danger" title="删除" onclick="confirmDeleteOkr(this)">
                 <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h8M5 4V2h4v2M4 4l1 8h4l1-8"/></svg>
               </button>
             </div>
@@ -999,11 +1504,11 @@
               <span class="okr-progress-label">67%</span>
             </div>
             <div class="okr-kr-list">
-              <div class="okr-kr-row"><div class="kr-check done" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name done">完成核心功能重构</span><span class="kr-pct">100%</span></div>
-              <div class="okr-kr-row"><div class="kr-check" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name">上线 A/B 测试框架</span><span class="kr-pct">60%</span></div>
-              <div class="okr-kr-row"><div class="kr-check" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name">用户访谈 10 位</span><span class="kr-pct">40%</span></div>
+              <div class="okr-kr-row"><div class="kr-check done" onclick="toggleKrDone(this)"></div><span class="kr-name done" onclick="editKrName(this)">完成核心功能重构</span><span class="kr-pct" onclick="editKrPct(this)">100%</span><button type="button" class="kr-row-del" onclick="deleteKr(this)" aria-label="删除 KR"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button></div>
+              <div class="okr-kr-row"><div class="kr-check" onclick="toggleKrDone(this)"></div><span class="kr-name" onclick="editKrName(this)">上线 A/B 测试框架</span><span class="kr-pct" onclick="editKrPct(this)">60%</span><button type="button" class="kr-row-del" onclick="deleteKr(this)" aria-label="删除 KR"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button></div>
+              <div class="okr-kr-row"><div class="kr-check" onclick="toggleKrDone(this)"></div><span class="kr-name" onclick="editKrName(this)">用户访谈 10 位</span><span class="kr-pct" onclick="editKrPct(this)">40%</span><button type="button" class="kr-row-del" onclick="deleteKr(this)" aria-label="删除 KR"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button></div>
               <div class="okr-kr-add">
-                <input class="okr-kr-input" placeholder="+ 添加关键结果…" />
+                <input class="okr-kr-input" placeholder="+ 添加关键结果…" onkeydown="if(event.key==='Enter'){event.preventDefault();addKr(this);}" />
               </div>
             </div>
           </div>
@@ -1012,8 +1517,8 @@
           <div class="okr-list-row">
             <div class="okr-list-head">
               <div class="okr-list-dot" style="background:#8B5CF6"></div>
-              <span class="okr-list-name">健康管理 · 养成运动习惯</span>
-              <button type="button" class="okr-act-btn danger" title="删除" onclick="this.closest('.okr-list-row').style.display='none';showToast('已删除','OKR 已移除')">
+              <span class="okr-list-name" onclick="editOkrName(this)">健康管理 · 养成运动习惯</span>
+              <button type="button" class="okr-act-btn danger" title="删除" onclick="confirmDeleteOkr(this)">
                 <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h8M5 4V2h4v2M4 4l1 8h4l1-8"/></svg>
               </button>
             </div>
@@ -1022,10 +1527,10 @@
               <span class="okr-progress-label">45%</span>
             </div>
             <div class="okr-kr-list">
-              <div class="okr-kr-row"><div class="kr-check done" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name done">每周跑步 3 次</span><span class="kr-pct">66%</span></div>
-              <div class="okr-kr-row"><div class="kr-check" onclick="this.classList.toggle('done');this.nextElementSibling.classList.toggle('done')"></div><span class="kr-name">每天 8 杯水</span><span class="kr-pct">30%</span></div>
+              <div class="okr-kr-row"><div class="kr-check done" onclick="toggleKrDone(this)"></div><span class="kr-name done" onclick="editKrName(this)">每周跑步 3 次</span><span class="kr-pct" onclick="editKrPct(this)">66%</span><button type="button" class="kr-row-del" onclick="deleteKr(this)" aria-label="删除 KR"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button></div>
+              <div class="okr-kr-row"><div class="kr-check" onclick="toggleKrDone(this)"></div><span class="kr-name" onclick="editKrName(this)">每天 8 杯水</span><span class="kr-pct" onclick="editKrPct(this)">30%</span><button type="button" class="kr-row-del" onclick="deleteKr(this)" aria-label="删除 KR"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button></div>
               <div class="okr-kr-add">
-                <input class="okr-kr-input" placeholder="+ 添加关键结果…" />
+                <input class="okr-kr-input" placeholder="+ 添加关键结果…" onkeydown="if(event.key==='Enter'){event.preventDefault();addKr(this);}" />
               </div>
             </div>
           </div>
@@ -1034,14 +1539,14 @@
           <div class="okr-add-form">
             <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase">+ 新建 OKR</div>
             <div class="okr-add-color-pick">
-              <div class="okr-color-dot sel" style="background:var(--accent)"></div>
-              <div class="okr-color-dot" style="background:#8B5CF6"></div>
-              <div class="okr-color-dot" style="background:var(--warning)"></div>
-              <div class="okr-color-dot" style="background:var(--danger)"></div>
-              <div class="okr-color-dot" style="background:var(--muted)"></div>
+              <div class="okr-color-dot sel" data-color="accent" style="background:var(--accent)"></div>
+              <div class="okr-color-dot" data-color="purple" style="background:#8B5CF6"></div>
+              <div class="okr-color-dot" data-color="warning" style="background:var(--warning)"></div>
+              <div class="okr-color-dot" data-color="danger" style="background:var(--danger)"></div>
+              <div class="okr-color-dot" data-color="muted" style="background:var(--muted)"></div>
             </div>
-            <input class="okr-add-name" placeholder="例如：技能提升 · 掌握 TypeScript" />
-            <button type="button" class="task-btn primary" style="width:100%" onclick="closeOkrMgr();showToast('OKR 已创建','新建的目标已添加到列表')">创建 OKR</button>
+            <input class="okr-add-name" placeholder="例如：技能提升 · 掌握 TypeScript" id="okrAddName" />
+            <button type="button" class="task-btn primary" style="width:100%" onclick="createOkr()">创建 OKR</button>
           </div>
         </div>
       </div>
@@ -1057,6 +1562,21 @@ function tabBar(el,name){
   document.querySelectorAll('.view-body').forEach(function(v){v.style.display='none'});
   document.getElementById('vb-'+name).style.display='block';
   document.getElementById('appBody').scrollTop = 0;
+  // Calendar month view uses flex layout (fixed grid + scrollable tasks)
+  if(name === 'calendar'){
+    var vb = document.getElementById('vb-calendar');
+    var monthActive = vb && vb.querySelector('.m-subview[data-msubview="calendar-month"].active');
+    if(vb && monthActive){
+      vb.classList.add('has-month-flex');
+      var sc = vb.querySelector('.cal-month-scroll');
+      if(sc) sc.scrollTop = 0;
+    } else if(vb){
+      vb.classList.remove('has-month-flex');
+    }
+  } else {
+    var other = document.getElementById('vb-calendar');
+    if(other) other.classList.remove('has-month-flex');
+  }
 }
 
 function iosCheck(el){
@@ -1250,6 +1770,17 @@ function switchMSub(panel, view, el){
   vb.querySelectorAll(':scope > .m-subview').forEach(function(v){
     v.classList.toggle('active', v.getAttribute('data-msubview') === panel + '-' + view);
   });
+  // Calendar month view: enable internal flex layout (fixed grid + scrollable tasks)
+  if(panel === 'calendar'){
+    if(view === 'month'){
+      vb.classList.add('has-month-flex');
+      // Scroll the inner panel back to top when re-entering
+      var sc = vb.querySelector('.cal-month-scroll');
+      if(sc) sc.scrollTop = 0;
+    } else {
+      vb.classList.remove('has-month-flex');
+    }
+  }
   triggerHaptic();
 }
 
@@ -1406,6 +1937,362 @@ function markDone(btn){
     showToast('任务已完成','+ 4h 专注时间');
     triggerHaptic();
   }
+}
+
+// ─── 搜索 ───
+function openSearch(){
+  triggerHaptic();
+  document.getElementById('searchSheet').classList.add('open');
+  setTimeout(function(){
+    var inp = document.getElementById('searchInput');
+    if(inp) inp.focus();
+  }, 280);
+}
+function closeSearch(){ document.getElementById('searchSheet').classList.remove('open'); }
+function filterSearch(q){
+  var wrap = document.getElementById('searchResults');
+  if(!wrap) return;
+  q = (q || '').trim().toLowerCase();
+  if(!q){ wrap.innerHTML = '<div class="search-empty">输入关键词开始搜索</div>'; return; }
+  // 静态示例数据 (匹配 OKR / 任务 / KR)
+  var items = [
+    {color:'var(--accent)', title:'Q3 OKR 评审材料', meta:'产品增长  ·  紧急重要'},
+    {color:'var(--success)', title:'每周跑步 3 次', meta:'健康管理'},
+    {color:'var(--warning)', title:'学习 TypeScript 进阶', meta:'技能提升'},
+    {color:'var(--danger)',  title:'建立应急基金', meta:'财务健康'},
+    {color:'var(--accent)', title:'用户访谈 10 位', meta:'产品增长  ·  KR'},
+    {color:'var(--success)', title:'阅读《原子习惯》', meta:'个人成长'}
+  ];
+  var hits = items.filter(function(it){ return it.title.toLowerCase().indexOf(q) >= 0 || it.meta.toLowerCase().indexOf(q) >= 0; });
+  if(!hits.length){ wrap.innerHTML = '<div class="search-empty">没有匹配的任务</div>'; return; }
+  var html = '';
+  hits.forEach(function(it){
+    html += '<div class="search-row" onclick="closeSearch();openTaskDetail(this)">'
+         +  '<div class="search-row-mark" style="background:'+it.color+'"></div>'
+         +  '<div class="search-row-body"><div class="search-row-title">'+it.title+'</div><div class="search-row-meta">'+it.meta+'</div></div>'
+         +  '</div>';
+  });
+  wrap.innerHTML = html;
+}
+
+// ─── 通知 ───
+function openNotification(){
+  triggerHaptic();
+  document.getElementById('notifSheet').classList.add('open');
+}
+function closeNotification(){ document.getElementById('notifSheet').classList.remove('open'); }
+
+// ─── 列表搜索 ───
+function filterList(q){
+  q = (q || '').trim().toLowerCase();
+  document.querySelectorAll('.m-subview.active .okr-card').forEach(function(card){
+    var text = card.textContent.toLowerCase();
+    card.classList.toggle('hidden', q.length > 0 && text.indexOf(q) < 0);
+  });
+}
+
+// ─── KR 子任务展开 ───
+function iosKrSub(row){
+  if(event.target.closest('.kr-ck')) return; // 不要在勾选时展开
+  triggerHaptic();
+  row.classList.toggle('open');
+  var sub = row.nextElementSibling;
+  if(sub && sub.classList.contains('kr-sub-list')) sub.classList.toggle('open');
+}
+
+// ─── 日历导航 ───
+var _calMonth = 6; // 7 月 (0-based: 0=Jan)
+var _calYear = 2025;
+var _weekOffset = 0; // 距本周的周数 (0=本周, -1=上周, +1=下周)
+var _dayOffset = 0; // 距今天的日数 (0=今天, -1=昨天, +1=明天)
+var _monthNames = ['1 月','2 月','3 月','4 月','5 月','6 月','7 月','8 月','9 月','10 月','11 月','12 月'];
+var _dowNames = ['日','一','二','三','四','五','六'];
+
+function calNav(view, delta){
+  triggerHaptic();
+  if(view === 'month'){
+    _calMonth += delta;
+    if(_calMonth < 0){ _calMonth = 11; _calYear--; }
+    if(_calMonth > 11){ _calMonth = 0; _calYear++; }
+    var label = document.getElementById('calMonthLabel');
+    if(label) label.textContent = _calYear + ' 年 ' + _monthNames[_calMonth];
+    renderCalMonth();
+  } else if(view === 'week'){
+    _weekOffset += delta;
+    var startDate = new Date(2025, 6, 14); // 本周起点 7/14 (周一)
+    startDate.setDate(startDate.getDate() + _weekOffset * 7);
+    var endDate = new Date(startDate); endDate.setDate(endDate.getDate() + 6);
+    var lbl = document.getElementById('calWeekLabel');
+    var suffix = _weekOffset === 0 ? '  ·  本周' : (_weekOffset === 1 ? '  ·  下周' : (_weekOffset === -1 ? '  ·  上周' : ''));
+    if(lbl) lbl.textContent = (startDate.getMonth()+1) + '/' + startDate.getDate() + ' – ' + (endDate.getMonth()+1) + '/' + endDate.getDate() + suffix;
+    showToast(_weekOffset === 0 ? '本周' : (_weekOffset > 0 ? '下周' : '上周'), '已切换');
+  } else if(view === 'day'){
+    _dayOffset += delta;
+    var baseDate = new Date(2025, 6, 18); // 今天 7/18
+    baseDate.setDate(baseDate.getDate() + _dayOffset);
+    var lbl2 = document.getElementById('calDayLabel');
+    var prefix = _dayOffset === 0 ? '今日' : (_dayOffset === 1 ? '明天' : (_dayOffset === -1 ? '昨天' : (baseDate.getMonth()+1) + '月' + baseDate.getDate() + '日'));
+    if(lbl2) lbl2.textContent = prefix + '  ·  ' + (baseDate.getMonth()+1) + '/' + baseDate.getDate() + '  ' + _dowNames[baseDate.getDay()];
+    showToast(_dayOffset === 0 ? '今天' : (_dayOffset > 0 ? '明天' : '昨天'), '已切换');
+  }
+}
+
+function renderCalMonth(){
+  // 简化: 仅替换月份 label (网格保持静态 7 月)
+  // 真实场景下会重新生成 42 天
+}
+
+// ─── OKR Manager: 增/删/改 ───
+function editOkrName(el){
+  if(el.getAttribute('contenteditable') === 'true') return;
+  el.setAttribute('contenteditable','true');
+  el.focus();
+  var sel = window.getSelection(); var range = document.createRange();
+  range.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(range);
+  function commit(){
+    el.removeAttribute('contenteditable');
+    el.removeEventListener('blur', commit);
+    el.removeEventListener('keydown', onKey);
+    showToast('已更新','OKR 名称已保存');
+  }
+  function onKey(e){
+    if(e.key === 'Enter'){ e.preventDefault(); el.blur(); }
+    if(e.key === 'Escape'){ el.textContent = el.dataset.orig || el.textContent; el.blur(); }
+  }
+  el.dataset.orig = el.textContent;
+  el.addEventListener('blur', commit);
+  el.addEventListener('keydown', onKey);
+}
+
+function editKrName(el){
+  if(el.getAttribute('contenteditable') === 'true') return;
+  el.setAttribute('contenteditable','true');
+  el.focus();
+  var sel = window.getSelection(); var range = document.createRange();
+  range.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(range);
+  function commit(){
+    el.removeAttribute('contenteditable');
+    el.removeEventListener('blur', commit);
+    el.removeEventListener('keydown', onKey);
+  }
+  function onKey(e){
+    if(e.key === 'Enter'){ e.preventDefault(); el.blur(); }
+    if(e.key === 'Escape'){ el.textContent = el.dataset.orig || el.textContent; el.blur(); }
+  }
+  el.dataset.orig = el.textContent;
+  el.addEventListener('blur', commit);
+  el.addEventListener('keydown', onKey);
+}
+
+function editKrPct(el){
+  if(el.getAttribute('contenteditable') === 'true') return;
+  el.setAttribute('contenteditable','true');
+  el.focus();
+  var sel = window.getSelection(); var range = document.createRange();
+  range.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(range);
+  function commit(){
+    var v = parseInt(el.textContent.replace(/[^\d]/g,''), 10);
+    if(isNaN(v)) v = 0;
+    v = Math.max(0, Math.min(100, v));
+    el.textContent = v + '%';
+    el.removeAttribute('contenteditable');
+    el.removeEventListener('blur', commit);
+    el.removeEventListener('keydown', onKey);
+    var row = el.closest('.okr-list-row');
+    if(row) recalcOkr(row);
+    showToast('进度已更新', v + '%');
+  }
+  function onKey(e){
+    if(e.key === 'Enter'){ e.preventDefault(); el.blur(); }
+    if(e.key === 'Escape'){ el.textContent = el.dataset.orig || el.textContent; el.blur(); }
+  }
+  el.dataset.orig = el.textContent;
+  el.addEventListener('blur', commit);
+  el.addEventListener('keydown', onKey);
+}
+
+function toggleKrDone(ck){
+  ck.classList.toggle('done');
+  var name = ck.nextElementSibling;
+  if(name) name.classList.toggle('done');
+  var row = ck.closest('.okr-list-row');
+  if(row) recalcOkr(row);
+  triggerHaptic();
+}
+
+function recalcOkr(row){
+  var pcts = Array.from(row.querySelectorAll('.okr-kr-row')).map(function(r){
+    var pctEl = r.querySelector('.kr-pct');
+    var pct = parseInt((pctEl && pctEl.textContent || '0').replace(/[^\d]/g,''), 10);
+    var done = r.querySelector('.kr-check').classList.contains('done');
+    return done ? 100 : (isNaN(pct) ? 0 : pct);
+  });
+  if(!pcts.length) return;
+  var sum = pcts.reduce(function(a,b){return a+b;}, 0);
+  var avg = Math.round(sum / pcts.length);
+  var fill = row.querySelector('.okr-progress-fill');
+  var label = row.querySelector('.okr-progress-label');
+  if(fill) fill.style.width = avg + '%';
+  if(label) label.textContent = avg + '%';
+}
+
+function addKr(input){
+  var v = input.value.trim();
+  if(!v) return;
+  var row = document.createElement('div');
+  row.className = 'okr-kr-row';
+  row.innerHTML = '<div class="kr-check" onclick="toggleKrDone(this)"></div>'
+    + '<span class="kr-name" onclick="editKrName(this)">' + v.replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];}) + '</span>'
+    + '<span class="kr-pct" onclick="editKrPct(this)">0%</span>'
+    + '<button type="button" class="kr-row-del" onclick="deleteKr(this)" aria-label="删除 KR"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>';
+  var list = input.closest('.okr-kr-list');
+  list.insertBefore(row, input.parentElement);
+  input.value = '';
+  var okrRow = list.closest('.okr-list-row');
+  if(okrRow) recalcOkr(okrRow);
+  triggerHaptic();
+  showToast('KR 已添加', v);
+}
+
+function deleteKr(btn){
+  var row = btn.closest('.okr-kr-row');
+  var okrRow = row.closest('.okr-list-row');
+  row.remove();
+  if(okrRow) recalcOkr(okrRow);
+  triggerHaptic();
+}
+
+function confirmDeleteOkr(btn){
+  var row = btn.closest('.okr-list-row');
+  var name = row.querySelector('.okr-list-name').textContent;
+  openConfirm('删除 OKR？', '确定要删除「' + name + '」？所有 KR 进度也会一并移除。', function(){
+    row.style.transition = 'opacity .25s, transform .25s';
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(20px)';
+    setTimeout(function(){ row.remove(); showToast('已删除', name + ' 已移除'); }, 260);
+  });
+}
+
+function createOkr(){
+  var input = document.getElementById('okrAddName');
+  var name = input.value.trim();
+  if(!name){ showToast('请输入 OKR 名称', '先想清楚这个季度想达成什么'); return; }
+  var color = (document.querySelector('.okr-add-color-pick .okr-color-dot.sel') || {}).getAttribute('data-color') || 'accent';
+  var colorMap = {accent:'var(--accent)', purple:'#8B5CF6', warning:'var(--warning)', danger:'var(--danger)', muted:'var(--muted)'};
+  var bg = colorMap[color] || colorMap.accent;
+  var row = document.createElement('div');
+  row.className = 'okr-list-row';
+  row.innerHTML = '<div class="okr-list-head">'
+    + '<div class="okr-list-dot" style="background:'+bg+'"></div>'
+    + '<span class="okr-list-name" onclick="editOkrName(this)">' + name.replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];}) + '</span>'
+    + '<button type="button" class="okr-act-btn danger" title="删除" onclick="confirmDeleteOkr(this)"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h8M5 4V2h4v2M4 4l1 8h4l1-8"/></svg></button>'
+    + '</div>'
+    + '<div class="okr-progress-row"><div class="okr-progress-bar"><div class="okr-progress-fill" style="width:0%;background:'+bg+'"></div></div><span class="okr-progress-label">0%</span></div>'
+    + '<div class="okr-kr-list"><div class="okr-kr-add"><input class="okr-kr-input" placeholder="+ 添加关键结果…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addKr(this);}" /></div></div>';
+  var list = document.querySelector('.okr-list');
+  var addForm = list.querySelector('.okr-add-form');
+  list.insertBefore(row, addForm);
+  input.value = '';
+  triggerHaptic();
+  showToast('OKR 已创建', name);
+}
+
+// ─── 通用确认弹窗 ───
+var _confirmCallback = null;
+function openConfirm(title, msg, onOk){
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  _confirmCallback = onOk;
+  document.getElementById('confirmOverlay').classList.add('open');
+  triggerHaptic();
+}
+function closeConfirm(){
+  document.getElementById('confirmOverlay').classList.remove('open');
+  _confirmCallback = null;
+}
+document.getElementById('confirmOkBtn').addEventListener('click', function(){
+  var cb = _confirmCallback;
+  closeConfirm();
+  if(cb) cb();
+});
+
+// ─── Task Edit Mode ───
+function switchToEdit(){
+  triggerHaptic();
+  // 同步 view-mode → edit-mode
+  var title = document.getElementById('task-title').textContent;
+  var desc = document.getElementById('task-desc').textContent;
+  document.getElementById('editTitle').value = title;
+  document.getElementById('editDesc').value = desc;
+  // 切换显示
+  document.getElementById('taskViewMode').style.display = 'none';
+  document.getElementById('taskEditMode').style.display = 'block';
+  document.getElementById('taskFootLeft').style.display = 'none';
+  document.getElementById('taskFootRight').style.display = 'none';
+  document.getElementById('taskEditFoot').style.display = 'flex';
+  // focus 标题
+  setTimeout(function(){
+    var t = document.getElementById('editTitle');
+    if(t){ t.focus(); t.setSelectionRange(t.value.length, t.value.length); }
+  }, 50);
+}
+function switchToView(){
+  triggerHaptic();
+  document.getElementById('taskViewMode').style.display = 'block';
+  document.getElementById('taskEditMode').style.display = 'none';
+  document.getElementById('taskFootLeft').style.display = 'flex';
+  document.getElementById('taskFootRight').style.display = 'flex';
+  document.getElementById('taskEditFoot').style.display = 'none';
+}
+function saveTask(){
+  triggerHaptic();
+  var newTitle = document.getElementById('editTitle').value.trim() || '未命名任务';
+  var newDesc = document.getElementById('editDesc').value.trim();
+  var okr = document.getElementById('editOkr').value;
+  var due = document.getElementById('editDue').value;
+  var estimate = document.getElementById('editEstimate').value;
+  var qCell = document.querySelector('.task-form-quad-cell.sel');
+  var q = qCell ? qCell.getAttribute('data-q') : 'q1';
+  var qLabels = {q1:'紧急 × 重要', q2:'不紧急 × 重要', q3:'紧急 × 不重要', q4:'不紧急 × 不重要'};
+  // 写回 view-mode
+  document.getElementById('task-title').textContent = newTitle;
+  document.getElementById('task-desc').textContent = newDesc;
+  document.getElementById('task-pill').textContent = qLabels[q];
+  document.getElementById('task-pill').className = 'task-pill ' + q;
+  document.getElementById('task-okr').lastChild && (document.getElementById('task-okr').innerHTML = '<span class="okr-dot" style="background:var(--accent);color:#fff;width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700">P</span> ' + okr.split('  ·  ')[0]);
+  if(due) document.getElementById('task-due').textContent = due;
+  if(estimate) document.getElementById('task-estimate').textContent = estimate;
+  // 同步子任务数
+  var subs = document.querySelectorAll('#taskEditSubtasks .task-edit-sub').length;
+  document.getElementById('task-children-count').textContent = subs + ' 项';
+  switchToView();
+  showToast('已保存','任务信息已更新');
+}
+function deleteTask(){
+  triggerHaptic();
+  var title = document.getElementById('task-title').textContent;
+  openConfirm('删除任务？', '确定要删除「' + title + '」？此操作无法撤销。', function(){
+    closeTask();
+    showToast('已删除','任务已从 OKR 中移除');
+  });
+}
+function pickEditQ(cell){
+  cell.parentElement.querySelectorAll('.task-form-quad-cell').forEach(function(c){c.classList.remove('sel')});
+  cell.classList.add('sel');
+  triggerHaptic();
+}
+function addSubtaskFromEdit(){
+  var inp = document.getElementById('taskNewSubtask');
+  var v = inp.value.trim();
+  if(!v) return;
+  var row = document.createElement('div');
+  row.className = 'task-edit-sub';
+  row.innerHTML = '<div class="task-sub-check"></div>'
+    + '<span class="task-sub-text">' + v.replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];}) + '</span>'
+    + '<button type="button" class="task-edit-sub-del" onclick="this.parentElement.remove()" aria-label="删除"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>';
+  document.getElementById('taskEditSubtasks').appendChild(row);
+  inp.value = '';
+  triggerHaptic();
 }
 </script>
 </body>
