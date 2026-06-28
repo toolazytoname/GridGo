@@ -78,6 +78,22 @@ export function MatrixView() {
   const totalCount = filtered.length
   const doingCount = filtered.filter((t) => !t.done).length
 
+  // 空态：没有任何任务
+  if (tasks.length === 0) {
+    return (
+      <div className="gg-view">
+        <div className="gg-empty-state">
+          <div className="gg-empty-state-icon">📋</div>
+          <div className="gg-empty-state-title">还没有任务</div>
+          <div className="gg-empty-state-sub">添加你的第一个任务，按紧急和重要程度分到 4 个象限</div>
+          <button type="button" className="gg-btn gg-btn-primary" onClick={openTaskModal}>
+            + 添加第一个任务
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="gg-view">
       <div className="gg-subtabs" role="tablist" aria-label="四象限视图">

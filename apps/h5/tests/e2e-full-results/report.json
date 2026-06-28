@@ -1,0 +1,108 @@
+{
+  "steps": [
+    {
+      "name": "打开主页",
+      "pass": true
+    },
+    {
+      "name": "1. Matrix Tab 默认显示 + 4 子 Tab",
+      "pass": true
+    },
+    {
+      "name": "1a. Matrix 切换到 今日 子 Tab",
+      "pass": true
+    },
+    {
+      "name": "1b. Matrix 切回 全部",
+      "pass": true
+    },
+    {
+      "name": "1c. Matrix 切换 本周 子 Tab",
+      "pass": true
+    },
+    {
+      "name": "1d. Matrix 切回 全部",
+      "pass": true
+    },
+    {
+      "name": "2. 打开 OKR Manager (topbar 我的 OKR)",
+      "pass": true
+    },
+    {
+      "name": "3. 点 + 添加任务 → 提交 → 任务出现",
+      "pass": true
+    },
+    {
+      "name": "4. 点 task → 打开 view modal → 点 标记完成",
+      "pass": true
+    },
+    {
+      "name": "5. 切换到 列表 Tab",
+      "pass": true
+    },
+    {
+      "name": "5a. 列表 切换 进行中 子 Tab",
+      "pass": true
+    },
+    {
+      "name": "5b. 列表 切换 已完成 子 Tab",
+      "pass": true
+    },
+    {
+      "name": "5c. 列表 切回 全部",
+      "pass": true
+    },
+    {
+      "name": "6. 切换到 日历 Tab",
+      "pass": true
+    },
+    {
+      "name": "6a. 日历 切换 周 子 Tab",
+      "pass": true
+    },
+    {
+      "name": "6b. 日历 切换 日 子 Tab",
+      "pass": true
+    },
+    {
+      "name": "7. 切换到 甘特图 Tab",
+      "pass": true
+    },
+    {
+      "name": "7a. 甘特图 切换 本月 子 Tab",
+      "pass": true
+    },
+    {
+      "name": "7b. 甘特图 切换 全年 子 Tab",
+      "pass": true
+    },
+    {
+      "name": "8. 切换到 我的 Tab",
+      "pass": true
+    },
+    {
+      "name": "8a. 验证 profile 关键元素",
+      "pass": true
+    },
+    {
+      "name": "9. 打开 OKR Manager 弹窗",
+      "pass": true
+    },
+    {
+      "name": "10. 打开 Auth 弹窗 (avatar)",
+      "pass": true
+    },
+    {
+      "name": "11. 打开 Share 弹窗 (topbar share btn)",
+      "pass": true
+    },
+    {
+      "name": "12. 打开 Task view modal (点 task)",
+      "pass": true
+    }
+  ],
+  "pass": true,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (File not found)"
+  ]
+}

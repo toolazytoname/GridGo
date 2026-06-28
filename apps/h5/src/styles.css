@@ -1022,6 +1022,8 @@
   border: 1px solid var(--gg-border);
   border-radius: 12px;
   padding: 14px;
+  position: relative;
+  overflow: hidden;
 }
 .gg-gantt-header {
   display: grid;
@@ -1046,16 +1048,17 @@
 .gg-gantt-grid-line {
   position: absolute;
   top: 20px;
-  bottom: -1000px;
+  bottom: 0;
   width: 1px;
   background: var(--gg-border-soft);
 }
 .gg-gantt-today {
   position: absolute;
   top: 20px;
-  bottom: -1000px;
+  bottom: 0;
   width: 2px;
   background: var(--gg-accent);
+  z-index: 1;
 }
 
 .gg-gantt-okr { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
@@ -1431,6 +1434,36 @@
   color: var(--gg-success);
   font-variant-numeric: tabular-nums;
 }
+/* ── Empty state ────────────────────────────── */
+.gg-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  color: var(--gg-muted);
+  gap: 12px;
+  min-height: 400px;
+}
+.gg-empty-state-icon {
+  font-size: 48px;
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+.gg-empty-state-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gg-fg);
+}
+.gg-empty-state-sub {
+  font-size: 13px;
+  color: var(--gg-muted);
+  max-width: 320px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
 .gg-placeholder {
   background: var(--gg-surface);
   border: 1px dashed var(--gg-border);
