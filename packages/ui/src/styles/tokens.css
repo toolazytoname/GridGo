@@ -74,17 +74,3 @@
   --gg-topbar-h: 52px;
   --gg-tabbar-h: 64px;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --gg-bg: oklch(15% 0.01 250);
-    --gg-surface: oklch(19% 0.01 250);
-    --gg-surface-warm: oklch(17% 0.01 250);
-    --gg-fg: oklch(96% 0.005 240);
-    --gg-fg-2: oklch(82% 0.008 240);
-    --gg-muted: oklch(64% 0.012 250);
-    --gg-meta: oklch(50% 0.008 250);
-    --gg-border: oklch(28% 0.008 250);
-    --gg-border-soft: oklch(24% 0.008 250);
-  }
-}
