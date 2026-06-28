@@ -77,15 +77,30 @@ export function MatrixView() {
 
   const totalCount = filtered.length
   const doingCount = filtered.filter((t) => !t.done).length
+  const isDemo = useTasksStore((s) => s.isDemo)
+  const isAuthed = useTasksStore((s) => s.isAuthed)
+  const loadDemo = useTasksStore((s) => s.loadDemo)
 
   // 空态：没有任何任务
   if (tasks.length === 0) {
     return (
       <div className="gg-view">
+        {isAuthed && (
+          <div className="gg-demo-banner">
+            <div className="gg-demo-banner-icon">✨</div>
+            <div className="gg-demo-banner-text">
+              <div className="gg-demo-banner-title">欢迎！从模板开始</div>
+              <div className="gg-demo-banner-sub">点击下方"加载示例"快速体验，或直接添加你的第一个任务</div>
+            </div>
+            <button type="button" className="gg-btn gg-btn-primary" onClick={loadDemo}>
+              加载示例任务
+            </button>
+          </div>
+        )}
         <div className="gg-empty-state">
           <div className="gg-empty-state-icon">📋</div>
           <div className="gg-empty-state-title">还没有任务</div>
-          <div className="gg-empty-state-sub">添加你的第一个任务，按紧急和重要程度分到 4 个象限</div>
+          <div className="gg-empty-state-sub">{isAuthed ? '添加你的第一个任务开始' : '登录后开始你的真实数据'}</div>
           <button type="button" className="gg-btn gg-btn-primary" onClick={() => openTaskModal()}>
             + 添加第一个任务
           </button>

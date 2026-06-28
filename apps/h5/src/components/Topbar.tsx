@@ -65,7 +65,7 @@ export function Topbar() {
       </button>
 
       {isAuthed ? (
-        <div className="gg-topbar-avatar" title={user?.email ?? '账号'} onClick={openAuth} role="button" tabIndex={0}>
+        <div className="gg-topbar-avatar" title={user?.email ?? '账号'} onClick={() => useUIStore.getState().setActiveTab('profile')} role="button" tabIndex={0}>
           {avatarLetter}
         </div>
       ) : (

@@ -10,6 +10,9 @@ interface TasksState {
   okrs: { id: string; title: string; category: OkrCategory }[]
   loading: boolean
   isAuthed: boolean
+  isDemo: boolean
+  loadDemo: () => void
+  clearDemo: () => void
   toggle: (id: string) => Promise<void>
   add: (t: Omit<Task, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'sort_order' | 'done' | 'done_at' | 'parent_task_id' | 'key_result_id'>) => Promise<void>
   updateTask: (id: string, patch: Partial<Task>) => Promise<void>
@@ -26,10 +29,11 @@ const SEED_OKRS = [
 ]
 
 export const useTasksStore = create<TasksState>((set, get) => ({
-  tasks: SEED_TASKS,
-  okrs: SEED_OKRS,
+  tasks: [],
+  okrs: [],
   loading: false,
   isAuthed: false,
+  isDemo: false,
 
   init: () => {
     onAuthChange(async (user) => {
@@ -37,7 +41,8 @@ export const useTasksStore = create<TasksState>((set, get) => ({
         set({ isAuthed: true })
         await get().reload()
       } else {
-        set({ isAuthed: false, tasks: SEED_TASKS, okrs: SEED_OKRS })
+        // 未登录：清空 store（数据是 demo，不应该留在 store 里）
+        set({ isAuthed: false, tasks: [], okrs: [], isDemo: false })
       }
     })
     getCurrentUser().then(async (user) => {
@@ -48,19 +53,21 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     })
   },
 
+  loadDemo: () => {
+    // 显式 demo 模式：用户主动点击才加载样例
+    set({ isDemo: true, tasks: SEED_TASKS, okrs: SEED_OKRS })
+  },
+
+  clearDemo: () => {
+    set({ isDemo: false, tasks: [], okrs: [] })
+  },
+
   reload: async () => {
     set({ loading: true })
     try {
       const tasks = await api.listTasks()
       const okrs = await api.listOkrs()
-      // 新用户：登录了但 0 task → 自动 seed 让他不空
-      if (tasks.length === 0 && get().isAuthed) {
-        console.log('[tasks] new user detected, seeding demo data')
-        const seeded = await seedForNewUser()
-        set({ tasks: seeded, okrs: await api.listOkrs(), loading: false })
-      } else {
-        set({ tasks, okrs, loading: false })
-      }
+      set({ tasks, okrs, loading: false })
     } catch (e) {
       console.error('[tasks] reload failed:', e)
       set({ loading: false })

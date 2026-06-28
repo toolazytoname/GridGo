@@ -222,7 +222,7 @@
   white-space: nowrap;
 }
 .gg-subtab-active {
-  background: var(--gg-fg);
+  background: var(--gg-accent);
   color: #fff;
 }
 /* Underline variant (设计 line 1678 数据/勋章/复盘/分享) */
@@ -1558,6 +1558,36 @@
   color: var(--gg-muted);
   font-size: 11px;
 }
+
+.gg-pwd-row {
+  display: flex;
+  gap: 4px;
+}
+.gg-pwd-row .gg-input { flex: 1; }
+.gg-pwd-toggle {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--gg-border);
+  background: var(--gg-surface);
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.gg-demo-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, oklch(96% 0.03 255), oklch(96% 0.03 145));
+  border: 1px solid var(--gg-border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.gg-demo-banner-icon { font-size: 24px; }
+.gg-demo-banner-text { flex: 1; }
+.gg-demo-banner-title { font-size: 13px; font-weight: 600; color: var(--gg-fg); }
+.gg-demo-banner-sub { font-size: 11px; color: var(--gg-muted); margin-top: 2px; }
 .gg-auth-divider::before,
 .gg-auth-divider::after {
   content: '';
