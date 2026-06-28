@@ -1,0 +1,44 @@
+{
+  "steps": [
+    {
+      "name": "0. 打开主页",
+      "pass": true
+    },
+    {
+      "name": "1. 打开 auth 弹窗 (avatar)",
+      "pass": true
+    },
+    {
+      "name": "2. 切到 邮箱 tab",
+      "pass": true
+    },
+    {
+      "name": "3. 填邮箱 + (password 模式不可用时用 JS 注入 session)",
+      "pass": true
+    },
+    {
+      "name": "4. 登录后 avatar 显示",
+      "pass": true
+    },
+    {
+      "name": "5. 验证四象限有 8 个 task (e2e 用户数据)",
+      "pass": true
+    },
+    {
+      "name": "6. 添加新 task",
+      "pass": true
+    },
+    {
+      "name": "7. 编辑 task (view modal 改元数据)",
+      "pass": true
+    },
+    {
+      "name": "8. 切到 list 验证 CRUD task 在",
+      "pass": true
+    }
+  ],
+  "pass": true,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (File not found)"
+  ]
+}
