@@ -155,6 +155,92 @@ await step('8. 标记 PIPELINE 任务完成', async () => {
   console.log('  ✓ PIPELINE 任务标完成，已出现')
 })
 
+await step('8a. 改 PIPELINE 任务名 (edit)', async () => {
+  await page.evaluate(() => {
+    for (const t of document.querySelectorAll('.gg-subtab')) {
+      if (t.textContent?.trim() === '已完成') { t.click(); return }
+    }
+  })
+  await new Promise(r => setTimeout(r, 200))
+  await page.evaluate(() => {
+    for (const t of document.querySelectorAll('.gg-tab')) {
+      if (t.textContent?.trim() === '四象限') { t.click(); return }
+    }
+  })
+  await new Promise(r => setTimeout(r, 400))
+  // 改回 全部 tab 找未完成的同名 task
+  await page.evaluate(() => {
+    for (const t of document.querySelectorAll('.gg-subtab')) {
+      if (t.textContent?.trim() === '全部') { t.click(); return }
+    }
+  })
+  await new Promise(r => setTimeout(r, 200))
+  // 加一个新 task 来测试 edit
+  const addBtns = await page.$$('.gg-eq-add')
+  await addBtns[0].click()
+  await new Promise(r => setTimeout(r, 400))
+  await page.type('input[placeholder*="清晰的名字"]', 'EDIT 测试')
+  await page.evaluate(() => {
+    for (const b of document.querySelectorAll('button.gg-btn.gg-btn-primary')) {
+      if (b.textContent?.trim() === '添加') { b.click(); return }
+    }
+  })
+  await new Promise(r => setTimeout(r, 800))
+  // 找刚加的，点开 view → edit
+  await page.evaluate(() => {
+    const titles = [...document.querySelectorAll('.gg-eq-task-title')]
+    const t = titles.find(t => t.textContent === 'EDIT 测试')
+    if (t) t.closest('.gg-eq-task').click()
+  })
+  await new Promise(r => setTimeout(r, 500))
+  // 点 编辑
+  await page.evaluate(() => {
+    for (const b of document.querySelectorAll('.gg-modal-foot button.gg-btn.gg-btn-primary')) {
+      if (b.textContent?.trim() === '编辑') { b.click(); return }
+    }
+  })
+  await new Promise(r => setTimeout(r, 400))
+  // 改标题
+  await page.evaluate(() => {
+    const input = document.querySelector('.gg-modal-body input.gg-input')
+    if (input) {
+      input.value = ''
+    }
+  })
+  await page.focus('.gg-modal-body input.gg-input')
+  await page.keyboard.type('EDIT 测试 - 已修改')
+  // 点 保存
+  await page.evaluate(() => {
+    for (const b of document.querySelectorAll('.gg-modal-foot button.gg-btn.gg-btn-primary')) {
+      if (b.textContent?.trim() === '保存') { b.click(); return }
+    }
+  })
+  await new Promise(r => setTimeout(r, 1500))
+  const found = await page.evaluate(() => Array.from(document.querySelectorAll('.gg-eq-task-title')).some(e => e.textContent === 'EDIT 测试 - 已修改'))
+  if (!found) throw new Error('edit 后任务名没改')
+  console.log('  ✓ edit 成功，任务名已改')
+})
+
+await step('8b. 删 EDIT 测试任务', async () => {
+  await page.evaluate(() => {
+    const titles = [...document.querySelectorAll('.gg-eq-task-title')]
+    const t = titles.find(t => t.textContent === 'EDIT 测试 - 已修改')
+    if (t) t.closest('.gg-eq-task').click()
+  })
+  await new Promise(r => setTimeout(r, 500))
+  // 自动 accept confirm
+  page.on('dialog', async (d) => { await d.accept() })
+  await page.evaluate(() => {
+    for (const b of document.querySelectorAll('.gg-modal-foot button.gg-btn.gg-btn-danger')) {
+      if (b.textContent?.includes('删除')) { b.click(); return }
+    }
+  })
+  await new Promise(r => setTimeout(r, 1500))
+  const stillThere = await page.evaluate(() => Array.from(document.querySelectorAll('.gg-eq-task-title')).some(e => e.textContent === 'EDIT 测试 - 已修改'))
+  if (stillThere) throw new Error('删后任务还在')
+  console.log('  ✓ 任务已删')
+})
+
 await step('9. 注销登录', async () => {
   await page.evaluate(() => {
     for (const t of document.querySelectorAll('.gg-tab')) {

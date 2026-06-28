@@ -1,5 +1,5 @@
 {
-  "email": "e2e-pipeline-11924@gridgo.test",
+  "email": "e2e-pipeline-5038@gridgo.test",
   "steps": [
     {
       "name": "0. 打开主页",
@@ -35,6 +35,14 @@
     },
     {
       "name": "8. 标记 PIPELINE 任务完成",
+      "pass": true
+    },
+    {
+      "name": "8a. 改 PIPELINE 任务名 (edit)",
+      "pass": true
+    },
+    {
+      "name": "8b. 删 EDIT 测试任务",
       "pass": true
     },
     {
