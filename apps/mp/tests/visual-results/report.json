@@ -1,0 +1,30 @@
+{
+  "steps": [
+    {
+      "name": "matrix",
+      "pass": true,
+      "size": 11361
+    },
+    {
+      "name": "list",
+      "pass": true,
+      "size": 17056
+    },
+    {
+      "name": "calendar",
+      "pass": true,
+      "size": 5646
+    },
+    {
+      "name": "gantt",
+      "pass": true,
+      "size": 7321
+    },
+    {
+      "name": "profile",
+      "pass": true,
+      "size": 25151
+    }
+  ],
+  "pass": true
+}
