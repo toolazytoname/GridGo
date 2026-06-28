@@ -4,7 +4,9 @@
     "pages/list/list",
     "pages/calendar/calendar",
     "pages/gantt/gantt",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/auth/auth",
+    "pages/okr-mgr/okr-mgr"
   ],
   "window": {
     "backgroundTextStyle": "light",
