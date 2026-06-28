@@ -53,7 +53,6 @@ function ShareModalGate() {
 }
 
 function TaskModalGate() {
-  const open = useUIStore((s) => s.taskModalOpen)
   const mode = useUIStore((s) => s.taskModalMode)
   const id = useUIStore((s) => s.taskModalId)
   return <TaskModal mode={mode} taskId={id ?? undefined} />

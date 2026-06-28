@@ -1605,3 +1605,191 @@
 /* ── Auth ───────────────────────────────────── */
 .gg-auth-pane { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
 .gg-auth-hint { font-size: 12px; color: var(--gg-muted); line-height: 1.55; }
+
+/* ── Task detail / edit modal ─────────────── */
+.gg-task-pill-row { display: flex; align-items: center; gap: 8px; }
+.gg-task-pill {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: var(--gg-radius-pill);
+  background: oklch(96% 0.02 25);
+  color: oklch(45% 0.18 25);
+  font-size: 11px;
+  font-weight: 600;
+}
+.gg-task-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--gg-fg-2);
+}
+.gg-task-status-done { color: var(--gg-success); }
+.gg-task-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gg-accent);
+}
+.gg-task-status-done .gg-task-dot { background: var(--gg-success); }
+.gg-task-title-lg {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gg-fg);
+  line-height: 1.4;
+  margin: 12px 0 16px;
+}
+.gg-task-title-edit-placeholder {
+  font-size: 11px;
+  color: var(--gg-warning);
+  background: oklch(96% 0.04 45);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+.gg-task-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gg-task-meta-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+}
+.gg-task-meta-label { color: var(--gg-muted); }
+.gg-task-meta-val { color: var(--gg-fg); display: flex; align-items: center; gap: 6px; }
+.gg-task-desc {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: var(--gg-bg);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--gg-fg-2);
+  line-height: 1.6;
+}
+.gg-task-children { margin-top: 14px; }
+.gg-task-children-head {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gg-fg-2);
+  margin-bottom: 8px;
+}
+.gg-task-children-count { color: var(--gg-muted); font-weight: 400; }
+
+/* ── Share modal ─────────────────────────── */
+.gg-share-cover {
+  background: var(--gg-bg);
+  border: 1px solid var(--gg-border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.gg-share-cover-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gg-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.gg-share-cover-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gg-fg);
+  margin-bottom: 6px;
+}
+.gg-share-cover-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--gg-muted);
+}
+
+.gg-share-link-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.gg-share-link-input {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--gg-bg);
+  border: 1px solid var(--gg-border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--gg-fg-2);
+  font-family: var(--gg-font-mono);
+  outline: none;
+  min-width: 0;
+}
+.gg-share-link-copy {
+  padding: 6px 12px;
+  background: var(--gg-accent);
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gg-share-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gg-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 14px 0 8px;
+}
+.gg-share-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.gg-share-target {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.12s var(--gg-ease-standard);
+}
+.gg-share-target:hover { background: var(--gg-bg); }
+.gg-share-target-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--gg-surface);
+}
+.gg-share-target-label { font-size: 11px; color: var(--gg-fg-2); }
+
+.gg-share-visibility {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--gg-bg);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.gg-share-vis-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--gg-border-soft);
+}
+.gg-share-vis-row:last-child { border-bottom: 0; }
+.gg-share-vis-label { font-size: 13px; font-weight: 500; color: var(--gg-fg); }
+.gg-share-vis-sub { font-size: 11px; color: var(--gg-muted); margin-top: 2px; }

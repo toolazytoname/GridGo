@@ -212,7 +212,7 @@ export function ListView() {
         <div className="gg-placeholder">
           <div className="gg-placeholder-title">没有匹配的任务</div>
           {sub === 'doing' && (
-            <button type="button" className="gg-btn gg-btn-primary" onClick={openTaskModal}>
+            <button type="button" className="gg-btn gg-btn-primary" onClick={() => openTaskModal()}>
               + 添加一个任务
             </button>
           )}

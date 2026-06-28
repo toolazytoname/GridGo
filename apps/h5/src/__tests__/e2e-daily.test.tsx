@@ -6,7 +6,6 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { useEffect } from 'react'
 
 // Mock @gridgo/api：所有调用都直接落到本地 store，不打 Supabase
 vi.mock('@gridgo/api', () => {

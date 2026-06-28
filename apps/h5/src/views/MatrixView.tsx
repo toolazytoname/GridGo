@@ -63,7 +63,6 @@ export function MatrixView() {
   const openTaskModal = useUIStore((s) => s.openTaskModal)
   const tasks = useTasksStore((s) => s.tasks)
   const okrs = useTasksStore((s) => s.okrs)
-  const toggle = useTasksStore((s) => s.toggle)
 
   const filtered = useMemo(() => {
     if (sub === 'today') return tasks.filter((t) => isToday(t.due_date))

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Modal } from './Modal'
 import { useUIStore } from '../store/ui'
-import { useTasksStore, okrColorClass } from '../store/tasks'
+import { useTasksStore } from '../store/tasks'
 import { useOkrStore } from '../store/okrs'
 import type { Task, Quadrant, OkrCategory } from '@gridgo/types'
 
@@ -29,7 +29,6 @@ export function TaskModal({ mode, taskId }: TaskModalProps) {
   const addTask = useTasksStore((s) => s.add)
   const toggle = useTasksStore((s) => s.toggle)
   const subTasks = useOkrStore((s) => s.subTasks)
-  const toggleSub = useOkrStore((s) => s.toggleSub)
 
   const [viewMode, setViewMode] = useState<'view' | 'edit'>(mode === 'edit' ? 'edit' : 'view')
 
@@ -197,7 +196,7 @@ function ViewMode({ task, okr, subs, onClose, onEdit, onToggle }: { task: Task; 
           <div className="gg-task-children">
             <div className="gg-task-children-head">子任务 <span className="gg-task-children-count">{subs.length} 项</span></div>
             {subs.map((s) => (
-              <div key={s.id} className="gg-sub-row" onClick={() => toggleSub(s.id)}>
+              <div key={s.id} className="gg-sub-row" onClick={() => useOkrStore.getState().toggleSub(s.id)}>
                 <div className="gg-sub-dot" />
                 <div className={`gg-sub-check ${s.done ? 'done' : ''}`}>
                   {s.done && (

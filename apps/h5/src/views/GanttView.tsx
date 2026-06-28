@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useTasksStore, okrColorClass } from '../store/tasks'
+import { useTasksStore } from '../store/tasks'
 import { useOkrStore } from '../store/okrs'
 import type { OkrCategory, Task, Okr } from '@gridgo/types'
 
@@ -195,7 +195,6 @@ function GanttYear({ okrs }: { okrs: Okr[] }) {
 
 function GanttBarRow({ t, okr, rangeStart, totalDays, showDuration }: { t: Task; okr: Okr; rangeStart: Date; totalDays: number; showDuration?: boolean }) {
   if (!t.due_date) return null
-  const due = new Date(t.due_date)
   const start = new Date(t.due_date)
   start.setDate(start.getDate() - 3) // 任务前 3 天开始
   const offset = Math.max(0, (start.getTime() - rangeStart.getTime()) / 86400000)
