@@ -12,6 +12,8 @@ interface TasksState {
   isAuthed: boolean
   toggle: (id: string) => Promise<void>
   add: (t: Omit<Task, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'sort_order' | 'done' | 'done_at' | 'parent_task_id' | 'key_result_id'>) => Promise<void>
+  updateTask: (id: string, patch: Partial<Task>) => Promise<void>
+  deleteTask: (id: string) => Promise<void>
   reload: () => Promise<void>
   init: () => void
 }
@@ -113,6 +115,32 @@ export const useTasksStore = create<TasksState>((set, get) => ({
         ],
       }))
     }
+  },
+
+  updateTask: async (id, patch) => {
+    if (!get().isAuthed) {
+      set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...patch } : t)) }))
+      return
+    }
+    try {
+      const updated = await api.updateTask(id, patch)
+      set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? updated : t)) }))
+    } catch (e) {
+      console.error('[tasks] updateTask failed:', e)
+      throw e
+    }
+  },
+
+  deleteTask: async (id) => {
+    if (get().isAuthed) {
+      try {
+        await api.deleteTask(id)
+      } catch (e) {
+        console.error('[tasks] deleteTask failed:', e)
+        throw e
+      }
+    }
+    set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) }))
   },
 }))
 

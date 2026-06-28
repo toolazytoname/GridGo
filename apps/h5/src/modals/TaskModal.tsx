@@ -28,11 +28,13 @@ export function TaskModal({ mode, taskId }: TaskModalProps) {
   const allTasks = useTasksStore((s) => s.tasks)
   const addTask = useTasksStore((s) => s.add)
   const toggle = useTasksStore((s) => s.toggle)
+  const updateTask = useTasksStore((s) => s.updateTask)
+  const deleteTask = useTasksStore((s) => s.deleteTask)
   const subTasks = useOkrStore((s) => s.subTasks)
+  const toggleSub = useOkrStore((s) => s.toggleSub)
 
   const [viewMode, setViewMode] = useState<'view' | 'edit'>(mode === 'edit' ? 'edit' : 'view')
 
-  // add 模式 state
   const [title, setTitle] = useState('')
   const [quadrant, setQuadrant] = useState<Quadrant>('q2')
   const [priority, setPriority] = useState<'low' | 'med' | 'high' | null>('med')
@@ -40,7 +42,6 @@ export function TaskModal({ mode, taskId }: TaskModalProps) {
   const [due, setDue] = useState('')
   const [estimate, setEstimate] = useState<number | ''>('')
 
-  // 重置 add 模式
   useEffect(() => {
     if (open && mode === 'add') {
       setTitle(''); setQuadrant('q2'); setPriority('med'); setOkrId(null); setDue(''); setEstimate('')
@@ -50,7 +51,6 @@ export function TaskModal({ mode, taskId }: TaskModalProps) {
 
   if (!open) return null
 
-  // 找 task（view/edit 模式）
   const task = mode !== 'add' && taskId ? allTasks.find((t) => t.id === taskId) : null
   const okr = task?.okr_id ? okrs.find((o) => o.id === task.okr_id) : null
   const childSubs = task ? subTasks.filter((s) => s.task_id === task.id) : []
@@ -70,6 +70,16 @@ export function TaskModal({ mode, taskId }: TaskModalProps) {
     close()
   }
 
+  const handleEditSave = async (patch: Partial<Task>) => {
+    if (!task) return
+    try {
+      await updateTask(task.id, patch)
+      setViewMode('view')
+    } catch (e: any) {
+      alert('保存失败: ' + e.message)
+    }
+  }
+
   return (
     <Modal open={open} onClose={close} wide>
       {mode === 'add' ? (
@@ -86,9 +96,13 @@ export function TaskModal({ mode, taskId }: TaskModalProps) {
         />
       ) : task ? (
         viewMode === 'view' ? (
-          <ViewMode task={task} okr={okr} subs={childSubs} onClose={close} onEdit={() => setViewMode('edit')} onToggle={() => toggle(task.id)} />
+          <ViewMode task={task} okr={okr} subs={childSubs} onClose={close} onEdit={() => setViewMode('edit')} onToggle={() => toggle(task.id)} onDelete={async () => {
+            if (!confirm('确定删除？此操作不可撤销。')) return
+            try { await deleteTask(task.id); close() }
+            catch (e: any) { alert('删除失败: ' + e.message) }
+          }} />
         ) : (
-          <EditMode task={task} onClose={close} onCancel={() => setViewMode('view')} />
+          <EditMode task={task} okrs={okrs} onClose={close} onCancel={() => setViewMode('view')} onSave={handleEditSave} />
         )
       ) : null}
     </Modal>
@@ -150,7 +164,7 @@ function AddForm({ title, setTitle, quadrant, setQuadrant, priority, setPriority
   )
 }
 
-function ViewMode({ task, okr, subs, onClose, onEdit, onToggle }: { task: Task; okr: any; subs: any[]; onClose: () => void; onEdit: () => void; onToggle: () => void }) {
+function ViewMode({ task, okr, subs, onClose, onEdit, onToggle, onDelete }: { task: Task; okr: any; subs: any[]; onClose: () => void; onEdit: () => void; onToggle: () => void; onDelete: () => void | Promise<void> }) {
   return (
     <>
       <div className="gg-modal-head">
@@ -213,7 +227,7 @@ function ViewMode({ task, okr, subs, onClose, onEdit, onToggle }: { task: Task; 
         )}
       </div>
       <div className="gg-modal-foot">
-        <button type="button" className="gg-btn gg-btn-danger" onClick={() => { if (confirm('删除此任务？')) { /* TODO: deleteTask(task.id); */ onClose() } }}>删除</button>
+        <button type="button" className="gg-btn gg-btn-danger" onClick={() => onDelete()}>删除</button>
         <div style={{ flex: 1 }} />
         <button type="button" className="gg-btn" onClick={onToggle}>{task.done ? '标记未完成' : '标记完成'}</button>
         <button type="button" className="gg-btn gg-btn-primary" onClick={onEdit}>编辑</button>
@@ -222,7 +236,15 @@ function ViewMode({ task, okr, subs, onClose, onEdit, onToggle }: { task: Task; 
   )
 }
 
-function EditMode({ task, onClose, onCancel }: { task: Task; onClose: () => void; onCancel: () => void }) {
+function EditMode({ task, okrs, onClose, onCancel, onSave }: { task: Task; okrs: any[]; onClose: () => void; onCancel: () => void; onSave: (patch: Partial<Task>) => Promise<void> }) {
+  const [title, setTitle] = useState(task.title)
+  const [quadrant, setQuadrant] = useState<Quadrant>(task.quadrant ?? 'q2')
+  const [priority, setPriority] = useState<'low' | 'med' | 'high' | null>(task.priority)
+  const [okrId, setOkrId] = useState<string | null>(task.okr_id)
+  const [due, setDue] = useState(task.due_date ?? '')
+  const [estimate, setEstimate] = useState<number | ''>(task.estimate_min ?? '')
+  const [busy, setBusy] = useState(false)
+
   return (
     <>
       <div className="gg-modal-head">
@@ -230,33 +252,59 @@ function EditMode({ task, onClose, onCancel }: { task: Task; onClose: () => void
         <button type="button" className="gg-modal-close" onClick={onClose} aria-label="关闭">×</button>
       </div>
       <div className="gg-modal-body gg-form">
-        <div className="gg-task-title-edit-placeholder">编辑模式（保存到 Supabase 暂未接）</div>
-        <div className="gg-field">
+        <label className="gg-field">
           <span className="gg-field-label">任务名称</span>
-          <input type="text" className="gg-input" defaultValue={task.title} />
-        </div>
+          <input type="text" className="gg-input" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
+        </label>
+        <label className="gg-field">
+          <span className="gg-field-label">所属 OKR</span>
+          <select className="gg-input" value={okrId ?? ''} onChange={(e) => setOkrId(e.target.value || null)}>
+            <option value="">未指定</option>
+            {okrs.map((o) => <option key={o.id} value={o.id}>{o.title}</option>)}
+          </select>
+        </label>
         <div className="gg-field">
           <span className="gg-field-label">象限</span>
           <div className="gg-chip-row">
             {QUADRANTS.map((q) => (
-              <button key={q.key} type="button" className={`gg-chip gg-chip-${q.key} ${task.quadrant === q.key ? 'gg-chip-active' : ''}`}>{q.label}</button>
+              <button key={q.key} type="button" className={`gg-chip gg-chip-${q.key} ${quadrant === q.key ? 'gg-chip-active' : ''}`} onClick={() => setQuadrant(q.key)}>{q.label}</button>
             ))}
           </div>
         </div>
+        <div className="gg-field">
+          <span className="gg-field-label">优先级</span>
+          <div className="gg-chip-row">
+            <button type="button" className={`gg-chip ${priority === 'low' ? 'gg-chip-active' : ''}`} onClick={() => setPriority('low')}>低</button>
+            <button type="button" className={`gg-chip ${priority === 'med' ? 'gg-chip-active' : ''}`} onClick={() => setPriority('med')}>中</button>
+            <button type="button" className={`gg-chip ${priority === 'high' ? 'gg-chip-active' : ''}`} onClick={() => setPriority('high')}>高</button>
+            <button type="button" className={`gg-chip ${priority === null ? 'gg-chip-active' : ''}`} onClick={() => setPriority(null)}>无</button>
+          </div>
+        </div>
         <div className="gg-field-row">
-          <div className="gg-field">
+          <label className="gg-field">
             <span className="gg-field-label">截止日期</span>
-            <input type="date" className="gg-input" defaultValue={task.due_date ?? ''} />
-          </div>
-          <div className="gg-field">
-            <span className="gg-field-label">预计耗时 (分钟)</span>
-            <input type="number" className="gg-input" defaultValue={task.estimate_min ?? ''} />
-          </div>
+            <input type="date" className="gg-input" value={due} onChange={(e) => setDue(e.target.value)} />
+          </label>
+          <label className="gg-field">
+            <span className="gg-field-label">预计时长 (分钟)</span>
+            <input type="number" className="gg-input" min="5" step="5" value={estimate} onChange={(e) => setEstimate(e.target.value === '' ? '' : Number(e.target.value))} />
+          </label>
         </div>
       </div>
       <div className="gg-modal-foot">
         <button type="button" className="gg-btn" onClick={onCancel}>取消</button>
-        <button type="button" className="gg-btn gg-btn-primary" onClick={onClose}>保存</button>
+        <button type="button" className="gg-btn gg-btn-primary" disabled={busy} onClick={async () => {
+          if (!title.trim()) { alert('标题不能为空'); return }
+          setBusy(true)
+          await onSave({
+            title: title.trim(),
+            quadrant, priority, okr_id: okrId,
+            due_date: due || null,
+            estimate_min: estimate === '' ? null : Number(estimate),
+          })
+          setBusy(false)
+          onClose()
+        }}>保存</button>
       </div>
     </>
   )

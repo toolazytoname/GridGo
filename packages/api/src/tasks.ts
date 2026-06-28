@@ -35,3 +35,14 @@ export async function deleteTask(id: string): Promise<void> {
   const { error } = await getSupabase().from('tasks').delete().eq('id', id)
   if (error) throw new Error(error.message)
 }
+
+export async function updateTask(id: string, patch: Partial<Task>): Promise<Task> {
+  const { data, error } = await getSupabase()
+    .from('tasks')
+    .update(patch)
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw new Error(error.message)
+  return data as Task
+}
