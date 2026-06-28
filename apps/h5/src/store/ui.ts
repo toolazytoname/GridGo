@@ -8,6 +8,8 @@ interface UIState {
   matrixSub: MatrixSubTab
   okrMgrOpen: boolean
   taskModalOpen: boolean
+  taskModalMode: 'add' | 'view' | 'edit'
+  taskModalId: string | null
   authOpen: boolean
   shareOpen: boolean
   shareKind: 'calendar' | 'gantt' | 'profile'
@@ -15,7 +17,7 @@ interface UIState {
   setMatrixSub: (m: MatrixSubTab) => void
   openOkrMgr: () => void
   closeOkrMgr: () => void
-  openTaskModal: () => void
+  openTaskModal: (mode?: 'add' | 'view' | 'edit', taskId?: string) => void
   closeTaskModal: () => void
   openAuth: () => void
   closeAuth: () => void
@@ -28,6 +30,8 @@ export const useUIStore = create<UIState>((set) => ({
   matrixSub: 'all',
   okrMgrOpen: false,
   taskModalOpen: false,
+  taskModalMode: 'add',
+  taskModalId: null,
   authOpen: false,
   shareOpen: false,
   shareKind: 'calendar',
@@ -35,7 +39,7 @@ export const useUIStore = create<UIState>((set) => ({
   setMatrixSub: (m) => set({ matrixSub: m }),
   openOkrMgr: () => set({ okrMgrOpen: true }),
   closeOkrMgr: () => set({ okrMgrOpen: false }),
-  openTaskModal: () => set({ taskModalOpen: true }),
+  openTaskModal: (mode, taskId) => set({ taskModalOpen: true, taskModalMode: mode ?? 'add', taskModalId: taskId ?? null }),
   closeTaskModal: () => set({ taskModalOpen: false }),
   openAuth: () => set({ authOpen: true }),
   closeAuth: () => set({ authOpen: false }),

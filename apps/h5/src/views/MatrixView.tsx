@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useUIStore, type MatrixSubTab } from '../store/ui'
 import { useTasksStore } from '../store/tasks'
-import type { Quadrant, Task, OkrCategory } from '@gridgo/types'
+import type { Quadrant, Task } from '@gridgo/types'
 
 const QUADRANTS: { key: Quadrant; label: string }[] = [
   { key: 'q1', label: '紧急 × 重要' },
@@ -161,7 +161,7 @@ export function MatrixView() {
                     </div>
                   )
                 })}
-                <button type="button" className="gg-eq-add" onClick={openTaskModal}>
+                <button type="button" className="gg-eq-add" onClick={() => openTaskModal()}>
                   + 添加任务
                 </button>
               </div>

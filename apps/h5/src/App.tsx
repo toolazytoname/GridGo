@@ -38,7 +38,7 @@ export function App() {
       </main>
       <TabBar />
       <OkrManager />
-      <TaskModal />
+      <TaskModalGate />
       <AuthModal />
       <ShareModalGate />
     </div>
@@ -50,4 +50,11 @@ function ShareModalGate() {
   const kind = useUIStore((s) => s.shareKind)
   const close = useUIStore((s) => s.closeShare)
   return <ShareModal open={open} onClose={close} kind={kind} />
+}
+
+function TaskModalGate() {
+  const open = useUIStore((s) => s.taskModalOpen)
+  const mode = useUIStore((s) => s.taskModalMode)
+  const id = useUIStore((s) => s.taskModalId)
+  return <TaskModal mode={mode} taskId={id ?? undefined} />
 }
