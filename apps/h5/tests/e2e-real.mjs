@@ -153,24 +153,28 @@ await step('切到 Gantt Tab', async () => {
   if (subs.length < 3) throw new Error(`期望 ≥3 子 Tab，实际 ${subs.length}`)
 })
 
-// 7. 切到我的 (成就)
-await step('切到 成就 Tab', async () => {
+// 7. 切到我的 (profile)
+await step('切到 我的 Tab', async () => {
   await page.evaluate(() => {
     const tabs = document.querySelectorAll('.gg-tab')
     for (const t of tabs) {
-      if (t.textContent?.trim() === '成就') { t.click(); return }
+      if (t.textContent?.trim() === '我的') { t.click(); return }
     }
   })
   await new Promise((r) => setTimeout(r, 500))
-  await shot('08-ach-tab')
+  await shot('08-profile-tab')
 
-  const num = await page.$eval('.gg-ach-big-num', (e) => e.textContent)
-  if (num !== '12') throw new Error(`连胜数字应=12，实际 ${num}`)
-  const boxes = await page.$$eval('.gg-ach-streak-box', (els) => els.length)
-  if (boxes !== 14) throw new Error(`streak boxes 应=14，实际 ${boxes}`)
-  const cards = await page.$$eval('.gg-ach-card', (els) => els.length)
-  if (cards !== 4) throw new Error(`cards 应=4，实际 ${cards}`)
-  console.log(`  ✓ 大数字 ${num} + ${boxes} 格子 + ${cards} 卡片`)
+  // 验证 profile 关键元素
+  const avatar = await page.$('.gg-me-avatar')
+  if (!avatar) throw new Error('profile avatar 缺失')
+  const stats = await page.$$eval('.gg-me-stat-num', (els) => els.length)
+  if (stats !== 3) throw new Error(`stats 应=3，实际 ${stats}`)
+  const quickCards = await page.$$eval('.gg-me-quick-card', (els) => els.length)
+  if (quickCards !== 2) throw new Error(`quick cards 应=2，实际 ${quickCards}`)
+  const sectionTitles = await page.$$eval('.gg-me-section-title', (els) => els.map((e) => e.textContent))
+  if (!sectionTitles.includes('偏好')) throw new Error('偏好 section 缺失')
+  if (!sectionTitles.includes('账号')) throw new Error('账号 section 缺失')
+  console.log(`  ✓ avatar + ${stats} stats + ${quickCards} 快捷 + 2 sections`)
 })
 
 // 8. 切回 Matrix 验证任务还在

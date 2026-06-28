@@ -134,7 +134,7 @@ export function MatrixView() {
                   const okr = okrs.find((o) => o.id === t.okr_id)
                   const meta = formatMeta(t)
                   return (
-                    <div key={t.id} className="gg-eq-task" onClick={() => toggle(t.id)}>
+                    <div key={t.id} className="gg-eq-task" onClick={() => useUIStore.getState().openTaskModal('view', t.id)}>
                       <div className={`gg-eq-check ${t.done ? 'gg-eq-check-on' : ''}`}>
                         {t.done && (
                           <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2">

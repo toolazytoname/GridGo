@@ -157,7 +157,7 @@ export function ListView() {
                     )
                   })}
                   {okrTasks.filter((t) => !t.key_result_id).map((t) => (
-                    <div key={t.id} className="gg-tree-row" onClick={() => toggleTask(t.id)}>
+                    <div key={t.id} className="gg-tree-row" onClick={() => useUIStore.getState().openTaskModal('view', t.id)}>
                       <div className="gg-tree-expand" style={{ visibility: 'hidden' }} />
                       <div className={`gg-tree-check ${t.done ? 'gg-tree-check-on' : ''}`}>
                         {t.done && (
