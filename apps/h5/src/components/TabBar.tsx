@@ -43,7 +43,7 @@ const TABS: { key: TabKey; label: string; icon: JSX.Element }[] = [
   },
   {
     key: 'profile',
-    label: '成就',
+    label: '我的',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <circle cx="12" cy="8" r="4" />
