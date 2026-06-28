@@ -840,7 +840,7 @@
   padding: 0 4px;
   margin-bottom: 12px;
 }
-.gg-cal-month { font-family: var(--gg-font-display); font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+.gg-cal-month { font-family: var(--gg-font-display); font-size: 18px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
 .gg-cal-nav {
   width: 32px; height: 32px;
   border-radius: var(--gg-radius-sm);
@@ -850,6 +850,7 @@
   background: transparent;
   border: 0;
   cursor: pointer;
+  flex-shrink: 0;
 }
 .gg-cal-nav:hover { background: var(--gg-surface); color: var(--gg-fg); }
 

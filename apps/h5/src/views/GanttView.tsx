@@ -5,11 +5,8 @@ import type { OkrCategory, Task, Okr } from '@gridgo/types'
 
 type GanttSub = 'month' | 'quarter' | 'year'
 
-const CAT_LABELS: Record<OkrCategory, string> = {
-  product: 'P',
-  health: 'H',
-  skill: 'S',
-  finance: '$',
+const CAT_LETTER: Record<OkrCategory, string> = {
+  product: 'P', health: 'H', skill: 'S', finance: '$',
 }
 
 export function GanttView() {
@@ -46,8 +43,8 @@ function GanttMonth({ tasks, okrs }: { tasks: Task[]; okrs: Okr[] }) {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1)
   const totalDays = Math.round((monthEnd.getTime() - monthStart.getTime()) / 86400000)
-  const weeks = Math.ceil(totalDays / 7)
-  const weekMarkers = Array.from({ length: weeks }, (_, i) => {
+  const weekCount = Math.ceil(totalDays / 7)
+  const weekMarkers = Array.from({ length: weekCount }, (_, i) => {
     const d = new Date(monthStart)
     d.setDate(monthStart.getDate() + i * 7)
     return { label: `${d.getMonth() + 1}/${d.getDate()}`, pct: ((i * 7) / totalDays) * 100 }
@@ -61,9 +58,6 @@ function GanttMonth({ tasks, okrs }: { tasks: Task[]; okrs: Okr[] }) {
           {weekMarkers.map((m, i) => (
             <div key={i} className="gg-gantt-month" style={{ left: `${m.pct}%` }}>{m.label}</div>
           ))}
-          {weekMarkers.map((_, i) => (
-            <div key={`g-${i}`} className="gg-gantt-grid-line" style={{ left: `${((i * 7) / totalDays) * 100}%` }} />
-          ))}
         </div>
       </div>
       {okrs.map((o) => {
@@ -72,7 +66,7 @@ function GanttMonth({ tasks, okrs }: { tasks: Task[]; okrs: Okr[] }) {
         return (
           <div key={o.id} className="gg-gantt-okr">
             <div className="gg-gantt-okr-head">
-              <span className={`gg-okr-dot gg-okr-dot-lg ${okrColorClass[o.category as OkrCategory]}`}>{CAT_LABELS[o.category as OkrCategory]}</span>
+              <span className={`gg-okr-dot-lg gg-okr-dot-${o.category}`}>{CAT_LETTER[o.category]}</span>
               {o.title}
             </div>
             {items.map((t) => <GanttBarRow key={t.id} t={t} okr={o} rangeStart={monthStart} totalDays={totalDays} />)}
@@ -85,11 +79,16 @@ function GanttMonth({ tasks, okrs }: { tasks: Task[]; okrs: Okr[] }) {
 
 function GanttQuarter({ tasks, okrs }: { tasks: Task[]; okrs: Okr[] }) {
   const now = new Date()
-  const qStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1)
+  // 用"今天往后 3 个月"作为本季度范围
+  const qStart = new Date(now.getFullYear(), now.getMonth(), 1)
   const qEnd = new Date(qStart)
   qEnd.setMonth(qStart.getMonth() + 3)
   const totalDays = Math.round((qEnd.getTime() - qStart.getTime()) / 86400000)
-  const months = ['7月', '8月', '9月']
+  const monthLabels = [
+    `${qStart.getMonth() + 1}月`,
+    `${(qStart.getMonth() + 1) % 12 + 1}月`,
+    `${(qStart.getMonth() + 2) % 12 + 1}月`,
+  ]
   const monthPcts = [0, 33.33, 66.66]
   const doing = tasks.filter((t) => !t.done && t.due_date).length
   const urgent = tasks.filter((t) => t.due_date && new Date(t.due_date).getTime() < Date.now() + 7 * 86400000).length
@@ -99,8 +98,8 @@ function GanttQuarter({ tasks, okrs }: { tasks: Task[]; okrs: Okr[] }) {
       <div className="gg-gantt-header">
         <div className="gg-gantt-task-label">任务</div>
         <div className="gg-gantt-bars">
-          {months.map((m, i) => (
-            <div key={i} className="gg-gantt-month" style={{ left: `${monthPcts[i]}%` }}>{m}</div>
+          {monthLabels.map((m, i) => (
+            <div key={i} className="gg-gantt-month" style={{ left: `${monthPcts[i] + 16.66}%` }}>{m}</div>
           ))}
           <div className="gg-gantt-grid-line" style={{ left: 0 }} />
           <div className="gg-gantt-grid-line" style={{ left: '50%' }} />
@@ -128,7 +127,7 @@ function GanttQuarter({ tasks, okrs }: { tasks: Task[]; okrs: Okr[] }) {
         return (
           <div key={o.id} className="gg-gantt-okr">
             <div className="gg-gantt-okr-head">
-              <span className={`gg-okr-dot gg-okr-dot-lg ${okrColorClass[o.category as OkrCategory]}`}>{CAT_LABELS[o.category as OkrCategory]}</span>
+              <span className={`gg-okr-dot-lg gg-okr-dot-${o.category}`}>{CAT_LETTER[o.category]}</span>
               {o.title}
             </div>
             {items.map((t) => <GanttBarRow key={t.id} t={t} okr={o} rangeStart={qStart} totalDays={totalDays} showDuration />)}
@@ -142,9 +141,8 @@ function GanttQuarter({ tasks, okrs }: { tasks: Task[]; okrs: Okr[] }) {
 function GanttYear({ okrs }: { okrs: Okr[] }) {
   const now = new Date()
   const quarterLabels = ['Q1', 'Q2', 'Q3', 'Q4']
-  const quarterPcts = [0, 25, 50, 75]
-  const completedQ = Math.floor(now.getMonth() / 3)
-  const currentQ = completedQ
+  const quarterPcts = [12.5, 37.5, 62.5, 87.5]
+  const currentQ = Math.floor(now.getMonth() / 3)
 
   return (
     <div className="gg-gantt">
@@ -152,16 +150,16 @@ function GanttYear({ okrs }: { okrs: Okr[] }) {
         <div className="gg-gantt-task-label">OKR</div>
         <div className="gg-gantt-bars">
           {quarterLabels.map((q, i) => (
-            <div key={i} className="gg-gantt-month" style={{ left: `${quarterPcts[i] + 12.5}%` }}>{q}</div>
+            <div key={i} className="gg-gantt-month" style={{ left: `${quarterPcts[i]}%` }}>{q}</div>
           ))}
           {quarterPcts.map((p, i) => (
-            <div key={`g-${i}`} className="gg-gantt-grid-line" style={{ left: `${p}%` }} />
+            <div key={`g-${i}`} className="gg-gantt-grid-line" style={{ left: `${p - 12.5}%` }} />
           ))}
         </div>
       </div>
       <div className="gg-gantt-summary-cards">
         <div className="gg-gantt-summary">
-          <div className="gg-gantt-summary-num good">{completedQ}</div>
+          <div className="gg-gantt-summary-num good">{currentQ}</div>
           <div className="gg-gantt-summary-label">已完成季度</div>
         </div>
         <div className="gg-gantt-summary">
@@ -176,15 +174,15 @@ function GanttYear({ okrs }: { okrs: Okr[] }) {
       {okrs.map((o) => {
         const start = o.category === 'finance' ? 50 : 0
         const width = o.category === 'finance' ? 50 : 100
-        const cat = o.category as OkrCategory
+        const cat = o.category
         return (
           <div key={o.id} className="gg-gantt-row">
             <div className="gg-gantt-task-label">
-              <span className={`gg-okr-dot gg-okr-dot-lg ${okrColorClass[cat]}`} style={{ marginRight: 4, verticalAlign: 'middle' }}>{CAT_LABELS[cat]}</span>
+              <span className={`gg-okr-dot-lg gg-okr-dot-${cat}`} style={{ marginRight: 4, verticalAlign: 'middle' }}>{CAT_LETTER[cat]}</span>
               {o.title.split('·')[0]?.trim() || o.title}
             </div>
             <div className="gg-gantt-bar-container">
-              <div className={`gg-gantt-bar ${okrColorClass[cat]}`} style={{ left: `${start}%`, width: `${width}%` }}>
+              <div className={`gg-gantt-bar gg-okr-dot-${cat}`} style={{ left: `${start}%`, width: `${width}%` }}>
                 {width === 100 ? '全年' : 'H2 启动'}
               </div>
             </div>
@@ -198,14 +196,17 @@ function GanttYear({ okrs }: { okrs: Okr[] }) {
 function GanttBarRow({ t, okr, rangeStart, totalDays, showDuration }: { t: Task; okr: Okr; rangeStart: Date; totalDays: number; showDuration?: boolean }) {
   if (!t.due_date) return null
   const due = new Date(t.due_date)
-  const offset = Math.max(0, (due.getTime() - rangeStart.getTime()) / 86400000)
-  const left = Math.min(100, (offset / totalDays) * 100)
+  const start = new Date(t.due_date)
+  start.setDate(start.getDate() - 3) // 任务前 3 天开始
+  const offset = Math.max(0, (start.getTime() - rangeStart.getTime()) / 86400000)
+  const left = Math.min(95, (offset / totalDays) * 100)
   const width = showDuration ? Math.max(8, 12) : Math.max(2, 4)
+  const cat = okr.category
   return (
     <div className="gg-gantt-row">
       <div className="gg-gantt-task-label">{t.title}</div>
       <div className="gg-gantt-bar-container">
-        <div className={`gg-gantt-bar ${okrColorClass[okr.category as OkrCategory]}`} style={{ left: `${left}%`, width: `${width}%` }}>
+        <div className={`gg-gantt-bar gg-okr-dot-${cat}`} style={{ left: `${left}%`, width: `${width}%` }}>
           <span>{t.due_date.slice(5)}</span>
         </div>
       </div>
