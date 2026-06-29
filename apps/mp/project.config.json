@@ -6,9 +6,13 @@
     "es6": true,
     "postcss": false,
     "minified": false,
-    "newFeature": true
+    "newFeature": true,
+    "miniprogramNpm": "miniprogram-ci"
   },
   "compileType": "miniprogram",
   "libVersion": "3.0.0",
-  "appid": "touristappid"
+  "appid": "wx7e05af3fba31d828",
+  "setting2": {
+    "ignoreDevUnusedFiles": true
+  }
 }

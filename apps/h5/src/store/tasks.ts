@@ -29,26 +29,28 @@ const SEED_OKRS = [
 ]
 
 export const useTasksStore = create<TasksState>((set, get) => ({
-  tasks: [],
-  okrs: [],
+  tasks: SEED_TASKS,
+  okrs: SEED_OKRS,
   loading: false,
   isAuthed: false,
-  isDemo: false,
+  isDemo: true,
 
   init: () => {
     onAuthChange(async (user) => {
       if (user) {
-        set({ isAuthed: true })
+        set({ isAuthed: true, isDemo: false })
         await get().reload()
       } else {
-        // 未登录：清空 store（数据是 demo，不应该留在 store 里）
-        set({ isAuthed: false, tasks: [], okrs: [], isDemo: false })
+        // 未登录：保留 demo 数据，只标 isAuthed = false
+        set({ isAuthed: false, isDemo: true })
       }
     })
     getCurrentUser().then(async (user) => {
       if (user) {
-        set({ isAuthed: true })
+        set({ isAuthed: true, isDemo: false })
         await get().reload()
+      } else {
+        set({ isDemo: true })
       }
     })
   },

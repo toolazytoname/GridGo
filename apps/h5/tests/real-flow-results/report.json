@@ -1,0 +1,49 @@
+{
+  "steps": [
+    {
+      "name": "0. 打开主页 (空 demo 数据)",
+      "pass": true
+    },
+    {
+      "name": "1. 未登录 → 显示 demo 数据 + 8 个 task",
+      "pass": true
+    },
+    {
+      "name": "2. 打开 auth 弹窗 + 注册",
+      "pass": true
+    },
+    {
+      "name": "3. 注册成功 → 提示\"去邮箱验证\"",
+      "pass": false,
+      "error": "Error: 注册后应显示\"去邮箱\"提示"
+    },
+    {
+      "name": "4. 邮箱密码直接登录 (autoconfirm 应该开)",
+      "pass": false,
+      "error": "Error: 登录后没显示 avatar"
+    },
+    {
+      "name": "5. 登录后 → 真账户空 (不自动 seed)",
+      "pass": false,
+      "error": "Error: 真新账户应 0 task，实际 11"
+    },
+    {
+      "name": "6. 点 + 添加第一个任务 → 写真入库",
+      "pass": true
+    },
+    {
+      "name": "7. 跨 tab 验证 task 存在",
+      "pass": false,
+      "error": "Error: list 找不到 E2E REAL FLOW"
+    },
+    {
+      "name": "8. 注销 → 回到 demo 模式",
+      "pass": true
+    }
+  ],
+  "pass": false,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (File not found)"
+  ],
+  "testEmail": "e2e-real-1782702318841@gridgo.test"
+}

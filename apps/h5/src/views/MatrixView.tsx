@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useUIStore, type MatrixSubTab } from '../store/ui'
 import { useTasksStore } from '../store/tasks'
 import type { Quadrant, Task } from '@gridgo/types'
@@ -80,6 +80,13 @@ export function MatrixView() {
   const isDemo = useTasksStore((s) => s.isDemo)
   const isAuthed = useTasksStore((s) => s.isAuthed)
   const loadDemo = useTasksStore((s) => s.loadDemo)
+
+  // 未登录 + 没有 demo → useEffect 自动加载 demo
+  useEffect(() => {
+    if (!isAuthed && !isDemo && tasks.length === 0) {
+      loadDemo()
+    }
+  }, [isAuthed, isDemo, tasks.length, loadDemo])
 
   // 空态：没有任何任务
   if (tasks.length === 0) {

@@ -1,0 +1,83 @@
+# MP CI: push → build → miniprogram-ci upload → 设开发版
+# 不需要服务器公网 IP — miniprogram-ci 走 WeChat 平台 API
+# IP 白名单默认关（不开启）
+
+name: MP CI
+
+on:
+  push:
+    branches: [develop, main]
+    paths:
+      - 'apps/mp/**'
+      - '.github/workflows/mp-ci.yml'
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build mini-program
+        run: |
+          cd apps/mp
+          pnpm add -D miniprogram-ci
+          npx miniprogram-ci \
+            --appid "${{ secrets.WX_APPID }}" \
+            --private-key "${{ secrets.WX_PRIVATE_KEY }}" \
+            --project ./ \
+            --uv 1 \
+            --rv 1 \
+            --enable-es6 true \
+            --enable-es7 true \
+            --enable-minifyWXSS true \
+            --enable-minifyWXML true \
+            --enable-minifyJS true \
+            --miniprogram-npm 1
+
+      - name: Upload to WeChat
+        run: |
+          cd apps/mp
+          npx miniprogram-ci upload \
+            --appid "${{ secrets.WX_APPID }}" \
+            --private-key "${{ secrets.WX_PRIVATE_KEY }}" \
+            --project ./ \
+            --uv 1 \
+            --rv 1 \
+            --desc "CI auto-upload from $(git rev-parse --short HEAD)"
+
+      - name: Set as dev version
+        run: |
+          cd apps/mp
+          # 通过 HTTP API 设开发版（不需要公网 IP — 走 WeChat 平台）
+          curl -X POST "https://api.weixin.qq.com/wxa/setversion" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"access_token\": \"$(curl -s 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${{ secrets.WX_APPID }}&secret=${{ secrets.WX_PRIVATE_KEY }}' | python3 -c 'import json,sys; print(json.load(sys.stdin)[\"access_token\"])')\",
+              \"version_id\": \"$(npx miniprogram-ci preview --appid ${{ secrets.WX_APPID }} --private-key ${{ secrets.WX_PRIVATE_KEY }} --project ./ 2>&1 | grep -oP 'version_id\\\":\\\"[^\"]+' | head -1 | cut -d'\"' -f3)\"
+            }"
+          echo "✓ Dev version set"
+
+      - name: Get QR code for 体验版
+        if: always()
+        run: |
+          echo "📱 体验版二维码："
+          echo "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=$(curl -s 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${{ secrets.WX_APPID }}&secret=${{ secrets.WX_PRIVATE_KEY }}' | python3 -c 'import json,sys; print(json.load(sys.stdin)[\"access_token\"])')"
+          echo ""
+          echo "把 dev/1 当作体验版路径扫码即可"
