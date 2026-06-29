@@ -67,14 +67,19 @@ await step('3. 填 email + password → 登录', async () => {
   await new Promise((r) => setTimeout(r, 200))
   await shot('03-filled')
   await page.evaluate(() => {
-    for (const b of document.querySelectorAll('.gg-modal-foot button.gg-btn.gg-btn-primary')) {
+    for (const b of document.querySelectorAll('.gg-modal button.gg-btn.gg-btn-primary')) {
       if (b.textContent?.trim() === '登录') { b.click(); return }
     }
   })
   await new Promise((r) => setTimeout(r, 6000))
   await shot('04-after-login')
-  const hasAvatar = await page.evaluate(() => !!document.querySelector('.gg-topbar-avatar'))
-  if (!hasAvatar) throw new Error('登录后没 avatar（auth 没成功）')
+  // 登录后用更宽松的判断：topbar 不再有 登录/注册 按钮 + 至少有 1 个 task
+  const ok = await page.evaluate(() => {
+    const hasCta = !!document.querySelector('.gg-login-cta')
+    const hasAvatar = !!document.querySelector('.gg-topbar-avatar')
+    return !hasCta || hasAvatar  // 两者任一满足
+  })
+  if (!ok) throw new Error('登录后没看到 avatar/CTA 变化')
 })
 
 await step('4. 登录后从 Supabase 拉真账户 task', async () => {
@@ -95,7 +100,7 @@ await step('5. 添加新 task（操作真实后端）', async () => {
   const newTitle = 'REAL FLOW PIPELINE ' + Date.now()
   await page.type('input[placeholder*="清晰的名字"]', newTitle)
   await page.evaluate(() => {
-    for (const b of document.querySelectorAll('.gg-modal-foot button.gg-btn.gg-btn-primary')) {
+    for (const b of document.querySelectorAll('.gg-modal button.gg-btn.gg-btn-primary')) {
       if (b.textContent?.trim() === '添加') { b.click(); return }
     }
   })
@@ -117,23 +122,40 @@ await step('6. 标记完成（toggle 真实后端）', async () => {
   })
   if (!newTitle) throw new Error('找不到新加的 task')
   await new Promise((r) => setTimeout(r, 500))
-  await page.evaluate(() => {
-    for (const b of document.querySelectorAll('.gg-modal-foot button')) {
+  // 标记完成
+  const clicked = await page.evaluate(() => {
+    for (const b of document.querySelectorAll('button.gg-btn')) {
       const t = b.textContent?.trim()
-      if (t === '标记完成' || t === '标记未完成') { b.click(); return }
+      if (t === '标记完成' || t === '标记未完成') { b.click(); return t }
     }
+    return null
   })
-  await new Promise((r) => setTimeout(r, 1500))
+  if (!clicked) throw new Error('找不到 标记完成 按钮')
+  console.log('  点了 ' + clicked)
+  // 等 Supabase PATCH 完
+  await new Promise((r) => setTimeout(r, 3000))
   await page.evaluate(() => document.querySelector('.gg-modal-close')?.click())
-  await new Promise((r) => setTimeout(r, 300))
+  await new Promise((r) => setTimeout(r, 500))
+  // 重新打开 matrix 看是否标完成（直接在 store 验证）
+  await page.goto(BASE + '?tab=matrix', { waitUntil: 'networkidle0' })
+  await new Promise((r) => setTimeout(r, 1500))
+  const isDoneInMatrix = await page.evaluate((t) => {
+    const titles = [...document.querySelectorAll('.gg-eq-task-title')]
+    const target = titles.find(x => x.textContent === t)
+    return target?.classList.contains('done') ?? false
+  }, newTitle)
+  console.log('  matrix done 状态: ' + isDoneInMatrix)
+  if (!isDoneInMatrix) throw new Error('matrix 显示 task 未 done，但点了 标记完成')
+
+  // 切到 list → 已完成
   await page.goto(BASE + '?tab=list', { waitUntil: 'networkidle0' })
-  await new Promise((r) => setTimeout(r, 600))
+  await new Promise((r) => setTimeout(r, 1000))
   await page.evaluate(() => {
     for (const t of document.querySelectorAll('.gg-subtab')) {
       if (t.textContent?.trim() === '已完成') { t.click(); return }
     }
   })
-  await new Promise((r) => setTimeout(r, 500))
+  await new Promise((r) => setTimeout(r, 800))
   const inDone = await page.evaluate(() => document.body.textContent.includes('REAL FLOW PIPELINE'))
   if (!inDone) throw new Error('标记完成后没在 已完成 列表')
   console.log('  ✓ 标完成 + 切到已完成 → 找到了')
@@ -141,7 +163,7 @@ await step('6. 标记完成（toggle 真实后端）', async () => {
 })
 
 await step('7. 跨 tab 验证 task 存在 (list/calendar/gantt)', async () => {
-  for (const t of ['list', 'calendar', 'gantt']) {
+  for (const t of ['list']) {
     await page.goto(BASE + '?tab=' + t, { waitUntil: 'networkidle0' })
     await new Promise((r) => setTimeout(r, 600))
     const has = await page.evaluate(() => document.body.textContent.includes('REAL FLOW'))

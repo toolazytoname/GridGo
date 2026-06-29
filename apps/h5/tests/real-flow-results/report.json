@@ -14,8 +14,7 @@
     },
     {
       "name": "3. 填 email + password → 登录",
-      "pass": false,
-      "error": "Error: 登录后没 avatar（auth 没成功）"
+      "pass": true
     },
     {
       "name": "4. 登录后从 Supabase 拉真账户 task",
@@ -27,20 +26,18 @@
     },
     {
       "name": "6. 标记完成（toggle 真实后端）",
-      "pass": false,
-      "error": "Error: 标记完成后没在 已完成 列表"
+      "pass": true
     },
     {
       "name": "7. 跨 tab 验证 task 存在 (list/calendar/gantt)",
-      "pass": false,
-      "error": "Error: list 找不到 task"
+      "pass": true
     },
     {
       "name": "8. 注销 → 回到 demo",
       "pass": true
     }
   ],
-  "pass": false,
+  "pass": true,
   "consoleErrors": [
     "Failed to load resource: the server responded with a status of 404 (File not found)"
   ],
