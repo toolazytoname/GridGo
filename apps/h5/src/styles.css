@@ -358,7 +358,6 @@
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   min-height: 0;
   transition: border-color 0.15s var(--gg-ease-standard);
 }
