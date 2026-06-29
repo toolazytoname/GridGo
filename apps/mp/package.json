@@ -1,0 +1,14 @@
+{
+  "name": "gridgo-mp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GridGo WeChat mini-program",
+  "scripts": {
+    "build": "miniprogram-ci --appid $WX_APPID --private-key $WX_PRIVATE_KEY --project ./ --uv 1 --rv 1 --enable-es6 --enable-es7 --enable-minifyWXSS --enable-minifyWXML --enable-minifyJS",
+    "upload": "miniprogram-ci upload --appid $WX_APPID --private-key $WX_PRIVATE_KEY --project ./ --uv 1 --rv 1",
+    "preview": "miniprogram-ci preview --appid $WX_APPID --private-key $WX_PRIVATE_KEY --project ./"
+  },
+  "devDependencies": {
+    "miniprogram-ci": "^2.1.0"
+  }
+}

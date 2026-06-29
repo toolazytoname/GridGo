@@ -31,13 +31,16 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
+      - name: Install MP deps (miniprogram-ci)
+        working-directory: apps/mp
+        run: npm install --no-audit --no-fund
+
       - name: Build mini-program
+        working-directory: apps/mp
         env:
           WX_APPID: ${{ secrets.WX_APPID }}
           WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
         run: |
-          cd apps/mp
-          npm install miniprogram-ci --no-save
           ./node_modules/.bin/miniprogram-ci \
             --appid "$WX_APPID" \
             --private-key "$WX_PRIVATE_KEY" \
@@ -52,11 +55,11 @@ jobs:
             --miniprogram-npm 1
 
       - name: Upload to WeChat
+        working-directory: apps/mp
         env:
           WX_APPID: ${{ secrets.WX_APPID }}
           WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
         run: |
-          cd apps/mp
           ./node_modules/.bin/miniprogram-ci upload \
             --appid "$WX_APPID" \
             --private-key "$WX_PRIVATE_KEY" \
@@ -71,7 +74,6 @@ jobs:
           WX_APPID: ${{ secrets.WX_APPID }}
           WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
         run: |
-          cd apps/mp
           ACCESS_TOKEN=$(curl -s "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$WX_PRIVATE_KEY" | python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')
           curl -s -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
             -H "Content-Type: application/json" \
