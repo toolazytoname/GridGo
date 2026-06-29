@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GridGo UI 1:1 验收</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; margin: 0; padding: 20px; background: #fafafa; max-width: 1300px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 8px; }
+  .meta { font-size: 13px; color: #7a7a82; margin-bottom: 20px; }
+  .img-block { background: #fff; border: 1px solid #e8e8ea; border-radius: 8px; padding: 12px; margin-bottom: 24px; }
+  .img-block img { width: 100%; display: block; }
+  .caption { font-size: 13px; color: #333; margin-bottom: 8px; font-weight: 500; }
+  .ask { background: #fff3cd; border: 1px solid #f0c040; border-radius: 8px; padding: 16px; margin-top: 24px; }
+  .ask h2 { margin: 0 0 8px; font-size: 16px; }
+  .ask p { margin: 6px 0; font-size: 13px; }
+  .ask code { background: #f0e8c0; padding: 1px 4px; border-radius: 3px; font-size: 12px; }
+  .ok { color: #2e7d32; font-weight: 600; }
+  .err { color: #c62828; font-weight: 600; }
+</style>
+</head>
+<body>
+  <h1>GridGo H5 UI vs app.html 设计稿对比</h1>
+  <div class="meta">
+    左：app.html 设计稿（1440×900 渲染）<br>
+    右：我的实现 beta.gridgo.weichao.studio（1440×900 渲染）<br>
+    <strong>请直接打开此页面，看图判断 1:1 还原</strong>
+  </div>
+
+  <div class="img-block">
+    <div class="caption"><strong>四象限 matrix（最关键）</strong> — 看 OKR pill 圆+字母 / meta 文字 / 象限 top 边框颜色 / 选中 tab 顶部蓝线</div>
+    <img src="./COMPARE-matrix.png" alt="四象限对比">
+  </div>
+
+  <div class="img-block">
+    <div class="caption"><strong>5 tab 整体</strong> — 顶部 topbar / 底部 5 tab / 各 tab 内容布局</div>
+    <img src="./compare-all.png" alt="5 tab 对比">
+  </div>
+
+  <div class="ask">
+    <h2>怎么回复</h2>
+    <p><span class="ok">对得上</span>（整体 1:1 还原，没明显差异）→ 回 <code>完美</code> / <code>对得上</code> / <code>可以了</code></p>
+    <p><span class="err">还差</span> → 回 <code>X 还要改：&lt;具体描述&gt;</code></p>
+    <p>说不清 → 回 <code>不对</code>，我换更细的对比</p>
+  </div>
+</body>
+</html>
