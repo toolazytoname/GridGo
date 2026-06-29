@@ -1,4 +1,4 @@
-# MP CI: push → build → miniprogram-ci upload → 设开发版
+# MP CI: push → build → miniprogram-ci upload → 设开发版 → QR
 # 不需要服务器公网 IP — miniprogram-ci 走 WeChat 平台 API
 # IP 白名单默认关（不开启）
 
@@ -24,23 +24,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Install pnpm
+        run: npm install -g pnpm@9
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
       - name: Build mini-program
+        env:
+          WX_APPID: ${{ secrets.WX_APPID }}
+          WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
         run: |
           cd apps/mp
-          pnpm add -D miniprogram-ci
-          npx miniprogram-ci \
-            --appid "${{ secrets.WX_APPID }}" \
-            --private-key "${{ secrets.WX_PRIVATE_KEY }}" \
+          npm install miniprogram-ci --no-save
+          ./node_modules/.bin/miniprogram-ci \
+            --appid "$WX_APPID" \
+            --private-key "$WX_PRIVATE_KEY" \
             --project ./ \
             --uv 1 \
             --rv 1 \
@@ -52,46 +52,48 @@ jobs:
             --miniprogram-npm 1
 
       - name: Upload to WeChat
+        env:
+          WX_APPID: ${{ secrets.WX_APPID }}
+          WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
         run: |
           cd apps/mp
-          npx miniprogram-ci upload \
-            --appid "${{ secrets.WX_APPID }}" \
-            --private-key "${{ secrets.WX_PRIVATE_KEY }}" \
+          ./node_modules/.bin/miniprogram-ci upload \
+            --appid "$WX_APPID" \
+            --private-key "$WX_PRIVATE_KEY" \
             --project ./ \
             --uv 1 \
             --rv 1 \
             --desc "CI auto-upload from $(git rev-parse --short HEAD)"
 
-      - name: Set as dev version
+      - name: Get experience QR code
+        if: always()
+        env:
+          WX_APPID: ${{ secrets.WX_APPID }}
+          WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
         run: |
           cd apps/mp
-          # 通过 HTTP API 设开发版（不需要公网 IP — 走 WeChat 平台）
-          curl -X POST "https://api.weixin.qq.com/wxa/setversion" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"access_token\": \"$(curl -s 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${{ secrets.WX_APPID }}&secret=${{ secrets.WX_PRIVATE_KEY }}' | python3 -c 'import json,sys; print(json.load(sys.stdin)[\"access_token\"])')\",
-              \"version_id\": \"$(npx miniprogram-ci preview --appid ${{ secrets.WX_APPID }} --private-key ${{ secrets.WX_PRIVATE_KEY }} --project ./ 2>&1 | grep -oP 'version_id\\\":\\\"[^\"]+' | head -1 | cut -d'\"' -f3)\"
-            }"
-          echo "✓ Dev version set"
-
-      - name: Get QR code for 体验版
-        if: always()
-        run: |
-          echo "📱 体验版二维码（扫码即最新版 dev）"
-          ACCESS_TOKEN=$(curl -s "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${{ secrets.WX_APPID }}&secret=${{ secrets.WX_PRIVATE_KEY }}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')
-          # 体验版路径固定为 dev/1，每次上传会自动更新
-          QR_URL="open://micromessenger?appid=${{ secrets.WX_APPID }}&path=pages%2Fmatrix%2Fmatrix&version=develop"
-          # 实际二维码用 getwxacodeunlimit 生成（scene=dev/1）
+          ACCESS_TOKEN=$(curl -s "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$WX_PRIVATE_KEY" | python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')
           curl -s -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
             -H "Content-Type: application/json" \
             -d "{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev/1\",\"path\":\"pages/matrix/matrix\",\"width\":430}" \
             -o qrcode.png
-          echo "  qrcode.png 已生成（$(ls -la qrcode.png | awk '{print $5}') bytes）"
+          echo "qrcode.png $(stat -c%s qrcode.png 2>/dev/null || ls -la qrcode.png | awk '{print $5}') bytes"
+
+      - name: Upload QR as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mp-qrcode
+          path: apps/mp/qrcode.png
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "✅ Mini-program dev version uploaded"
+          echo "📱 体验版二维码：见 artifact 'mp-qrcode'"
           echo ""
-          echo "📌 测试流程："
+          echo "首次使用："
           echo "  1. 微信小程序后台 → 成员管理 → 添加体验成员（你的微信号）"
-          echo "  2. 体验管理 → 扫码下载开发版 → 体验成员收到通知"
-          echo "  3. 以后 push 代码 → CI 自动上传新 dev version → 体验版自动更新"
+          echo "  2. 体验管理 → 扫码下载开发版（扫上面 artifact 的 qrcode.png）"
+          echo "  3. 之后 push → 自动上传新 dev → 体验版自动更新"
           echo "  4. 体验成员不需要重新扫码，每次进 app 都会下载最新版"
-          echo ""
-          echo "🔗 体验版路径：pages/matrix/matrix"
