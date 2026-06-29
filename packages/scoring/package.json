@@ -5,7 +5,9 @@
   "type": "module",
   "main": "score.mjs",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "node --check score.mjs && node --check loop.mjs"
   },
-  "devDependencies": { "typescript": "^5.4.5" }
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
 }
