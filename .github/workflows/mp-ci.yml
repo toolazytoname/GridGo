@@ -77,7 +77,21 @@ jobs:
       - name: Get QR code for 体验版
         if: always()
         run: |
-          echo "📱 体验版二维码："
-          echo "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=$(curl -s 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${{ secrets.WX_APPID }}&secret=${{ secrets.WX_PRIVATE_KEY }}' | python3 -c 'import json,sys; print(json.load(sys.stdin)[\"access_token\"])')"
+          echo "📱 体验版二维码（扫码即最新版 dev）"
+          ACCESS_TOKEN=$(curl -s "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${{ secrets.WX_APPID }}&secret=${{ secrets.WX_PRIVATE_KEY }}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')
+          # 体验版路径固定为 dev/1，每次上传会自动更新
+          QR_URL="open://micromessenger?appid=${{ secrets.WX_APPID }}&path=pages%2Fmatrix%2Fmatrix&version=develop"
+          # 实际二维码用 getwxacodeunlimit 生成（scene=dev/1）
+          curl -s -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
+            -H "Content-Type: application/json" \
+            -d "{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev/1\",\"path\":\"pages/matrix/matrix\",\"width\":430}" \
+            -o qrcode.png
+          echo "  qrcode.png 已生成（$(ls -la qrcode.png | awk '{print $5}') bytes）"
           echo ""
-          echo "把 dev/1 当作体验版路径扫码即可"
+          echo "📌 测试流程："
+          echo "  1. 微信小程序后台 → 成员管理 → 添加体验成员（你的微信号）"
+          echo "  2. 体验管理 → 扫码下载开发版 → 体验成员收到通知"
+          echo "  3. 以后 push 代码 → CI 自动上传新 dev version → 体验版自动更新"
+          echo "  4. 体验成员不需要重新扫码，每次进 app 都会下载最新版"
+          echo ""
+          echo "🔗 体验版路径：pages/matrix/matrix"
