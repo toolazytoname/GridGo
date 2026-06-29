@@ -4,7 +4,10 @@ packages:
   - 'supabase'
 
 allowBuilds:
+  '@swc/core': set this to true or false
   core-js: true
+  less: set this to true or false
+  protobufjs: set this to true or false
 
 onlyBuiltDependencies:
   - '@parcel/watcher'
