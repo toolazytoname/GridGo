@@ -9,6 +9,6 @@
     "preview": "miniprogram-ci preview --appid $WX_APPID --private-key $WX_PRIVATE_KEY --project ./"
   },
   "devDependencies": {
-    "miniprogram-ci": "^2.1.0"
+    "miniprogram-ci": "^2.1.31"
   }
 }
