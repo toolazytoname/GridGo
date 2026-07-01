@@ -12,6 +12,10 @@ on:
       - 'pnpm-lock.yaml'         # lockfile 改了也会影响 miniprogram-ci 解析
   workflow_dispatch:  # 允许手动触发
 
+# 允许 GITHUB_TOKEN 推 debug 分支（默认只读）
+permissions:
+  contents: write
+
 jobs:
   build-and-upload:
     runs-on: ubuntu-latest
