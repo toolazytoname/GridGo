@@ -88,13 +88,18 @@ jobs:
         run: |
           set -e
           echo "→ 获取 access_token…"
-          ACCESS_TOKEN=$(curl -sS --max-time 15 "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$WX_APP_SECRET" \
-            | python3 -c 'import json,sys; print(json.load(sys.stdin).get("access_token",""))')
+          # 把整个响应留下来，方便看 errcode/errmsg
+          TOKEN_RESP=$(curl -sS --max-time 15 "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$WX_APP_SECRET")
+          # 用 "or ''" 处理 access_token=null 的情况 — 否则 print(None) 输出 "None" 字符串
+          ACCESS_TOKEN=$(echo "$TOKEN_RESP" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("access_token") or "")')
+          ERR=$(echo "$TOKEN_RESP" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(f"errcode={d.get(\"errcode\",\"-\")} errmsg={d.get(\"errmsg\",\"-\")}")')
+          echo "→ token endpoint: $ERR"
           if [ -z "$ACCESS_TOKEN" ]; then
-            echo "❌ access_token 取不到（AppSecret 不对？）— 跳过 QR"
+            echo "❌ access_token 取不到（$ERR）— 跳过 QR"
             exit 0
           fi
-          echo "→ token OK (len=${#ACCESS_TOKEN})"
+          # 输出前 8 字符验证（access_token 有效期 2h，泄露 8 字符无所谓）
+          echo "→ token OK (len=${#ACCESS_TOKEN}, prefix=${ACCESS_TOKEN:0:8}…)"
           # 抓 headers 看 content-type
           curl -sS --max-time 15 -D /tmp/headers.txt -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
             -H "Content-Type: application/json" \
