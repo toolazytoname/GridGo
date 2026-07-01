@@ -1,5 +1,5 @@
-# MP CI: push → build → miniprogram-ci upload → 体验版 → QR
-# 走 WeChat 开放接口，不需要服务器公网 IP
+# MP CI: push → miniprogram-ci preview → 上传开发版 + 生成 dev preview QR
+# 走 WeChat 开放接口 + private key，不需要服务器公网 IP，也不需要 AppSecret
 
 name: MP CI
 
@@ -11,10 +11,6 @@ on:
       - '.github/workflows/mp-ci.yml'
       - 'pnpm-lock.yaml'         # lockfile 改了也会影响 miniprogram-ci 解析
   workflow_dispatch:  # 允许手动触发
-
-# 允许 GITHUB_TOKEN 推 debug 分支（默认只读）
-permissions:
-  contents: write
 
 jobs:
   build-and-upload:
@@ -39,7 +35,8 @@ jobs:
         working-directory: apps/mp
         run: npm install --no-audit --no-fund
 
-      - name: Build mini-program
+      - name: Build + upload + dev preview QR
+        if: always()
         working-directory: apps/mp
         env:
           WX_APPID: ${{ secrets.WX_APPID }}
@@ -53,171 +50,33 @@ jobs:
           chmod 600 .keys/wx.pem
           echo "key file size: $(wc -c < .keys/wx.pem) bytes"
           head -1 .keys/wx.pem
-          ./node_modules/.bin/miniprogram-ci \
+          # preview 子命令：编译 + 上传 + 生成 dev preview QR（用 private key 直连 WeChat）
+          # --uv/--rv 是 upload-version / robot-version
+          # --enable-qrcode + --qrcode-format image + --qrcode-output-dest 写出 QR 图片
+          ./node_modules/.bin/miniprogram-ci preview \
             --appid "$WX_APPID" \
             --pkp ./.keys/wx.pem \
             --pp ./ \
-            --uv 1 \
-            --rv 1 \
+            --uv 1 --rv 1 \
             --enable-es6 true \
             --enable-es7 true \
             --enable-minifyWXSS true \
             --enable-minifyWXML true \
-            --enable-minifyJS true
-
-      - name: Upload to WeChat (experience version)
-        working-directory: apps/mp
-        env:
-          WX_APPID: ${{ secrets.WX_APPID }}
-          WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
-        run: |
-          set -e
-          printf '%s' "$WX_PRIVATE_KEY" > .keys/wx.pem
-          chmod 600 .keys/wx.pem
-          ./node_modules/.bin/miniprogram-ci upload \
-            --appid "$WX_APPID" \
-            --pkp ./.keys/wx.pem \
-            --pp ./ \
-            --uv 1 \
-            --rv 1 \
-            --desc "CI auto-upload from $(git rev-parse --short HEAD)"
-
-      - name: Generate experience QR code
-        if: always()
-        working-directory: apps/mp
-        env:
-          WX_APPID: ${{ secrets.WX_APPID }}
-          # AppSecret（32 位 hex），不是 PEM。跟 WX_PRIVATE_KEY 分开。
-          WX_APP_SECRET: ${{ secrets.WX_APP_SECRET }}
-        run: |
-          echo "→ 获取 access_token…"
-          TOKEN_RESP=$(curl -sS --max-time 15 "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$WX_APP_SECRET")
-          # 提取 access_token；处理 null（python print(None) 不会输出 "None"，但是用 or "" 保险）
-          ACCESS_TOKEN=$(printf '%s' "$TOKEN_RESP" | python3 -c 'import json,sys; d=json.load(sys.stdin); v=d.get("access_token"); print(v if v else "")')
-          ERR_CODE=$(printf '%s' "$TOKEN_RESP" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("errcode","-"))')
-          ERR_MSG=$(printf '%s' "$TOKEN_RESP" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("errmsg","-"))')
-          echo "→ token endpoint: errcode=$ERR_CODE errmsg=$ERR_MSG"
-          if [ -z "$ACCESS_TOKEN" ]; then
-            echo "❌ access_token 取不到 — 跳过 QR"
-            exit 0
-          fi
-          echo "→ token OK (len=${#ACCESS_TOKEN}, prefix=${ACCESS_TOKEN:0:8}…)"
-          BODY="{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev\",\"path\":\"pages/matrix/matrix\",\"width\":430}"
-          # mask access_token 值，避免完整凭据进入公开 log
-          MASKED=$(printf '%s' "$BODY" | sed -E 's/("access_token":")[^"]+/\1***MASKED***/')
-          echo "--- request body (masked) ---"
-          printf '%s\n' "$MASKED"
-          echo "--- body length ---"
-          printf '%s' "$BODY" | wc -c
-          curl -sS --max-time 15 -D /tmp/headers.txt -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
-            -H "Content-Type: application/json" \
-            --data-raw "$BODY" \
-            -o qrcode.raw
-          echo "--- response headers ---"
-          cat /tmp/headers.txt 2>/dev/null
-          SIZE=$(stat -c%s qrcode.raw 2>/dev/null || echo 0)
-          echo "--- size: $SIZE bytes ---"
-          echo "--- first 4 bytes (hex, via od) ---"
-          head -c 4 qrcode.raw 2>/dev/null | od -An -tx1 | tr -d ' \n'
-          echo ""
-          echo "--- first 500 bytes (text) ---"
-          head -c 500 qrcode.raw 2>/dev/null
-          echo ""
-          # PNG 头 8 个字节是 89 50 4E 47 0D 0A 1A 0A；用前 4 字节 (89504e47) 判断
-          FIRST4=$(head -c 4 qrcode.raw 2>/dev/null | od -An -tx1 | tr -d ' \n')
-          if [ "$FIRST4" = "89504e47" ]; then
-            mv qrcode.raw qrcode.png
-            echo "✅ valid PNG, $(stat -c%s qrcode.png) bytes"
-          else
-            cp qrcode.raw qrcode-error.json 2>/dev/null
-            echo "❌ not PNG — saved as qrcode-error.json"
-          fi
-          # 调试通道：把关键 log 写到 mp-ci-debug orphan 分支（能 git pull 看到）
-          RUN_ID="${GITHUB_RUN_ID:-local}"
-          DEBUG_DIR=$(mktemp -d)
-          {
-            echo "=== run_id=$RUN_ID step=9 ==="
-            echo "=== cgi-bin/token endpoint ==="
-            echo "token endpoint: errcode=$ERR_CODE errmsg=$ERR_MSG"
-            echo "access_token len: ${#ACCESS_TOKEN}"
-            echo "access_token prefix: ${ACCESS_TOKEN:0:8}..."
-            echo ""
-            echo "=== request body sent to getwxacodeunlimit (masked) ==="
-            echo "$MASKED"
-            echo "body length: $(printf '%s' "$BODY" | wc -c) bytes"
-            echo ""
-            echo "=== response headers ==="
-            cat /tmp/headers.txt 2>/dev/null | head -20
-            echo ""
-            echo "=== WeChat response body (first 600 bytes) ==="
-            head -c 600 qrcode.raw 2>/dev/null
-            echo ""
-          } > "$DEBUG_DIR/qr-debug-$RUN_ID.txt"
-          # 写到 GitHub Actions step summary（public repo 不需 auth，run 页面可见）
-          if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
-            {
-              echo "## QR step 9 debug (run=$RUN_ID)"
-              echo ""
-              echo "**token endpoint** errcode=$ERR_CODE errmsg=$ERR_MSG"
-              echo ""
-              echo "**access_token** len=${#ACCESS_TOKEN} prefix=${ACCESS_TOKEN:0:8}..."
-              echo ""
-              echo "**request body (masked)**"
-              echo '```json'
-              echo "$MASKED"
-              echo '```'
-              echo "body length: $(printf '%s' "$BODY" | wc -c) bytes"
-              echo ""
-              echo "**response headers**"
-              echo '```'
-              cat /tmp/headers.txt 2>/dev/null | head -20
-              echo '```'
-              echo "**WeChat response (first 600 bytes)**"
-              echo '```'
-              head -c 600 qrcode.raw 2>/dev/null
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
-          fi
-          # 同步写一份到 GitHub Issue，让我能从 API 读到（不用 admin auth）
-          if command -v gh >/dev/null 2>&1; then
-            ISSUE_BODY=$(mktemp)
-            {
-              echo "CI debug for run $RUN_ID"
-              echo ""
-              echo "**token endpoint**: errcode=$ERR_CODE errmsg=$ERR_MSG"
-              echo ""
-              echo "**access_token**: len=${#ACCESS_TOKEN} prefix=${ACCESS_TOKEN:0:8}..."
-              echo ""
-              echo "**request body (masked)**:"
-              echo '```json'
-              echo "$MASKED"
-              echo '```'
-              echo "body length: \$(printf '%s' \"\$BODY\" | wc -c) bytes"
-              echo ""
-              echo "**response headers**:"
-              echo '```'
-              cat /tmp/headers.txt 2>/dev/null | head -20
-              echo '```'
-              echo "**WeChat response (first 600 bytes)**:"
-              echo '```'
-              head -c 600 qrcode.raw 2>/dev/null
-              echo '```'
-            } > "$ISSUE_BODY"
-            # 创建 issue，title 含 run id
-            gh issue create --label "ci-debug" --title "CI debug: MP CI run $RUN_ID" --body-file "$ISSUE_BODY" 2>&1 | tail -2
-            rm -f "$ISSUE_BODY"
-          fi
-          # 永远 exit 0 — 不阻塞 CI 主流程
-          exit 0
+            --enable-minifyJS true \
+            --enable-qrcode \
+            --qrcode-format image \
+            --qrcode-output-dest ./qrcode.png
+          ls -la qrcode.png
+          file qrcode.png || true
+          # 清理私钥文件
+          rm -f .keys/wx.pem
 
       - name: Upload QR as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mp-qrcode
-          path: |
-            apps/mp/qrcode.png
-            apps/mp/qrcode-error.json
+          path: apps/mp/qrcode.png
           if-no-files-found: warn
 
       - name: Summary
@@ -225,18 +84,11 @@ jobs:
         run: |
           echo "✅ MP CI run finished"
           echo ""
-          echo "📱 体验二维码：见 artifact 'mp-qrcode'"
+          echo "📱 dev preview 二维码：见 artifact 'mp-qrcode'"
           echo ""
-          if [ -f apps/mp/qrcode-error.json ]; then
-            echo "⚠️  QR API 错误响应（不是 PNG）："
-            echo '```json'
-            cat apps/mp/qrcode-error.json
-            echo ''
-            echo '```'
-            echo "🔍 详细 debug（masked body + headers + response）："
-            echo "    https://github.com/toolazytoname/GridGo/blob/mp-ci-debug/"
-          fi
-          echo "首次使用："
-          echo "  1. mp.weixin.qq.com → 成员管理 → 添加体验成员（你的微信号）"
-          echo "  2. 体验管理 → 扫码绑定（扫 artifact 的 qrcode.png）"
-          echo "  3. 之后 push → 自动上传新 dev → 体验版自动更新（成员无需重新扫码）"
+          echo "扫码测试："
+          echo "  1. 微信开发者工具 → 添加项目 → 公众号测试号 → 用 appid 登录"
+          echo "  2. 用开发者工具的「二维码」→ 扫 artifact 里的 qrcode.png"
+          echo "     （或真机扫码进入 dev preview）"
+          echo ""
+          echo "push → 自动 build + 上传 + 生成新 QR"
