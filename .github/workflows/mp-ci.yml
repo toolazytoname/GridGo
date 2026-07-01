@@ -161,7 +161,8 @@ jobs:
           cp qr-debug-$RUN_ID.txt . 2>/dev/null || true
           git add -A
           git commit -q -m "CI debug: run=$RUN_ID" 2>/dev/null || true
-          git push -q -f origin mp-ci-debug 2>&1 | tail -3 || echo "(push failed)"
+          # 用 GITHUB_TOKEN 走 https 推送（actions/checkout 配的 SSH key 只对原 checkout 有效）
+          git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/toolazytoname/GridGo.git" mp-ci-debug 2>&1 | tail -3 || echo "(push failed)"
           # 永远 exit 0 — 不阻塞 CI 主流程
           exit 0
 
