@@ -154,15 +154,19 @@ jobs:
             echo ""
           } > "$DEBUG_DIR/qr-debug-$RUN_ID.txt"
           cd "$DEBUG_DIR"
-          git init -q
+          set -x
+          git init 2>&1
           git config user.email "ci@gridgo.local"
           git config user.name "GridGo CI"
-          git checkout -q --orphan mp-ci-debug
+          git checkout --orphan mp-ci-debug 2>&1
           cp qr-debug-$RUN_ID.txt . 2>/dev/null || true
           git add -A
-          git commit -q -m "CI debug: run=$RUN_ID" 2>/dev/null || true
-          # 用 GITHUB_TOKEN 走 https 推送（actions/checkout 配的 SSH key 只对原 checkout 有效）
-          git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/toolazytoname/GridGo.git" mp-ci-debug 2>&1 | tail -3 || echo "(push failed)"
+          git commit -m "CI debug: run=$RUN_ID" 2>&1
+          echo "--- pushing debug branch ---"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/toolazytoname/GridGo.git" mp-ci-debug 2>&1 | tail -10
+          PUSH_RC=${PIPESTATUS[0]}
+          echo "push exit code: $PUSH_RC"
+          set +x
           # 永远 exit 0 — 不阻塞 CI 主流程
           exit 0
 
