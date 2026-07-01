@@ -86,7 +86,7 @@ jobs:
           # AppSecret（32 位 hex），不是 PEM。跟 WX_PRIVATE_KEY 分开。
           WX_APP_SECRET: ${{ secrets.WX_APP_SECRET }}
         run: |
-          set -e
+          # 注意：不加 set -e — 这个 step 永远 exit 0（不阻塞 CI），错误交给 Summary 显示
           echo "→ 获取 access_token…"
           # 把整个响应留下来，方便看 errcode/errmsg
           TOKEN_RESP=$(curl -sS --max-time 15 "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$WX_APP_SECRET")
@@ -104,26 +104,40 @@ jobs:
           curl -sS --max-time 15 -D /tmp/headers.txt -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
             -H "Content-Type: application/json" \
             -d "{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev\",\"path\":\"pages/matrix/matrix\",\"width\":430}" \
-            -o qrcode.raw
+            -o qrcode.raw || true
           echo "--- response headers ---"
-          cat /tmp/headers.txt
+          cat /tmp/headers.txt 2>/dev/null || true
           echo "--- first 4 bytes (hex) ---"
-          head -c 4 qrcode.raw | xxd
+          python3 -c "
+import sys
+try:
+  with open('qrcode.raw','rb') as f: d=f.read(4)
+  print(' '.join(f'{b:02x}' for b in d))
+except Exception as e:
+  print(f'(read failed: {e})')
+"
           echo "--- size + first 500 bytes (text) ---"
-          echo "size: $(stat -c%s qrcode.raw) bytes"
-          head -c 500 qrcode.raw
+          echo "size: $(stat -c%s qrcode.raw 2>/dev/null || echo 0) bytes"
+          head -c 500 qrcode.raw 2>/dev/null || true
           echo ""
           # 简单判断：PNG 头是 89 50 4E 47
-          FIRST4=$(head -c 4 qrcode.raw | xxd -p)
+          FIRST4=$(python3 -c "
+import sys
+try:
+  with open('qrcode.raw','rb') as f: d=f.read(4)
+  print(''.join(f'{b:02x}' for b in d))
+except: pass
+")
           if [ "$FIRST4" = "89504e47" ]; then
             mv qrcode.raw qrcode.png
             echo "✅ valid PNG, $(stat -c%s qrcode.png) bytes"
           else
             # 不是 PNG — 是 JSON 错误响应
-            cp qrcode.raw qrcode-error.json
+            cp qrcode.raw qrcode-error.json 2>/dev/null || true
             echo "❌ not PNG — saved as qrcode-error.json (likely WeChat API error response)"
-            exit 0   # 不让 CI 红，错误信息已在 log
           fi
+          # 永远 exit 0 — 不阻塞 CI 主流程（build+upload 才是关键）
+          exit 0
 
       - name: Upload QR as artifact
         if: always()
