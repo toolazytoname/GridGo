@@ -86,57 +86,42 @@ jobs:
           # AppSecret（32 位 hex），不是 PEM。跟 WX_PRIVATE_KEY 分开。
           WX_APP_SECRET: ${{ secrets.WX_APP_SECRET }}
         run: |
-          # 注意：不加 set -e — 这个 step 永远 exit 0（不阻塞 CI），错误交给 Summary 显示
           echo "→ 获取 access_token…"
-          # 把整个响应留下来，方便看 errcode/errmsg
           TOKEN_RESP=$(curl -sS --max-time 15 "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$WX_APP_SECRET")
-          # 用 "or ''" 处理 access_token=null 的情况 — 否则 print(None) 输出 "None" 字符串
-          ACCESS_TOKEN=$(echo "$TOKEN_RESP" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("access_token") or "")')
-          ERR=$(echo "$TOKEN_RESP" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(f"errcode={d.get(\"errcode\",\"-\")} errmsg={d.get(\"errmsg\",\"-\")}")')
-          echo "→ token endpoint: $ERR"
+          # 提取 access_token；处理 null（python print(None) 不会输出 "None"，但是用 or "" 保险）
+          ACCESS_TOKEN=$(printf '%s' "$TOKEN_RESP" | python3 -c 'import json,sys; d=json.load(sys.stdin); v=d.get("access_token"); print(v if v else "")')
+          ERR_CODE=$(printf '%s' "$TOKEN_RESP" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("errcode","-"))')
+          ERR_MSG=$(printf '%s' "$TOKEN_RESP" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("errmsg","-"))')
+          echo "→ token endpoint: errcode=$ERR_CODE errmsg=$ERR_MSG"
           if [ -z "$ACCESS_TOKEN" ]; then
-            echo "❌ access_token 取不到（$ERR）— 跳过 QR"
+            echo "❌ access_token 取不到 — 跳过 QR"
             exit 0
           fi
-          # 输出前 8 字符验证（access_token 有效期 2h，泄露 8 字符无所谓）
           echo "→ token OK (len=${#ACCESS_TOKEN}, prefix=${ACCESS_TOKEN:0:8}…)"
-          # 抓 headers 看 content-type
           curl -sS --max-time 15 -D /tmp/headers.txt -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
             -H "Content-Type: application/json" \
             -d "{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev\",\"path\":\"pages/matrix/matrix\",\"width\":430}" \
-            -o qrcode.raw || true
+            -o qrcode.raw
           echo "--- response headers ---"
-          cat /tmp/headers.txt 2>/dev/null || true
-          echo "--- first 4 bytes (hex) ---"
-          python3 -c "
-import sys
-try:
-  with open('qrcode.raw','rb') as f: d=f.read(4)
-  print(' '.join(f'{b:02x}' for b in d))
-except Exception as e:
-  print(f'(read failed: {e})')
-"
-          echo "--- size + first 500 bytes (text) ---"
-          echo "size: $(stat -c%s qrcode.raw 2>/dev/null || echo 0) bytes"
-          head -c 500 qrcode.raw 2>/dev/null || true
+          cat /tmp/headers.txt 2>/dev/null
+          SIZE=$(stat -c%s qrcode.raw 2>/dev/null || echo 0)
+          echo "--- size: $SIZE bytes ---"
+          echo "--- first 4 bytes (hex, via od) ---"
+          head -c 4 qrcode.raw 2>/dev/null | od -An -tx1 | tr -d ' \n'
           echo ""
-          # 简单判断：PNG 头是 89 50 4E 47
-          FIRST4=$(python3 -c "
-import sys
-try:
-  with open('qrcode.raw','rb') as f: d=f.read(4)
-  print(''.join(f'{b:02x}' for b in d))
-except: pass
-")
+          echo "--- first 500 bytes (text) ---"
+          head -c 500 qrcode.raw 2>/dev/null
+          echo ""
+          # PNG 头 8 个字节是 89 50 4E 47 0D 0A 1A 0A；用前 4 字节 (89504e47) 判断
+          FIRST4=$(head -c 4 qrcode.raw 2>/dev/null | od -An -tx1 | tr -d ' \n')
           if [ "$FIRST4" = "89504e47" ]; then
             mv qrcode.raw qrcode.png
             echo "✅ valid PNG, $(stat -c%s qrcode.png) bytes"
           else
-            # 不是 PNG — 是 JSON 错误响应
-            cp qrcode.raw qrcode-error.json 2>/dev/null || true
-            echo "❌ not PNG — saved as qrcode-error.json (likely WeChat API error response)"
+            cp qrcode.raw qrcode-error.json 2>/dev/null
+            echo "❌ not PNG — saved as qrcode-error.json"
           fi
-          # 永远 exit 0 — 不阻塞 CI 主流程（build+upload 才是关键）
+          # 永远 exit 0 — 不阻塞 CI 主流程
           exit 0
 
       - name: Upload QR as artifact
