@@ -95,18 +95,39 @@ jobs:
             exit 0
           fi
           echo "→ token OK (len=${#ACCESS_TOKEN})"
-          curl -sS --max-time 15 -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
+          # 抓 headers 看 content-type
+          curl -sS --max-time 15 -D /tmp/headers.txt -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
             -H "Content-Type: application/json" \
             -d "{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev\",\"path\":\"pages/matrix/matrix\",\"width\":430}" \
-            -o qrcode.png
-          echo "qrcode.png $(stat -c%s qrcode.png 2>/dev/null || ls -la qrcode.png | awk '{print $5}') bytes"
+            -o qrcode.raw
+          echo "--- response headers ---"
+          cat /tmp/headers.txt
+          echo "--- first 4 bytes (hex) ---"
+          head -c 4 qrcode.raw | xxd
+          echo "--- size + first 500 bytes (text) ---"
+          echo "size: $(stat -c%s qrcode.raw) bytes"
+          head -c 500 qrcode.raw
+          echo ""
+          # 简单判断：PNG 头是 89 50 4E 47
+          FIRST4=$(head -c 4 qrcode.raw | xxd -p)
+          if [ "$FIRST4" = "89504e47" ]; then
+            mv qrcode.raw qrcode.png
+            echo "✅ valid PNG, $(stat -c%s qrcode.png) bytes"
+          else
+            # 不是 PNG — 是 JSON 错误响应
+            cp qrcode.raw qrcode-error.json
+            echo "❌ not PNG — saved as qrcode-error.json (likely WeChat API error response)"
+            exit 0   # 不让 CI 红，错误信息已在 log
+          fi
 
       - name: Upload QR as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mp-qrcode
-          path: apps/mp/qrcode.png
+          path: |
+            apps/mp/qrcode.png
+            apps/mp/qrcode-error.json
           if-no-files-found: warn
 
       - name: Summary
