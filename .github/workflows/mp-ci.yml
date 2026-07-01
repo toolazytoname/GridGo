@@ -98,9 +98,16 @@ jobs:
             exit 0
           fi
           echo "→ token OK (len=${#ACCESS_TOKEN}, prefix=${ACCESS_TOKEN:0:8}…)"
+          BODY="{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev\",\"path\":\"pages/matrix/matrix\",\"width\":430}"
+          # mask access_token 值，避免完整凭据进入公开 log
+          MASKED=$(printf '%s' "$BODY" | sed -E 's/("access_token":")[^"]+/\1***MASKED***/')
+          echo "--- request body (masked) ---"
+          printf '%s\n' "$MASKED"
+          echo "--- body length ---"
+          printf '%s' "$BODY" | wc -c
           curl -sS --max-time 15 -D /tmp/headers.txt -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
             -H "Content-Type: application/json" \
-            -d "{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev\",\"path\":\"pages/matrix/matrix\",\"width\":430}" \
+            --data-raw "$BODY" \
             -o qrcode.raw
           echo "--- response headers ---"
           cat /tmp/headers.txt 2>/dev/null
