@@ -9,6 +9,7 @@ on:
     paths:
       - 'apps/mp/**'
       - '.github/workflows/mp-ci.yml'
+      - 'pnpm-lock.yaml'         # lockfile 改了也会影响 miniprogram-ci 解析
   workflow_dispatch:  # 允许手动触发
 
 jobs:
