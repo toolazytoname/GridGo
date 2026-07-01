@@ -128,6 +128,36 @@ jobs:
             cp qrcode.raw qrcode-error.json 2>/dev/null
             echo "❌ not PNG — saved as qrcode-error.json"
           fi
+          # 调试通道：把关键 log 写到 mp-ci-debug orphan 分支（能 git pull 看到）
+          RUN_ID="${GITHUB_RUN_ID:-local}"
+          DEBUG_DIR=$(mktemp -d)
+          {
+            echo "=== run_id=$RUN_ID step=9 ==="
+            echo "=== cgi-bin/token endpoint ==="
+            echo "token endpoint: errcode=$ERR_CODE errmsg=$ERR_MSG"
+            echo "access_token len: ${#ACCESS_TOKEN}"
+            echo "access_token prefix: ${ACCESS_TOKEN:0:8}..."
+            echo ""
+            echo "=== request body sent to getwxacodeunlimit (masked) ==="
+            echo "$MASKED"
+            echo "body length: $(printf '%s' "$BODY" | wc -c) bytes"
+            echo ""
+            echo "=== response headers ==="
+            cat /tmp/headers.txt 2>/dev/null | head -20
+            echo ""
+            echo "=== WeChat response body (first 600 bytes) ==="
+            head -c 600 qrcode.raw 2>/dev/null
+            echo ""
+          } > "$DEBUG_DIR/qr-debug-$RUN_ID.txt"
+          cd "$DEBUG_DIR"
+          git init -q
+          git config user.email "ci@gridgo.local"
+          git config user.name "GridGo CI"
+          git checkout -q --orphan mp-ci-debug
+          cp qr-debug-$RUN_ID.txt . 2>/dev/null || true
+          git add -A
+          git commit -q -m "CI debug: run=$RUN_ID" 2>/dev/null || true
+          git push -q -f origin mp-ci-debug 2>&1 | tail -3 || echo "(push failed)"
           # 永远 exit 0 — 不阻塞 CI 主流程
           exit 0
 
@@ -154,6 +184,8 @@ jobs:
             cat apps/mp/qrcode-error.json
             echo ''
             echo '```'
+            echo "🔍 详细 debug（masked body + headers + response）："
+            echo "    https://github.com/toolazytoname/GridGo/blob/mp-ci-debug/"
           fi
           echo "首次使用："
           echo "  1. mp.weixin.qq.com → 成员管理 → 添加体验成员（你的微信号）"
