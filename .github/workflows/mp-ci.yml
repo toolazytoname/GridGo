@@ -1,6 +1,5 @@
-# MP CI: push → build → miniprogram-ci upload → 设开发版 → QR
-# 不需要服务器公网 IP — miniprogram-ci 走 WeChat 平台 API
-# IP 白名单默认关（不开启）
+# MP CI: push → build → miniprogram-ci upload → 体验版 → QR
+# 走 WeChat 开放接口，不需要服务器公网 IP
 
 name: MP CI
 
@@ -39,12 +38,19 @@ jobs:
         working-directory: apps/mp
         env:
           WX_APPID: ${{ secrets.WX_APPID }}
+          # 必须是 PEM 格式的 RSA 私钥，从 mp.weixin.qq.com → 开发管理 → 代码上传密钥 生成
+          WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
         run: |
+          set -e
+          mkdir -p .keys
           # private key 写到临时文件（miniprogram-ci 只接文件路径）
-          echo -n "${{ secrets.WX_PRIVATE_KEY }}" > .keys/wx.key
+          printf '%s' "$WX_PRIVATE_KEY" > .keys/wx.pem
+          chmod 600 .keys/wx.pem
+          echo "key file size: $(wc -c < .keys/wx.pem) bytes"
+          head -1 .keys/wx.pem
           ./node_modules/.bin/miniprogram-ci \
             --appid "$WX_APPID" \
-            --pkp ./.keys/wx.key \
+            --pkp ./.keys/wx.pem \
             --pp ./ \
             --uv 1 \
             --rv 1 \
@@ -52,17 +58,20 @@ jobs:
             --enable-es7 true \
             --enable-minifyWXSS true \
             --enable-minifyWXML true \
-            --enable-minifyJS true \
-            --miniprogram-npm 1
+            --enable-minifyJS true
 
-      - name: Upload to WeChat
+      - name: Upload to WeChat (experience version)
         working-directory: apps/mp
         env:
           WX_APPID: ${{ secrets.WX_APPID }}
+          WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
         run: |
+          set -e
+          printf '%s' "$WX_PRIVATE_KEY" > .keys/wx.pem
+          chmod 600 .keys/wx.pem
           ./node_modules/.bin/miniprogram-ci upload \
             --appid "$WX_APPID" \
-            --pkp ./.keys/wx.key \
+            --pkp ./.keys/wx.pem \
             --pp ./ \
             --uv 1 \
             --rv 1 \
@@ -70,26 +79,24 @@ jobs:
 
       - name: Generate experience QR code
         if: always()
+        working-directory: apps/mp
         env:
           WX_APPID: ${{ secrets.WX_APPID }}
+          # AppSecret（32 位 hex），不是 PEM。跟 WX_PRIVATE_KEY 分开。
+          WX_APP_SECRET: ${{ secrets.WX_APP_SECRET }}
         run: |
-          ACCESS_TOKEN=$(curl -s "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$(cat .keys/wx.key)" | python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')
-          curl -s -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
+          set -e
+          echo "→ 获取 access_token…"
+          ACCESS_TOKEN=$(curl -sS --max-time 15 "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$WX_APP_SECRET" \
+            | python3 -c 'import json,sys; print(json.load(sys.stdin).get("access_token",""))')
+          if [ -z "$ACCESS_TOKEN" ]; then
+            echo "❌ access_token 取不到（AppSecret 不对？）— 跳过 QR"
+            exit 0
+          fi
+          echo "→ token OK (len=${#ACCESS_TOKEN})"
+          curl -sS --max-time 15 -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
             -H "Content-Type: application/json" \
-            -d "{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev/1\",\"path\":\"pages/matrix/matrix\",\"width\":430}" \
-            -o qrcode.png
-          echo "qrcode.png $(stat -c%s qrcode.png 2>/dev/null || ls -la qrcode.png | awk '{print $5}') bytes"
-
-      - name: Get experience QR code
-        if: always()
-        env:
-          WX_APPID: ${{ secrets.WX_APPID }}
-          WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
-        run: |
-          ACCESS_TOKEN=$(curl -s "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$WX_APPID&secret=$WX_PRIVATE_KEY" | python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')
-          curl -s -X POST "https://api.weixin.qq.com/wxa/getwxacodeunlimit" \
-            -H "Content-Type: application/json" \
-            -d "{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev/1\",\"path\":\"pages/matrix/matrix\",\"width\":430}" \
+            -d "{\"access_token\":\"$ACCESS_TOKEN\",\"scene\":\"dev\",\"path\":\"pages/matrix/matrix\",\"width\":430}" \
             -o qrcode.png
           echo "qrcode.png $(stat -c%s qrcode.png 2>/dev/null || ls -la qrcode.png | awk '{print $5}') bytes"
 
@@ -99,15 +106,16 @@ jobs:
         with:
           name: mp-qrcode
           path: apps/mp/qrcode.png
+          if-no-files-found: warn
 
       - name: Summary
         if: always()
         run: |
-          echo "✅ Mini-program dev version uploaded"
-          echo "📱 体验版二维码：见 artifact 'mp-qrcode'"
+          echo "✅ MP CI run finished"
+          echo ""
+          echo "📱 体验二维码：见 artifact 'mp-qrcode'"
           echo ""
           echo "首次使用："
-          echo "  1. 微信小程序后台 → 成员管理 → 添加体验成员（你的微信号）"
-          echo "  2. 体验管理 → 扫码下载开发版（扫上面 artifact 的 qrcode.png）"
-          echo "  3. 之后 push → 自动上传新 dev → 体验版自动更新"
-          echo "  4. 体验成员不需要重新扫码，每次进 app 都会下载最新版"
+          echo "  1. mp.weixin.qq.com → 成员管理 → 添加体验成员（你的微信号）"
+          echo "  2. 体验管理 → 扫码绑定（扫 artifact 的 qrcode.png）"
+          echo "  3. 之后 push → 自动上传新 dev → 体验版自动更新（成员无需重新扫码）"
