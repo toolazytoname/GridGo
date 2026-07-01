@@ -137,6 +137,13 @@ jobs:
           echo ""
           echo "📱 体验二维码：见 artifact 'mp-qrcode'"
           echo ""
+          if [ -f apps/mp/qrcode-error.json ]; then
+            echo "⚠️  QR API 错误响应（不是 PNG）："
+            echo '```json'
+            cat apps/mp/qrcode-error.json
+            echo ''
+            echo '```'
+          fi
           echo "首次使用："
           echo "  1. mp.weixin.qq.com → 成员管理 → 添加体验成员（你的微信号）"
           echo "  2. 体验管理 → 扫码绑定（扫 artifact 的 qrcode.png）"
